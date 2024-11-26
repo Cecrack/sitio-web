@@ -1,0 +1,122 @@
+/* Reseteo básico */ 
+* { 
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+/* Estilos del encabezado */
+.header {
+    background-color: #d7c7b3;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    font-size: 18px;
+}
+
+.header .title {
+    font-weight: bold;
+}
+
+.header .user-info {
+    font-size: 16px;
+}
+
+/* Contenedor principal */
+.main-container {
+    display: flex;
+    flex: 1;
+    height: calc(100vh - 77px);
+}
+
+/* Menú lateral izquierdo */
+.menu-container {
+    background-color: #3e3e3e;
+    width: 250px;
+    min-height: 100vh;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.menu-container button {
+    background-color: #c1815d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    margin: 10px 0;
+    width: 80%;
+    cursor: pointer;
+    text-align: center;
+}
+
+.menu-container button:hover {
+    background-color: #a9654b;
+}
+
+.menu-container .active {
+    background-color: #a9654b;
+}
+
+/* Botón activo */
+.menu-container button.active {
+    background-color: #333; /* Color oscuro para destacar */
+    color: white; /* Texto en blanco */
+    font-weight: bold;
+}
+
+/* Área de contenido principal */
+.content {
+    flex: 1;
+    background-color: #FAF7F0;
+    padding: 40px;
+    border-left: 2px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.content h1 {
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.content h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #555;
+}
+
+.content p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Pie de página */
+.footer {
+    height: 40px;
+    background-color: #333;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Inventario - Ganadería Inteligente</title>
+    <link rel="stylesheet" href="../styles/stylePanelAdministracion.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    
+    <!-- Encabezado superior -->
+    <div class="header">
+        <div class="title">Gestión de Inventario</div>
+        <div class="user-info">Antonio Lopez Obrador</div>
+    </div>
+
+    <!-- Contenedor principal -->
+    <div class="main-container">
+        <!-- Menú lateral izquierdo -->
+        <div class="menu-container">
+            <button id="btn-inicio" onclick="window.location.href='../index.html';">Inicio</button>
+            <button id="btn-inventario" class="active" onclick="window.location.href='../screens/inventario.html';">Gestión de Inventario</button>
+            <button id="btn-reportes" onclick="window.location.href='../screens/reportes.html';">Reportes</button>
+            <button id="btn-consulta" onclick="window.location.href='../screens/consulta.html';">Consulta</button>
+            <button id="btn-panel" onclick="window.location.href='../screens/panelAdministracion.html';">Panel de Administración</button>
+        </div>
+
+        <!-- Área de contenido principal -->
+        <div class="content" id="content">
+            <!-- Botones superiores -->
+            <div class="top-buttons">
+                <!-- Botón Registrar Vaca -->
+                <button id="btn-registrar" onclick="openModal('modal-registrar')" class="top-btn">
+                    <span class="material-icons btn-icon">add_circle_outline</span>
+                    <h3>Registrar vaca</h3>
+                </button>
+            
+                <!-- Botón Consultar Vaca -->
+                <button id="btn-consultar" onclick="openModal('modal-consultar')" class="top-btn">
+                    <span class="material-icons btn-icon">search</span>
+                    <h3>Consultar vaca</h3>
+                </button>
+            
+                <!-- Botón Eliminar Vaca -->
+                <button id="btn-eliminar" onclick="openModal('modal-eliminar')" class="top-btn">
+                    <span class="material-icons btn-icon">delete</span>
+                    <h3>Eliminar vaca</h3>
+                </button>
+            </div>
+            
+
+            <!-- DataGridView -->
+            <table class="data-grid">
+                <thead>
+                    <tr>
+                        <th>Foto</th>
+                        <th>RFID #</th>
+                        <th>Nombre</th>
+                        <th>Fecha Ingreso</th>
+                        <th>Peso Actual</th>
+                        <th>Estado Actual</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Aquí se cargarán los datos dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Ventanas emergentes -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Modal para registrar vaca -->
+    <div class="modal" id="modal-registrar">
+        <div class="modal-header">
+            Registrar vaca
+            <button class="modal-close" onclick="closeModal('modal-registrar')">X</button>
+        </div>
+        <div class="modal-body">
+            <!-- Campo RFID -->
+            <div class="form-group">
+                <div class="form-group">
+                    <input type="text" placeholder="RFID (En espera)" class="form-input">
+                </div>
+                <p class="rfid-info">Acerca el sensor RFID al arete de la vaca</p>
+            </div>
+
+            <!-- Otros campos -->
+            <div class="form-group">
+                <input type="text" placeholder="Nombre" class="form-input">
+            </div>
+            <div class="form-group">
+                <input type="text" placeholder="Sexo" class="form-input">
+            </div>
+            <div class="form-group">
+                <input type="text" placeholder="Raza" class="form-input">
+            </div>
+            <div class="form-group">
+                <input type="number" placeholder="Peso" class="form-input">
+            </div>
+            <div class="form-group">
+                <input type="date" placeholder="Fecha de ingreso" class="form-input">
+            </div>
+
+           <!-- Botón para abrir cámara -->
+            <div class="form-group camera-button">
+                <button class="camera-btn">
+                    <span class="material-icons camera-icon">photo_camera</span>
+                    Abrir cámara
+                </button>
+            </div>
+
+
+            <!-- Botón Registrar Vaca -->
+            <div class="form-group">
+                <button class="register-btn">
+                    <span class="material-icons register-icon">add_circle_outline</span>
+                    Registrar vaca
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal para consultar vaca -->
+    <div class="modal" id="modal-consultar">
+        <div class="modal-header">
+            Consultar vaca
+            <button class="modal-close" onclick="closeModal('modal-consultar')">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <!-- Campo RFID -->
+            <div class="form-group">
+                <label class="rfid-label">RFID (en espera)</label>
+                <p class="rfid-info">Acerca el sensor RFID al arete de la vaca</p>
+            </div>
+    
+            <!-- Botón Consultar Vaca -->
+            <div class="form-group">
+                <button class="consult-btn">
+                    <span class="material-icons btn-icon">search</span>
+                    Consultar vaca
+                </button>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Modal para eliminar vaca -->
+    <div class="modal" id="modal-eliminar">
+        <div class="modal-header">
+            Eliminar vaca
+            <button class="modal-close" onclick="closeModal('modal-eliminar')">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <!-- Campo Buscar por RFID -->
+            <div class="form-group">
+                <label class="rfid-label">Buscar por RFID</label>
+                <input type="text" placeholder="RFID (en espera)" class="form-input">
+                <p class="rfid-info">Acerca el sensor RFID al arete de la vaca</p>
+            </div>
+            <hr>
+            <!-- Campo Buscar por Nombre -->
+            <div class="form-group">
+                <label class="name-label">Buscar por Nombre</label>
+                <select class="form-combobox" id="cow-names" placeholder="Nombre">
+                    <option value="">Seleccione una vaca...</option>
+                    <!-- Nombres de vacas dinámicos -->
+                    <option value="vaca1">Vaca 1</option>
+                    <option value="vaca2">Vaca 2</option>
+                    <option value="vaca3">Vaca 3</option>
+                </select>
+            </div>
+
+            <!-- Botón Eliminar Vaca -->
+            <div class="form-group">
+                <button class="delete-btn" onclick="confirmDelete()">
+                    <span class="material-icons btn-icon">delete</span>
+                    Eliminar vaca
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div class="modal" id="modal-confirmar">
+        <div class="modal-header">
+            Confirmar eliminación
+            <button class="modal-close" onclick="closeModal('modal-confirmar')">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>¿Estás seguro de que deseas eliminar esta vaca?</p>
+            <div class="confirm-buttons">
+                <button class="confirm-yes" onclick="deleteCow()">Sí</button>
+                <button class="confirm-no" onclick="closeModal('modal-confirmar')">No</button>
+            </div>
+        </div>
+    </div>
+    <script src="../script.js"></script>
+
+
+    <script>
+        // Función para abrir una ventana emergente
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+
+        // Función para cerrar una ventana emergente
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
