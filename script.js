@@ -1,43 +1,64 @@
-// Selección de elementos
-const btnInicio = document.getElementById("btn-inicio");
-const btnInventario = document.getElementById("btn-inventario");
-const btnReportes = document.getElementById("btn-reportes");
-const btnConsulta = document.getElementById("btn-consulta");
-const btnPanel = document.getElementById("btn-panel");
-const textContainer = document.getElementById("text-container");
+// Cambiar el título del encabezado dinámicamente
+document.addEventListener("DOMContentLoaded", () => {
+    const pageTitles = {
+        "inicio.html": "Inicio",
+        "inventario.html": "Gestión de Inventario",
+        "reportes.html": "Reportes",
+        "consulta.html": "Consulta",
+        "panel.html": "Panel de Administración"
+    };
 
-// Funciones para cambiar el contenido
-btnInicio.addEventListener("click", function() {
-    textContainer.innerHTML = ""; // Limpiar el contenido anterior
-    textContainer.innerHTML = `
-        <h1>Bienvenidos a Ganadería Inteligente</h1>
-        <h3>Transformando la gestión de ganado con tecnología avanzada</h3>
-        <p>
-            Bienvenido a Ganadería Inteligente, una plataforma diseñada para optimizar y modernizar 
-            la gestión de inventario de animales en una ganadería. <br><br>
-            Gracias al uso de tecnologías como RFID, cámaras de alta resolución, y sistemas de monitoreo 
-            en tiempo real, te ofrecemos una solución que reduce los errores humanos, mejora el seguimiento 
-            del estado de salud del ganado y te proporciona datos precisos y actualizados.
-        </p>
-    `;
-});
+    // Obtener el nombre del archivo actual
+    const currentPage = window.location.pathname.split("/").pop();
 
-btnInventario.addEventListener("click", function() {
-    textContainer.innerHTML = ""; // Limpiar el contenido anterior
-    textContainer.innerHTML = "<h2>Gestión de Inventario</h2><p>Aquí podrás gestionar el inventario de animales en la ganadería.</p>";
-});
+    // Cambiar el título del encabezado si coincide
+    const headerTitle = document.getElementById("page-title");
+    if (headerTitle && pageTitles[currentPage]) {
+        headerTitle.textContent = pageTitles[currentPage];
+    }
+    
+    // Función para abrir un modal
+    window.openModal = (modalId) => {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add("active");
 
-btnReportes.addEventListener("click", function() {
-    textContainer.innerHTML = ""; // Limpiar el contenido anterior
-    textContainer.innerHTML = "<h2>Reportes</h2><p>En esta sección podrás generar y visualizar los reportes del sistema.</p>";
-});
+            // Mostrar overlay si es necesario
+            const overlay = document.getElementById("overlay");
+            if (overlay) {
+                overlay.classList.add("active");
+            }
+        }
+    };
 
-btnConsulta.addEventListener("click", function() {
-    textContainer.innerHTML = ""; // Limpiar el contenido anterior
-    textContainer.innerHTML = "<h2>Consulta</h2><p>Consulta la información relacionada con el ganado y sus estados de salud.</p>";
-});
+    // Función para cerrar un modal
+    window.closeModal = (modalId) => {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove("active");
 
-btnPanel.addEventListener("click", function() {
-    textContainer.innerHTML = ""; // Limpiar el contenido anterior
-    textContainer.innerHTML = "<h2>Panel de Administración</h2><p>Accede a las herramientas de administración del sistema.</p>";
+            // Ocultar overlay si no hay más modales abiertos
+            const activeModals = document.querySelectorAll(".modal.active");
+            if (activeModals.length === 0) {
+                const overlay = document.getElementById("overlay");
+                if (overlay) {
+                    overlay.classList.remove("active");
+                }
+            }
+        }
+    };
+
+    // Función para confirmar la eliminación
+    window.confirmDelete = () => {
+        openModal("modal-confirmar");
+    };
+
+    // Función para eliminar una vaca
+    window.deleteCow = () => {
+        alert("La vaca ha sido eliminada con éxito.");
+
+        // Cerrar ambos modales
+        closeModal("modal-confirmar");
+        closeModal("modal-eliminar");
+    };
 });

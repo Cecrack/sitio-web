@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ganadería Inteligente</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Inicio - Ganadería Inteligente</title>
+    <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
 
     <!-- Encabezado superior -->
     <div class="header">
-        <div class="title">Ganadería Inteligente</div>
+        <div class="title" id="page-title">Inicio</div>
         <div class="user-info">Antonio Lopez Obrador</div>
     </div>
 
@@ -19,17 +19,16 @@
 
         <!-- Menú lateral izquierdo -->
         <div class="menu-container">
-            <button id="btn-inicio">Inicio</button>
-            <button id="btn-inventario">Gestión de Inventario</button>
-            <button id="btn-reportes">Reportes</button>
-            <button id="btn-consulta">Consulta</button>
-            <button id="btn-panel">Panel de Administración</button>
+            <button id="btn-inicio" class="active" onclick="window.location.href='inicio.html';">Inicio</button>
+            <button id="btn-inventario" onclick="window.location.href='screens/inventario.html';">Gestión de Inventario</button>
+            <button id="btn-reportes" onclick="window.location.href='screens/reportes.html';">Reportes</button>
+            <button id="btn-consulta" onclick="window.location.href='screens/consulta.html';">Consulta</button>
+            <button id="btn-panel" onclick="window.location.href='screens/panelAdministracion.html';">Panel de Administración</button>
         </div>
 
         <!-- Área de contenido principal -->
         <div class="content" id="content">
-            <!-- Contenedor donde se actualizará el texto -->
-            <div id="text-container"></div>
+            <h1>Bienvenido a Inicio</h1>
         </div>
     </div>
 
