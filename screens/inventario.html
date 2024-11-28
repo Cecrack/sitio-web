@@ -6,220 +6,267 @@
     <title>Gestión de Inventario - Ganadería Inteligente</title>
     <link rel="stylesheet" href="../styles/stylePanelAdministracion.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* Estilo para el menú desplegable */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 10px;
+            top: 50px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            z-index: 100;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+        }
+
+        .dropdown-menu button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background-color: transparent;
+            text-align: left;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .dropdown-menu button:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
 </head>
 <body>
     
-    <!-- Encabezado superior -->
-    <div class="header">
-        <div class="title">Gestión de Inventario</div>
-        <div class="user-info">Antonio Lopez Obrador</div>
-    </div>
-
-    <!-- Contenedor principal -->
-    <div class="main-container">
-        <!-- Menú lateral izquierdo -->
-        <div class="menu-container">
-            <button id="btn-inicio" onclick="window.location.href='../index.html';">Inicio</button>
-            <button id="btn-inventario" class="active" onclick="window.location.href='../screens/inventario.html';">Gestión de Inventario</button>
-            <button id="btn-reportes" onclick="window.location.href='../screens/reportes.html';">Reportes</button>
-            <button id="btn-consulta" onclick="window.location.href='../screens/consulta.html';">Consulta</button>
-            <button id="btn-panel" onclick="window.location.href='../screens/panelAdministracion.html';">Panel de Administración</button>
+<!-- Encabezado superior -->
+<div class="header">
+    <div class="title" id="page-title">Gestión de inventario</div>
+    <div class="user-info">
+        <span id="session-status">Iniciar sesión</span> <!-- Este texto cambiará dinámicamente -->
+        <div class="profile-circle" id="profile-icon" onclick="toggleDropdown()">
+            <!-- El círculo del perfil estará vacío inicialmente -->
         </div>
-
-        <!-- Área de contenido principal -->
-        <div class="content" id="content">
-            <!-- Botones superiores -->
-            <div class="top-buttons">
-                <!-- Botón Registrar Vaca -->
-                <button id="btn-registrar" onclick="openModal('modal-registrar')" class="top-btn">
-                    <span class="material-icons btn-icon">add_circle_outline</span>
-                    <h3>Registrar vaca</h3>
-                </button>
-            
-                <!-- Botón Consultar Vaca -->
-                <button id="btn-consultar" onclick="openModal('modal-consultar')" class="top-btn">
-                    <span class="material-icons btn-icon">search</span>
-                    <h3>Consultar vaca</h3>
-                </button>
-            
-                <!-- Botón Eliminar Vaca -->
-                <button id="btn-eliminar" onclick="openModal('modal-eliminar')" class="top-btn">
-                    <span class="material-icons btn-icon">delete</span>
-                    <h3>Eliminar vaca</h3>
-                </button>
-            </div>
-            
-
-            <!-- DataGridView -->
-            <table class="data-grid">
-                <thead>
-                    <tr>
-                        <th>Foto</th>
-                        <th>RFID #</th>
-                        <th>Nombre</th>
-                        <th>Fecha Ingreso</th>
-                        <th>Peso Actual</th>
-                        <th>Estado Actual</th>
-                        <th>Observaciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Aquí se cargarán los datos dinámicamente -->
-                </tbody>
-            </table>
+        <!-- Menú desplegable -->
+        <div class="dropdown-menu" id="dropdown-menu">
+            <!-- Botón para iniciar sesión -->
+            <button id="login-btn" onclick="openModal('login-form')">Iniciar sesión</button>
+        
+            <!-- Botón para crear cuenta -->
+            <button id="create-user-btn" onclick="openModal('create-user-form')">Crear cuenta</button>
+        
+            <!-- Botón para cerrar sesión (inicialmente oculto) -->
+            <button id="logout-btn" class="hidden">Cerrar sesión</button>
         </div>
     </div>
+</div>
 
-    <!-- Ventanas emergentes -->
-    <div class="overlay" id="overlay"></div>
+<!-- Contenedor principal -->
+<div class="main-container">
+    <!-- Menú lateral izquierdo -->
+    <div class="menu-container">
+        <button id="btn-inicio" onclick="window.location.href='../index.html';">Inicio</button>
+        <button id="btn-inventario" class="active" onclick="window.location.href='../screens/inventario.html';">Gestión de Inventario</button>
+        <button id="btn-reportes" onclick="window.location.href='../screens/reportes.html';">Reportes</button>
+        <button id="btn-consulta" onclick="window.location.href='../screens/consulta.html';">Consulta</button>
+        <button id="btn-panel" onclick="window.location.href='../screens/panelAdministracion.html';">Panel de Administración</button>
+    </div>
 
-    <!-- Modal para registrar vaca -->
-    <div class="modal" id="modal-registrar">
-        <div class="modal-header">
-            Registrar vaca
-            <button class="modal-close" onclick="closeModal('modal-registrar')">X</button>
-        </div>
-        <div class="modal-body">
-            <!-- Campo RFID -->
-            <div class="form-group">
-                <div class="form-group">
-                    <input type="text" placeholder="RFID (En espera)" class="form-input">
-                </div>
-                <p class="rfid-info">Acerca el sensor RFID al arete de la vaca</p>
-            </div>
-
-            <!-- Otros campos -->
-            <div class="form-group">
-                <input type="text" placeholder="Nombre" class="form-input">
-            </div>
-            <div class="form-group">
-                <input type="text" placeholder="Sexo" class="form-input">
-            </div>
-            <div class="form-group">
-                <input type="text" placeholder="Raza" class="form-input">
-            </div>
-            <div class="form-group">
-                <input type="number" placeholder="Peso" class="form-input">
-            </div>
-            <div class="form-group">
-                <input type="date" placeholder="Fecha de ingreso" class="form-input">
-            </div>
-
-           <!-- Botón para abrir cámara -->
-            <div class="form-group camera-button">
-                <button class="camera-btn">
-                    <span class="material-icons camera-icon">photo_camera</span>
-                    Abrir cámara
-                </button>
-            </div>
-
-
+    <!-- Área de contenido principal -->
+    <div class="content" id="content">
+        <!-- Botones superiores -->
+        <div class="top-buttons">
             <!-- Botón Registrar Vaca -->
-            <div class="form-group">
-                <button class="register-btn">
-                    <span class="material-icons register-icon">add_circle_outline</span>
-                    Registrar vaca
-                </button>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Modal para consultar vaca -->
-    <div class="modal" id="modal-consultar">
-        <div class="modal-header">
-            Consultar vaca
-            <button class="modal-close" onclick="closeModal('modal-consultar')">
-                <span class="material-icons">close</span>
+            <button id="btn-registrar" onclick="openModal('modal-registrar')" class="top-btn">
+                <span class="material-icons btn-icon">add_circle_outline</span>
+                <h3>Registrar vaca</h3>
             </button>
-        </div>
-        <div class="modal-body">
-            <!-- Campo RFID -->
-            <div class="form-group">
-                <label class="rfid-label">RFID (en espera)</label>
-                <p class="rfid-info">Acerca el sensor RFID al arete de la vaca</p>
-            </div>
-    
+        
             <!-- Botón Consultar Vaca -->
-            <div class="form-group">
-                <button class="consult-btn">
-                    <span class="material-icons btn-icon">search</span>
-                    Consultar vaca
-                </button>
-            </div>
-        </div>
-    </div>
-    
-
-    <!-- Modal para eliminar vaca -->
-    <div class="modal" id="modal-eliminar">
-        <div class="modal-header">
-            Eliminar vaca
-            <button class="modal-close" onclick="closeModal('modal-eliminar')">
-                <span class="material-icons">close</span>
+            <button id="btn-consultar" onclick="openModal('modal-consultar')" class="top-btn">
+                <span class="material-icons btn-icon">search</span>
+                <h3>Consultar vaca</h3>
             </button>
-        </div>
-        <div class="modal-body">
-            <!-- Campo Buscar por RFID -->
-            <div class="form-group">
-                <label class="rfid-label">Buscar por RFID</label>
-                <input type="text" placeholder="RFID (en espera)" class="form-input">
-                <p class="rfid-info">Acerca el sensor RFID al arete de la vaca</p>
-            </div>
-            <hr>
-            <!-- Campo Buscar por Nombre -->
-            <div class="form-group">
-                <label class="name-label">Buscar por Nombre</label>
-                <select class="form-combobox" id="cow-names" placeholder="Nombre">
-                    <option value="">Seleccione una vaca...</option>
-                    <!-- Nombres de vacas dinámicos -->
-                    <option value="vaca1">Vaca 1</option>
-                    <option value="vaca2">Vaca 2</option>
-                    <option value="vaca3">Vaca 3</option>
-                </select>
-            </div>
-
+        
             <!-- Botón Eliminar Vaca -->
-            <div class="form-group">
-                <button class="delete-btn" onclick="confirmDelete()">
-                    <span class="material-icons btn-icon">delete</span>
-                    Eliminar vaca
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de confirmación -->
-    <div class="modal" id="modal-confirmar">
-        <div class="modal-header">
-            Confirmar eliminación
-            <button class="modal-close" onclick="closeModal('modal-confirmar')">
-                <span class="material-icons">close</span>
+            <button id="btn-eliminar" onclick="openModal('modal-eliminar')" class="top-btn">
+                <span class="material-icons btn-icon">delete</span>
+                <h3>Eliminar vaca</h3>
             </button>
         </div>
-        <div class="modal-body">
-            <p>¿Estás seguro de que deseas eliminar esta vaca?</p>
-            <div class="confirm-buttons">
-                <button class="confirm-yes" onclick="deleteCow()">Sí</button>
-                <button class="confirm-no" onclick="closeModal('modal-confirmar')">No</button>
+        
+
+        <!-- DataGridView -->
+        <table class="data-grid">
+            <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>RFID #</th>
+                    <th>Nombre</th>
+                    <th>Fecha Ingreso</th>
+                    <th>Peso Actual</th>
+                    <th>Estado Actual</th>
+                    <th>Observaciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Aquí se cargarán los datos dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Ventanas emergentes -->
+<div class="overlay" id="overlay"></div>
+
+<!-- Modal para registrar vaca -->
+<div class="modal" id="modal-registrar">
+    <div class="modal-header">
+        Registrar vaca
+        <button class="modal-close" onclick="closeModal('modal-registrar')">X</button>
+    </div>
+    <div class="modal-body">
+        <!-- Campo RFID -->
+        <div class="form-group">
+            <div class="form-group">
+                <input type="text" placeholder="RFID (En espera)" class="form-input">
             </div>
+            <p class="rfid-info">Acerca el sensor RFID al arete de la vaca</p>
+        </div>
+
+        <!-- Otros campos -->
+        <div class="form-group">
+            <input type="text" placeholder="Nombre" class="form-input">
+        </div>
+        <div class="form-group">
+            <input type="text" placeholder="Sexo" class="form-input">
+        </div>
+        <div class="form-group">
+            <input type="text" placeholder="Raza" class="form-input">
+        </div>
+        <div class="form-group">
+            <input type="number" placeholder="Peso" class="form-input">
+        </div>
+        <div class="form-group">
+            <input type="date" placeholder="Fecha de ingreso" class="form-input">
+        </div>
+
+       <!-- Botón para abrir cámara -->
+        <div class="form-group camera-button">
+            <button class="camera-btn">
+                <span class="material-icons camera-icon">photo_camera</span>
+                Abrir cámara
+            </button>
+        </div>
+
+
+        <!-- Botón Registrar Vaca -->
+        <div class="form-group">
+            <button class="register-btn">
+                <span class="material-icons register-icon">add_circle_outline</span>
+                Registrar vaca
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal para consultar vaca -->
+<div class="modal" id="modal-consultar">
+    <div class="modal-header">
+        Consultar vaca
+        <button class="modal-close" onclick="closeModal('modal-consultar')">
+            <span class="material-icons">close</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <!-- Campo RFID -->
+        <div class="form-group">
+            <label class="rfid-label">RFID (en espera)</label>
+            <p class="rfid-info">Acerca el sensor RFID al arete de la vaca</p>
+        </div>
+
+        <!-- Botón Consultar Vaca -->
+        <div class="form-group">
+            <button class="consult-btn">
+                <span class="material-icons btn-icon">search</span>
+                Consultar vaca
+            </button>
         </div>
     </div>
-    <script src="../script.js"></script>
+</div>
 
 
-    <script>
-        // Función para abrir una ventana emergente
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-            document.getElementById('overlay').classList.add('active');
+<!-- Modal para eliminar vaca -->
+<div class="modal" id="modal-eliminar">
+    <div class="modal-header">
+        Eliminar vaca
+        <button class="modal-close" onclick="closeModal('modal-eliminar')">
+            <span class="material-icons">close</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <!-- Campo Buscar por RFID -->
+        <div class="form-group">
+            <label class="rfid-label">Buscar por RFID</label>
+            <input type="text" placeholder="RFID (en espera)" class="form-input">
+            <p class="rfid-info">Acerca el sensor RFID al arete de la vaca</p>
+        </div>
+        <hr>
+        <!-- Campo Buscar por Nombre -->
+        <div class="form-group">
+            <label class="name-label">Buscar por Nombre</label>
+            <select class="form-combobox" id="cow-names" placeholder="Nombre">
+                <option value="">Seleccione una vaca...</option>
+                <!-- Nombres de vacas dinámicos -->
+                <option value="vaca1">Vaca 1</option>
+                <option value="vaca2">Vaca 2</option>
+                <option value="vaca3">Vaca 3</option>
+            </select>
+        </div>
+
+        <!-- Botón Eliminar Vaca -->
+        <div class="form-group">
+            <button class="delete-btn" onclick="confirmDelete()">
+                <span class="material-icons btn-icon">delete</span>
+                Eliminar vaca
+            </button>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="../script.js"></script>
+
+<script>
+    // Función para abrir o cerrar el menú desplegable del perfil
+    function toggleDropdown() {
+        const dropdown = document.getElementById('dropdown-menu');
+        dropdown.classList.toggle('active');
+    }
+
+    // Función para manejar el cambio de estado de sesión (cerrar sesión)
+    function cerrarSesion() {
+        // Aquí puedes agregar la lógica para cerrar la sesión, por ejemplo, eliminar tokens de sesión, limpiar el estado, etc.
+        document.getElementById('session-status').textContent = 'Iniciar sesión';
+        alert('Sesión cerrada correctamente.');
+        toggleDropdown(); // Cierra el menú al hacer clic en "Cerrar sesión"
+    }
+
+    // Lógica para mostrar el estado de sesión (esto debería ser dinámico dependiendo de si el usuario está autenticado)
+    // Si el usuario está logueado, mostrar el nombre del usuario y opciones adecuadas.
+    document.addEventListener("DOMContentLoaded", function() {
+        const isAuthenticated = false; // Aquí deberías verificar si el usuario está autenticado
+
+        if (isAuthenticated) {
+            document.getElementById('session-status').textContent = 'Usuario autenticado'; // Mostrar nombre del usuario si está logueado
+            document.getElementById('btn-iniciar-sesion').style.display = 'none'; // Ocultar botón "Iniciar sesión"
+            document.getElementById('btn-crear-cuenta').style.display = 'none'; // Ocultar botón "Crear cuenta"
+        } else {
+            document.getElementById('session-status').textContent = 'Iniciar sesión'; // Estado cuando no está logueado
         }
-
-        // Función para cerrar una ventana emergente
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-            document.getElementById('overlay').classList.remove('active');
-        }
-    </script>
+    });
+</script>
 </body>
 </html>
