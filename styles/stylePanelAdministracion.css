@@ -400,3 +400,30 @@ body {
 .confirm-no:hover {
     background-color: #a9654b;
 }
+.user-info {
+    display: flex;
+    align-items: center; /* Alinear verticalmente el texto y el círculo */
+    gap: 10px; /* Espacio entre el texto y el círculo */
+    font-size: 16px;
+    font-style: italic;
+}
+
+/* Ajusta el círculo para que esté a la derecha del texto */
+.profile-circle {
+    width: 30px; /* Tamaño del círculo */
+    height: 30px;
+    background-color: #B17457; /* Color inicial mientras no hay imagen */
+    border-radius: 50%;
+    cursor: pointer;
+    overflow: hidden; /* Para recortar imágenes que el usuario suba */
+    display: flex;
+    justify-content: center; /* Centrar contenido dentro del círculo */
+    align-items: center;
+}
+
+.profile-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ajustar la imagen para cubrir el círculo */
+    border-radius: 50%; /* Asegurarse de que siga siendo un círculo */
+}
