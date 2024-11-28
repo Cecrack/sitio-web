@@ -16,32 +16,31 @@ body {
     overflow: hidden;
 }
 
-/* Encabezado superior */
+/* Estilos del encabezado */
 .header {
-    width: 100%;
-    height: 77px;
-    background-color: #D8D2C2;
+    background-color: #d7c7b3;
+    color: #333;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 10px 20px;
+    font-size: 18px;
 }
 
 .header .title {
-    font-size: 20px;
     font-weight: bold;
 }
 
 .header .user-info {
     font-size: 16px;
-    font-style: italic;
 }
 
 .user-info {
     display: flex;
     align-items: center; /* Alinear verticalmente el texto y el círculo */
     gap: 10px; /* Espacio entre el texto y el círculo */
+    font-size: 16px;
+    font-style: italic;
 }
 
 /* Estilos para el círculo del perfil */
@@ -68,31 +67,30 @@ body {
 /* Contenedor principal */
 .main-container {
     display: flex;
-    flex: 1;
-    height: calc(100vh - 77px);
 }
 
 /* Menú lateral izquierdo */
 .menu-container {
-    width: 348px;
-    background-color: #4A4947;
-    color: white;
+    background-color: #3e3e3e;
+    width: 250px;
+    min-height: 100vh;
+    padding: 20px 0;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    padding: 20px;
+    align-items: center;
 }
 
 .menu-container button {
-    width: 100%;
-    padding: 15px;
-    font-size: 14px;
-    background-color: #B17457;
-    color: black;
+    background-color: #c1815d;
+    color: white;
     border: none;
+    padding: 10px 20px;
+    font-size: 16px;
     border-radius: 5px;
+    margin: 10px 0;
+    width: 80%;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    text-align: center;
 }
 
 .menu-container button:hover {
@@ -107,7 +105,7 @@ body {
 /* Área de contenido principal */
 .content {
     flex: 1;
-    background-color: #FAF7F0;
+    background-color: #f9f9f9;
     padding: 40px;
     border-left: 2px solid #ccc;
     display: flex;
@@ -140,7 +138,7 @@ body {
     position: absolute;
     top: 60px; /* Ajusta la posición del menú debajo del perfil */
     right: 20px;
-    background-color: #fff;
+    background-color: #140202;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     width: 200px;
@@ -163,7 +161,7 @@ body {
 }
 
 .profile-menu button:hover {
-    background-color: #e0e0e0;
+    background-color: #c4bcbc;
 }
 
 .profile-menu.active {
@@ -367,7 +365,7 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #ccc;
+    background: #b17457;
     cursor: pointer;
 }
 
