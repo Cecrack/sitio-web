@@ -412,3 +412,54 @@ body {
     font-size: 20px;
     cursor: pointer;
 }
+
+/* Estilo responsivo para pantallas pequeñas */
+@media (max-width: 768px) {
+    .menu-container {
+        display: none; /* Ocultar el menú por defecto */
+        position: absolute;
+        top: 60px;
+        left: 0;
+        background: #3e3e3e;
+        width: 100%;
+        padding: 10px 0;
+        flex-direction: column;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        z-index: 100;
+    }
+
+    .menu-container.show {
+        display: flex; /* Mostrar el menú cuando se activa */
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .nav-toggle {
+        font-size: 24px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #333;
+    }
+}
+
+/* Mostrar el botón hamburguesa solo en pantallas pequeñas */
+.nav-toggle {
+    display: none; /* Ocultar por defecto */
+}
+
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: block; /* Mostrar en pantallas pequeñas */
+        font-size: 24px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #333;
+    }
+}

@@ -157,3 +157,21 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Firebase Authentication Logic (ya está bien definido en tu código)
+
+    // Manejo del menú lateral en móviles
+    const navToggle = document.getElementById('nav-toggle');
+    const navMenu = document.getElementById('nav-menu');
+
+    if (navToggle && navMenu) {
+        navToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('show'); // Agregar o quitar la clase "show"
+        });
+    }
+});
+
+
+
+

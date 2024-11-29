@@ -41,38 +41,31 @@
 </head>
 <body>
     
-<!-- Encabezado superior -->
-<div class="header">
-    <div class="title" id="page-title">Gestión de inventario</div>
-    <div class="user-info">
-        <span id="session-status">Iniciar sesión</span> <!-- Este texto cambiará dinámicamente -->
-        <div class="profile-circle" id="profile-icon" onclick="toggleDropdown()">
-            <!-- El círculo del perfil estará vacío inicialmente -->
-        </div>
-        <!-- Menú desplegable -->
-        <div class="dropdown-menu" id="dropdown-menu">
-            <!-- Botón para iniciar sesión -->
-            <button id="login-btn" onclick="openModal('login-form')">Iniciar sesión</button>
-        
-            <!-- Botón para crear cuenta -->
-            <button id="create-user-btn" onclick="openModal('create-user-form')">Crear cuenta</button>
-        
-            <!-- Botón para cerrar sesión (inicialmente oculto) -->
-            <button id="logout-btn" class="hidden">Cerrar sesión</button>
+    <div class="header">
+        <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú">&#9776;</button>
+        <div class="title" id="page-title">Gestión de inventario</div>
+        <div class="user-info">
+            <span id="session-status">Iniciar sesión</span>
+            <div class="profile-circle" id="profile-icon" onclick="toggleDropdown()"></div>
+            <div class="dropdown-menu" id="dropdown-menu">
+                <button id="login-btn" onclick="openModal('login-form')">Iniciar sesión</button>
+                <button id="create-user-btn" onclick="openModal('create-user-form')">Crear cuenta</button>
+                <button id="logout-btn" class="hidden">Cerrar sesión</button>
+            </div>
         </div>
     </div>
-</div>
+    
 
 <!-- Contenedor principal -->
 <div class="main-container">
-    <!-- Menú lateral izquierdo -->
-    <div class="menu-container">
-        <button id="btn-inicio" onclick="window.location.href='../index.html';">Inicio</button>
-        <button id="btn-inventario" class="active" onclick="window.location.href='../screens/inventario.html';">Gestión de Inventario</button>
-        <button id="btn-reportes" onclick="window.location.href='../screens/reportes.html';">Reportes</button>
-        <button id="btn-consulta" onclick="window.location.href='../screens/consulta.html';">Consulta</button>
-        <button id="btn-panel" onclick="window.location.href='../screens/panelAdministracion.html';">Panel de Administración</button>
-    </div>
+   <!-- Menú lateral -->
+   <nav class="menu-container" id="nav-menu">
+    <button id="btn-inicio" onclick="window.location.href='../index.html';">Inicio</button>
+    <button id="btn-inventario" class="active" onclick="window.location.href='inventario.html';">Gestión de Inventario</button>
+    <button id="btn-reportes" onclick="window.location.href='reportes.html';">Reportes</button>
+    <button id="btn-consulta" onclick="window.location.href='consulta.html';">Consulta</button>
+    <button id="btn-panel" onclick="window.location.href='panelAdministracion.html';">Panel de Administración</button>
+</nav>
 
     <!-- Área de contenido principal -->
     <div class="content" id="content">

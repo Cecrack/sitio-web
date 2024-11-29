@@ -30,7 +30,7 @@ body {
     display: flex;
 }
 
-/* Menú lateral izquierdo */
+/* Menú lateral por defecto (pantallas grandes) */
 .menu-container {
     background-color: #3e3e3e;
     width: 250px;
@@ -39,6 +39,11 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+/* Ocultar el botón hamburguesa en pantallas grandes */
+.nav-toggle {
+    display: none;
 }
 
 .menu-container button {
@@ -427,3 +432,63 @@ body {
     object-fit: cover; /* Ajustar la imagen para cubrir el círculo */
     border-radius: 50%; /* Asegurarse de que siga siendo un círculo */
 }
+
+/* Mostrar botón hamburguesa y ocultar menú lateral en móviles */
+@media (max-width: 768px) {
+    .menu-container {
+        display: none; /* Ocultar menú lateral por defecto */
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        background-color: #3e3e3e;
+        flex-direction: column;
+        z-index: 1000;
+        padding: 10px 0;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .menu-container.show {
+        display: flex; /* Mostrar menú lateral cuando está activo */
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .nav-toggle {
+        display: block; /* Mostrar botón hamburguesa en móviles */
+        font-size: 24px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #333;
+    }
+
+    /* Ajustar el contenido principal para móviles */
+    .main-container {
+        flex-direction: column;
+    }
+
+    .content {
+        padding: 10px;
+    }
+
+    .top-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .top-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .data-grid {
+        font-size: 12px;
+        overflow-x: auto;
+    }
+}
+
