@@ -136,30 +136,40 @@ body {
     color: #555;
 }
 
-/* Estilos para ventanas emergentes */
+/* Estilo general para el modal */
 .modal {
     display: none;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 300px;
-    background: white;
+    width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    background: #fff;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    padding: 20px;
     z-index: 1000;
+    padding: 20px;
 }
 
 .modal.active {
     display: block;
 }
 
-.modal .modal-header {
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 20px;
     font-weight: bold;
     margin-bottom: 10px;
-    font-size: 18px;
-    color: #333;
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .modal .modal-close {
@@ -321,23 +331,23 @@ body {
     color: white; /* Color del ícono */
 }
 
-/* Botón Consultar Vaca */
-.consult-btn {
+#info-vaca {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* Botones */
+.consult-btn, .modal-close {
     background-color: #c1815d;
     color: white;
     border: none;
     padding: 10px 20px;
     font-size: 16px;
-    border-radius: 15px;
+    border-radius: 5px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px; /* Espaciado entre el ícono y el texto */
-    transition: background-color 0.3s ease;
 }
 
-.consult-btn:hover {
+.consult-btn:hover, .modal-close:hover {
     background-color: #a9654b;
 }
 
@@ -371,7 +381,7 @@ body {
     color: white;
 }
 
-/* Confirmación */
+
 .confirm-buttons {
     display: flex;
     justify-content: space-around;
@@ -384,7 +394,7 @@ body {
     border: none;
     padding: 10px 20px;
     font-size: 16px;
-    border-radius: 10px;
+    border-radius: 5px;
     cursor: pointer;
 }
 
@@ -398,7 +408,7 @@ body {
     border: none;
     padding: 10px 20px;
     font-size: 16px;
-    border-radius: 10px;
+    border-radius: 5px;
     cursor: pointer;
 }
 
@@ -491,4 +501,137 @@ body {
         overflow-x: auto;
     }
 }
+
+/* Barra de progreso */
+.progress-bar {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.step {
+    width: 40px;
+    height: 40px;
+    background: #ccc;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.step.active {
+    background: #c1815d;
+}
+
+/* Contenido de los pasos */
+.step-content {
+    display: none;
+}
+
+.step-content.active {
+    display: block;
+}
+
+/* Botones de navegación */
+.navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.nav-btn {
+    background: #c1815d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.nav-btn:hover {
+    background: #a9654b;
+}
+
+.nav-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+label {
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+    display: block;
+}
+
+/* Espaciado entre los campos */
+.form-group, .form-input {
+    margin-bottom: 20px;
+}
+
+/* Uniformidad en los tamaños de los campos */
+.form-input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* Botón deshabilitado */
+.nav-btn[disabled] {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Estilo para campos con error */
+.form-input.error {
+    border: 2px solid red;
+    background-color: #ffe6e6;
+}
+
+/* Estilo para campos corregidos */
+.form-input {
+    border: 1px solid #ccc;
+    background-color: white;
+    transition: border 0.3s, background-color 0.3s;
+}
+
+/* Placeholder animado */
+.form-input::placeholder {
+    color: #666; /* Color del texto */
+    opacity: 1; /* Visibilidad completa */
+    animation: placeholderAnimation 1.5s infinite; /* Animación */
+    transition: opacity 0.3s ease;
+}
+
+/* Reducir visibilidad al enfocar el campo */
+.form-input:focus::placeholder {
+    opacity: 0.5;
+}
+
+/* Keyframes para animar el placeholder */
+@keyframes placeholderAnimation {
+    0% {
+        content: "Esperando lectura";
+    }
+    33% {
+        content: "Esperando lectura.";
+    }
+    66% {
+        content: "Esperando lectura..";
+    }
+    100% {
+        content: "Esperando lectura...";
+    }
+}
+
+
 

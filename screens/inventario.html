@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Inventario - Ganadería Inteligente</title>
-    <link rel="stylesheet" href="../styles/stylePanelAdministracion.css">
+    <link rel="stylesheet" href="../styles/styleInventarios.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         /* Estilo para el menú desplegable */
@@ -114,57 +114,125 @@
 <!-- Ventanas emergentes -->
 <div class="overlay" id="overlay"></div>
 
-<!-- Modal para registrar vaca -->
-<div class="modal" id="modal-registrar">
+<div class="modal active" id="modal-registrar">
     <div class="modal-header">
         Registrar vaca
         <button class="modal-close" onclick="closeModal('modal-registrar')">X</button>
     </div>
     <div class="modal-body">
-        <!-- Campo RFID -->
-        <div class="form-group">
-            <div class="form-group">
-                <input type="text" placeholder="RFID (En espera)" class="form-input">
+        <!-- Barra de progreso -->
+        <div class="progress-bar">
+            <div class="step active" id="step-1">1</div>
+            <div class="step" id="step-2">2</div>
+            <div class="step" id="step-3">3</div>
+            <div class="step" id="step-4">4</div>
+            <div class="step" id="step-5">5</div>
+            <div class="step" id="step-6">6</div>
+            <div class="step" id="step-7">7</div>
+        </div>
+
+        <!-- Contenedor de pasos -->
+        <form id="register-form">
+            <!-- Paso 1: Identificación -->
+            <div class="step-content active" id="step-content-1">
+                <h3>Identificación</h3>
+                <label for="rfid">RFID Escaneado</label>
+                <input type="text" id="rfid" class="form-input" placeholder="Esperando lectura...">
+                <label for="id-interno">Número de identificación interno</label>
+                <input type="text" id="id-interno" class="form-input" readonly>
             </div>
-            <p class="rfid-info">Acerca el sensor RFID al arete de la vaca</p>
-        </div>
-
-        <!-- Otros campos -->
-        <div class="form-group">
-            <input type="text" placeholder="Nombre" class="form-input">
-        </div>
-        <div class="form-group">
-            <input type="text" placeholder="Sexo" class="form-input">
-        </div>
-        <div class="form-group">
-            <input type="text" placeholder="Raza" class="form-input">
-        </div>
-        <div class="form-group">
-            <input type="number" placeholder="Peso" class="form-input">
-        </div>
-        <div class="form-group">
-            <input type="date" placeholder="Fecha de ingreso" class="form-input">
-        </div>
-
-       <!-- Botón para abrir cámara -->
-        <div class="form-group camera-button">
-            <button class="camera-btn">
-                <span class="material-icons camera-icon">photo_camera</span>
-                Abrir cámara
-            </button>
-        </div>
+            
 
 
-        <!-- Botón Registrar Vaca -->
-        <div class="form-group">
-            <button class="register-btn">
-                <span class="material-icons register-icon">add_circle_outline</span>
-                Registrar vaca
-            </button>
-        </div>
 
+
+            <!-- Paso 2: Datos generales -->
+            <div class="step-content" id="step-content-2">
+                <h3>Datos Generales</h3>
+                <label for="raza">Raza</label>
+                <input type="text" id="raza" class="form-input">
+                <label for="sexo">Sexo</label>
+                <select id="sexo" class="form-input">
+                    <option value="" disabled selected>Seleccionar</option>
+                    <option value="macho">Macho</option>
+                    <option value="hembra">Hembra</option>
+                </select>
+                <label for="peso">Peso (kg)</label>
+                <input type="number" id="peso" class="form-input">
+                <label for="fecha-ingreso">Fecha de ingreso</label>
+                <input type="date" id="fecha-ingreso" class="form-input">
+            </div>
+
+            <!-- Paso 3: Datos sanitarios -->
+            <div class="step-content" id="step-content-3">
+                <h3>Datos Sanitarios</h3>
+                <label for="historial-vacunacion">Historial de vacunación</label>
+                <textarea id="historial-vacunacion" class="form-input"></textarea>
+                <label for="fecha-desparasitacion">Fecha de última desparasitación</label>
+                <input type="date" id="fecha-desparasitacion" class="form-input">
+                <label for="estado-salud">Estado de salud</label>
+                <select id="estado-salud" class="form-input">
+                    <option value="" disabled selected>Seleccionar</option>
+                    <option value="bueno">Bueno</option>
+                    <option value="regular">Regular</option>
+                    <option value="enfermo">Enfermo</option>
+                </select>
+            </div>
+
+            <!-- Paso 4: Reproducción -->
+            <div class="step-content" id="step-content-4">
+                <h3>Reproducción</h3>
+                <label for="estado-reproductivo">Estado reproductivo</label>
+                <select id="estado-reproductivo" class="form-input">
+                    <option value="" disabled selected>Seleccionar</option>
+                    <option value="preñada">Preñada</option>
+                    <option value="lactando">Lactando</option>
+                    <option value="en-celo">En celo</option>
+                    <option value="vacia">Vacía</option>
+                </select>
+                <label for="fecha-ultimo-parto">Fecha del último parto</label>
+                <input type="date" id="fecha-ultimo-parto" class="form-input">
+                <label for="numero-crias">Número de crías registradas</label>
+                <input type="number" id="numero-crias" class="form-input">
+            </div>
+
+            <!-- Paso 5: Ubicación -->
+            <div class="step-content" id="step-content-5">
+                <h3>Ubicación</h3>
+                <label for="corral">Corral o ubicación</label>
+                <input type="text" id="corral" class="form-input">
+            </div>
+
+            <!-- Paso 6: Foto del animal -->
+            <div class="step-content" id="step-content-6">
+                <h3>Subir Foto</h3>
+                <div class="form-group">
+                    <button type="button" class="camera-btn">
+                        <span class="material-icons camera-icon">photo_camera</span>
+                        Abrir cámara
+                    </button>
+                </div>
+                <label for="foto-animal">Subir archivo</label>
+                <input type="file" id="foto-animal" class="form-input" accept="image/*">
+            </div>
+
+            <!-- Paso 7: Observaciones generales -->
+            <div class="step-content" id="step-content-7">
+                <h3>Observaciones Generales</h3>
+                <label for="observaciones">Notas o particularidades del animal</label>
+                <textarea id="observaciones" class="form-input"></textarea>
+            </div>
+
+            <!-- Botones de navegación -->
+            <div class="navigation-buttons">
+                <button type="button" class="nav-btn" id="prev-btn" disabled>Anterior</button>
+                <button type="button" class="nav-btn" id="next-btn">Siguiente</button>
+                <button type="submit" class="nav-btn hidden" id="submit-btn" disabled>Registrar</button>
+            </div>
+        </form>
     </div>
 </div>
+
 
 <!-- Modal para consultar vaca -->
 <div class="modal" id="modal-consultar">
