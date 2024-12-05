@@ -21,31 +21,87 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 // Initialize Firebase Authentication
 const auth = getAuth(app);
+// Initialize Functions Authentication
+const functions = getFunctions(app);
+// Variable para saber si el estado de autenticación ha sido verificado
+let isAuthChecked = false; 
 
 document.addEventListener("DOMContentLoaded", () => {
-    onAuthStateChanged(auth, (user) => {
+     let isAuthChecked = false; // Variable para saber si el estado de autenticación ha sido verificado
+
+    // Verifica el estado de autenticación
+    onAuthStateChanged(auth, async (user) => {
+        isAuthChecked = true;
+
         const userInfo = document.querySelector(".user-info span");
         const profileIcon = document.getElementById("profile-icon");
         const loginBtn = document.getElementById("login-btn");
         const createUserBtn = document.getElementById("create-user-btn");
         const logoutBtn = document.getElementById("logout-btn");
-    
-        if (loginBtn && createUserBtn && logoutBtn) {
-            if (user) {
-                if (userInfo) userInfo.textContent = `Bienvenido, ${user.email}`;
-                if (profileIcon) profileIcon.style.backgroundImage = "url('path_to_user_profile_picture')";
-                loginBtn.classList.add("hidden");
-                createUserBtn.classList.add("hidden");
-                logoutBtn.classList.remove("hidden");
+        const adminList = document.getElementById("admin-list"); // Área de administradores
+        const content = document.getElementById("content"); // Área de contenido principal
+
+        if (user) {
+            const idTokenResult = await user.getIdTokenResult();
+            const isAdmin = idTokenResult.claims.admin || false;
+
+            if (userInfo) userInfo.textContent = `Bienvenido, ${user.email}`;
+            if (profileIcon) profileIcon.style.backgroundImage = "";
+            loginBtn.classList.add("hidden");
+            createUserBtn.classList.add("hidden");
+            logoutBtn.classList.remove("hidden");
+
+            // Si el usuario es administrador
+            if (isAdmin) {
+                console.log("Usuario con rol de administrador detectado.");
+                const adminPanelBtn = document.getElementById("btn-panel");
+                if (adminPanelBtn) adminPanelBtn.classList.remove("hidden");
+
+                // Llamar a getUsers solo cuando el usuario es administrador
+                getUsers();
             } else {
-                if (userInfo) userInfo.textContent = "Iniciar sesión";
-                if (profileIcon) profileIcon.style.backgroundImage = "none";
-                loginBtn.classList.remove("hidden");
-                createUserBtn.classList.remove("hidden");
-                logoutBtn.classList.add("hidden");
+                // Si no es administrador y está en el panel de administración
+                if (window.location.pathname.includes('panelAdministracion.html')) {
+                    if (content) {
+                        content.innerHTML = `
+                            <div class="no-permission">
+                                <h2>No tienes permisos para acceder a esta sección.</h2>
+                                <p>Por favor, contacta a un administrador para obtener más información.</p>
+                            </div>
+                        `;
+                    }
+                    console.log("Usuario no tiene permisos para acceder al panel.");
+                }
+            }
+        } else {
+            if (userInfo) userInfo.textContent = "Iniciar sesión";
+            if (profileIcon) profileIcon.style.backgroundImage = "none";
+            loginBtn.classList.remove("hidden");
+            createUserBtn.classList.remove("hidden");
+            logoutBtn.classList.add("hidden");
+
+            if (window.location.pathname.includes('panelAdministracion.html')) {
+                window.location.href = "/index.html";
             }
         }
     });
+    
+
+    const getUsers = () => {
+        const adminList = document.getElementById("admin-list");
+        const tableBody = document.querySelector("#users-table tbody");
+    
+        // Simulando los usuarios que vendrían desde Firebase
+        const users = [
+            { email: 'juanescutia@gmail.com', uid: 'user1',rol:'usuario'},
+            { email: 'juancarlo@gmail.com', uid: 'user2',rol:'usuario' },
+            { email: 'misrrafan777@gmail.com', uid: 'user3' ,rol:'usuario'},
+            { email: 'chaves@gmail.com', uid: 'user4' ,rol:'usuario'},
+            { email: 'cecraft1@gmail.com', uid: 'user5',rol:'usuario' },
+            { email: 'q@gmail.com', uid: 'user6' ,rol:'usuario'},
+            { email: 'h@gmail.com', uid: 'user7',rol:'Administrador' },
+            { email: 'fierrosergio2907@gmail.com', uid: 'user8',rol:'usuario'}
+        ];
 
     // Configuración de títulos de página
     const pageTitles = {
