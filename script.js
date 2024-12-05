@@ -207,6 +207,28 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+       // Manejo del botón del Panel de Administración
+const adminPanelBtn = document.getElementById("btn-panel");
+if (adminPanelBtn) {
+    adminPanelBtn.addEventListener("click", async () => {
+        const currentPage = window.location.pathname.split("/").pop();
+        if (isAuthChecked && auth.currentUser) {
+            // Verificar si el usuario tiene el rol de administrador
+            const user = auth.currentUser;
+            const idTokenResult = await user.getIdTokenResult();
+            const isAdmin = idTokenResult.claims.admin || false;
+
+            if (isAdmin) {
+                // Si es administrador, redirigir al panel de administración
+                window.location.href = currentPage === 'index.html' ? 'screens/panelAdministracion.html' : '../screens/panelAdministracion.html';
+            } else {
+              
+            }
+        } else {
+        
+        }
+    });
+}
 
     // Función para cerrar sesión
     const logoutBtn = document.getElementById("logout-btn");
