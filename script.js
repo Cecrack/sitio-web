@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
             logoutBtn.classList.add("hidden");
 
             if (window.location.pathname.includes('panelAdministracion.html')) {
-                window.location.href = "/index.html";
+                window.location.href = "../index.html";
             }
         }
     });
@@ -248,7 +248,7 @@ if (adminPanelBtn) {
         logoutBtn.addEventListener("click", async () => {
             await signOut(auth);
             alert("Has cerrado sesión.");
-            window.location.href = "/index.html";
+            window.location.href = "../index.html";
         });
     }
 });
