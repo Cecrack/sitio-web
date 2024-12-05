@@ -239,8 +239,6 @@ if (adminPanelBtn) {
             alert("Has cerrado sesión.");
         });
     }
-});
-
 
 document.addEventListener("DOMContentLoaded", () => {
     // Firebase Authentication Logic (ya está bien definido en tu código)
