@@ -231,12 +231,13 @@ if (adminPanelBtn) {
     });
 }
 
-    // Función para cerrar sesión
+    // Cerrar sesión
     const logoutBtn = document.getElementById("logout-btn");
     if (logoutBtn) {
         logoutBtn.addEventListener("click", async () => {
             await signOut(auth);
             alert("Has cerrado sesión.");
+            window.location.href = "/index.html";
         });
     }
 
