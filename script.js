@@ -103,6 +103,17 @@ document.addEventListener("DOMContentLoaded", () => {
             { email: 'h@gmail.com', uid: 'user7',rol:'Administrador' },
             { email: 'fierrosergio2907@gmail.com', uid: 'user8',rol:'usuario'}
         ];
+        // Agregar los usuarios a la tabla
+        users.forEach(user => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${user.email}</td>
+                <td>${user.uid}</td>
+                <td>${user.rol}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    };
 
     // Configuración de títulos de página
     const pageTitles = {
