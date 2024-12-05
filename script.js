@@ -240,9 +240,9 @@ if (adminPanelBtn) {
             window.location.href = "/index.html";
         });
     }
+});
 
-
-document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", () => {
     // Firebase Authentication Logic (ya está bien definido en tu código)
 
     // Manejo del menú lateral en móviles
@@ -639,4 +639,3 @@ document.getElementById("add-vaca-btn").addEventListener("click", async () => {
         alert("Error al obtener el ID para la nueva vaca. Intenta nuevamente.");
     }
 });
-      });
