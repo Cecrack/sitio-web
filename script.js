@@ -259,17 +259,22 @@ if (adminPanelBtn) {
         }
     });
 }
+// Cerrar sesión
+const logoutBtn = document.getElementById("logout-btn");
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", async () => {
+        await signOut(auth);
+        alert("Has cerrado sesión.");
 
-    // Cerrar sesión
-    const logoutBtn = document.getElementById("logout-btn");
-    if (logoutBtn) {
-        logoutBtn.addEventListener("click", async () => {
-            await signOut(auth);
-            alert("Has cerrado sesión.");
-            window.location.href = "../index.html";
-        });
-    }
-});
+        // Verificar si ya estás en index.html
+        if (window.location.pathname.includes("index.html")) {
+            window.location.reload(); // Recargar la página si ya estás en index.html
+        } else {
+            window.location.href = "../index.html"; // Redirigir si estás en otra página
+        }
+    });
+}
+
 
   document.addEventListener("DOMContentLoaded", () => {
     // Firebase Authentication Logic (ya está bien definido en tu código)
