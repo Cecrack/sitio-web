@@ -88,31 +88,49 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     
 
-    const getUsers = () => {
-        const adminList = document.getElementById("admin-list");
+   const getUsers = async () => {
         const tableBody = document.querySelector("#users-table tbody");
     
-        // Simulando los usuarios que vendrían desde Firebase
-        const users = [
-            { email: 'juanescutia@gmail.com', uid: 'user1',rol:'usuario'},
-            { email: 'juancarlo@gmail.com', uid: 'user2',rol:'usuario' },
-            { email: 'misrrafan777@gmail.com', uid: 'user3' ,rol:'usuario'},
-            { email: 'chaves@gmail.com', uid: 'user4' ,rol:'usuario'},
-            { email: 'cecraft1@gmail.com', uid: 'user5',rol:'usuario' },
-            { email: 'q@gmail.com', uid: 'user6' ,rol:'usuario'},
-            { email: 'h@gmail.com', uid: 'user7',rol:'Administrador' },
-            { email: 'fierrosergio2907@gmail.com', uid: 'user8',rol:'usuario'}
-        ];
-        // Agregar los usuarios a la tabla
-        users.forEach(user => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${user.email}</td>
-                <td>${user.uid}</td>
-                <td>${user.rol}</td>
-            `;
-            tableBody.appendChild(row);
-        });
+        try {
+            // Obtener el token del usuario actual
+            const user = auth.currentUser; // Usamos la instancia de `auth` inicializada
+            if (!user) {
+                throw new Error("No hay un usuario autenticado.");
+            }
+            const userToken = await user.getIdToken();
+    
+            // Cambiar el URL por el de tu Firebase Cloud Function
+            const response = await fetch("https://us-central1-ganaderia-d357d.cloudfunctions.net/getUsers", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${userToken}` // Incluimos el token de autenticación
+                }
+            });
+    
+            if (!response.ok) {
+                throw new Error("Error al obtener usuarios: " + response.statusText);
+            }
+    
+            const data = await response.json();
+            const users = data.users;
+    
+            // Limpiar y llenar la tabla con los datos de los usuarios
+            tableBody.innerHTML = "";
+    
+            users.forEach(user => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${user.email}</td>
+                    <td>${user.uid}</td>
+                    <td>${user.provider}</td>
+                    <td>${new Date(user.creationTime).toLocaleDateString()}</td>
+                    <td>${new Date(user.lastSignInTime).toLocaleDateString()}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+        }
     };
 
     // Configuración de títulos de página
