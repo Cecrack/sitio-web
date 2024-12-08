@@ -272,8 +272,9 @@ if (logoutBtn) {
         } else {
             window.location.href = "../index.html"; // Redirigir si estás en otra página
         }
-    });
-}
+                });
+             }
+ });
 
 
   document.addEventListener("DOMContentLoaded", () => {
