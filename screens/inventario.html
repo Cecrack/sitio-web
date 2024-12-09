@@ -82,12 +82,6 @@
                 <span class="material-icons btn-icon">search</span>
                 <h3>Consultar vaca</h3>
             </button>
-        
-            <!-- Botón Eliminar Vaca -->
-            <button id="btn-eliminar" onclick="openModal('modal-eliminar')" class="top-btn">
-                <span class="material-icons btn-icon">delete</span>
-                <h3>Eliminar vaca</h3>
-            </button>
         </div>
         
 
@@ -97,7 +91,7 @@
                 <tr>
                     <th>Foto</th>
                     <th>RFID #</th>
-                    <th>Nombre</th>
+                    <th>Raza</th>
                     <th>Fecha Ingreso</th>
                     <th>Peso Actual</th>
                     <th>Estado Actual</th>
@@ -107,14 +101,24 @@
             <tbody>
                 <!-- Aquí se cargarán los datos dinámicamente -->
             </tbody>
-        </table>
+        </table>     
+        
+        <!-- Modal para mostrar la imagen en grande -->
+        <div class="image-modal" id="image-modal">
+            <div class="modal-content">
+                <span class="close-modal" id="close-image-modal">&times;</span>
+                <img id="modal-image" src="" alt="Imagen en grande">
+            </div>
+        </div>
+        
+
     </div>
 </div>
 
 <!-- Ventanas emergentes -->
 <div class="overlay" id="overlay"></div>
 
-<div class="modal active" id="modal-registrar">
+<div class="modal" id="modal-registrar">
     <div class="modal-header">
         Registrar vaca
         <button class="modal-close" onclick="closeModal('modal-registrar')">X</button>
@@ -136,19 +140,18 @@
             <!-- Paso 1: Identificación -->
             <div class="step-content active" id="step-content-1">
                 <h3>Identificación</h3>
+                <div id="error-message-1" class="error-message hidden"></div>
                 <label for="rfid">RFID Escaneado</label>
                 <input type="text" id="rfid" class="form-input" placeholder="Esperando lectura...">
                 <label for="id-interno">Número de identificación interno</label>
                 <input type="text" id="id-interno" class="form-input" readonly>
+
             </div>
             
-
-
-
-
             <!-- Paso 2: Datos generales -->
             <div class="step-content" id="step-content-2">
                 <h3>Datos Generales</h3>
+                <div id="error-message-2" class="error-message hidden"></div>
                 <label for="raza">Raza</label>
                 <input type="text" id="raza" class="form-input">
                 <label for="sexo">Sexo</label>
@@ -166,10 +169,7 @@
             <!-- Paso 3: Datos sanitarios -->
             <div class="step-content" id="step-content-3">
                 <h3>Datos Sanitarios</h3>
-                <label for="historial-vacunacion">Historial de vacunación</label>
-                <textarea id="historial-vacunacion" class="form-input"></textarea>
-                <label for="fecha-desparasitacion">Fecha de última desparasitación</label>
-                <input type="date" id="fecha-desparasitacion" class="form-input">
+                <div id="error-message-3" class="error-message hidden"></div>
                 <label for="estado-salud">Estado de salud</label>
                 <select id="estado-salud" class="form-input">
                     <option value="" disabled selected>Seleccionar</option>
@@ -177,11 +177,17 @@
                     <option value="regular">Regular</option>
                     <option value="enfermo">Enfermo</option>
                 </select>
+                <label for="historial-vacunacion">Historial de vacunación</label>
+                <textarea id="historial-vacunacion" class="form-input"></textarea>
+                <label for="fecha-desparasitacion">Fecha de última desparasitación</label>
+                <input type="date" id="fecha-desparasitacion" class="form-input">
+                
             </div>
 
             <!-- Paso 4: Reproducción -->
             <div class="step-content" id="step-content-4">
                 <h3>Reproducción</h3>
+                <div id="error-message-4" class="error-message hidden"></div>
                 <label for="estado-reproductivo">Estado reproductivo</label>
                 <select id="estado-reproductivo" class="form-input">
                     <option value="" disabled selected>Seleccionar</option>
@@ -199,6 +205,7 @@
             <!-- Paso 5: Ubicación -->
             <div class="step-content" id="step-content-5">
                 <h3>Ubicación</h3>
+                <div id="error-message-5" class="error-message hidden"></div>
                 <label for="corral">Corral o ubicación</label>
                 <input type="text" id="corral" class="form-input">
             </div>
@@ -206,19 +213,23 @@
             <!-- Paso 6: Foto del animal -->
             <div class="step-content" id="step-content-6">
                 <h3>Subir Foto</h3>
+                <div id="error-message-6" class="error-message hidden"></div>
                 <div class="form-group">
                     <button type="button" class="camera-btn">
                         <span class="material-icons camera-icon">photo_camera</span>
                         Abrir cámara
                     </button>
                 </div>
+                <!-- Subir archivo -->
                 <label for="foto-animal">Subir archivo</label>
                 <input type="file" id="foto-animal" class="form-input" accept="image/*">
+
             </div>
 
             <!-- Paso 7: Observaciones generales -->
             <div class="step-content" id="step-content-7">
                 <h3>Observaciones Generales</h3>
+                <div id="error-message-7" class="error-message hidden"></div>
                 <label for="observaciones">Notas o particularidades del animal</label>
                 <textarea id="observaciones" class="form-input"></textarea>
             </div>
@@ -233,7 +244,6 @@
     </div>
 </div>
 
-
 <!-- Modal para consultar vaca -->
 <div class="modal" id="modal-consultar">
     <div class="modal-header">
@@ -243,15 +253,12 @@
         </button>
     </div>
     <div class="modal-body">
-        <!-- Campo RFID -->
         <div class="form-group">
-            <label class="rfid-label">RFID (en espera)</label>
-            <p class="rfid-info">Acerca el sensor RFID al arete de la vaca</p>
+            <label class="rfid-label">RFID</label>
+            <input type="text" id="rfid-input" class="form-input" placeholder="Escanea o ingresa el RFID">
         </div>
-
-        <!-- Botón Consultar Vaca -->
         <div class="form-group">
-            <button class="consult-btn">
+            <button class="consult-btn" id="consult-btn">
                 <span class="material-icons btn-icon">search</span>
                 Consultar vaca
             </button>
@@ -259,46 +266,47 @@
     </div>
 </div>
 
-
-<!-- Modal para eliminar vaca -->
-<div class="modal" id="modal-eliminar">
+<!-- Modal para mostrar datos de la vaca -->
+<div class="modal" id="modal-datos-vaca">
     <div class="modal-header">
-        Eliminar vaca
-        <button class="modal-close" onclick="closeModal('modal-eliminar')">
+        <span id="modal-title">Datos de la vaca</span>
+        <button class="modal-close" onclick="closeModal('modal-datos-vaca')">
             <span class="material-icons">close</span>
         </button>
     </div>
     <div class="modal-body">
-        <!-- Campo Buscar por RFID -->
-        <div class="form-group">
-            <label class="rfid-label">Buscar por RFID</label>
-            <input type="text" placeholder="RFID (en espera)" class="form-input">
-            <p class="rfid-info">Acerca el sensor RFID al arete de la vaca</p>
-        </div>
-        <hr>
-        <!-- Campo Buscar por Nombre -->
-        <div class="form-group">
-            <label class="name-label">Buscar por Nombre</label>
-            <select class="form-combobox" id="cow-names" placeholder="Nombre">
-                <option value="">Seleccione una vaca...</option>
-                <!-- Nombres de vacas dinámicos -->
-                <option value="vaca1">Vaca 1</option>
-                <option value="vaca2">Vaca 2</option>
-                <option value="vaca3">Vaca 3</option>
-            </select>
-        </div>
-
-        <!-- Botón Eliminar Vaca -->
-        <div class="form-group">
-            <button class="delete-btn" onclick="confirmDelete()">
-                <span class="material-icons btn-icon">delete</span>
-                Eliminar vaca
-            </button>
+        <div class="vaca-card" id="vaca-details">
+            <!-- Información de la vaca se cargará dinámicamente aquí -->
         </div>
     </div>
 </div>
 
+<!-- Modal para ver imagen ampliada -->
+<div class="modal" id="modal-image">
+    <div class="modal-header">
+        Imagen
+        <button class="modal-close" onclick="closeModal('modal-image')">
+            <span class="material-icons">close</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <img id="modal-full-image" src="" alt="Imagen de la vaca" style="width: 100%; height: auto;">
+    </div>
+</div>
+
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- MQTT.js -->
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+<!-- Tu script principal -->
 <script type="module" src="../script.js"></script>
+
+
+
+
 
 <script>
     // Función para abrir o cerrar el menú desplegable del perfil
@@ -329,5 +337,7 @@
         }
     });
 </script>
+
+
 </body>
 </html>

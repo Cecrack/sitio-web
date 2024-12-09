@@ -1,6 +1,28 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
-import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+import { 
+    getAuth, 
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword, 
+    onAuthStateChanged, 
+    signOut 
+} from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
+import { 
+    doc,
+    getFirestore, 
+    collection, 
+    addDoc,
+    setDoc,
+    getDoc,
+    query,
+    where, 
+    getDocs // Importa `getDocs` del paquete de Firestore
+} from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+import { 
+    getStorage, 
+    ref, 
+    uploadBytes, 
+    getDownloadURL 
+} from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js';
 
 
 
@@ -15,14 +37,194 @@ const firebaseConfig = {
   measurementId: "G-Q55L8JX9WX"
 };
 
-// Initialize Firebase
+// Inicializa Firebase
 const app = initializeApp(firebaseConfig);
-// Inicializar Firestore
-const db = getFirestore(app);
-// Initialize Firebase Authentication
 const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
 document.addEventListener("DOMContentLoaded", () => {
+
+    // --- Código de MQTT Integrado ---
+
+    // Configuración de MQTT
+    const mqttUrl = "wss://d5e57d2e51ce444ea8dd953e6f0ef5a6.s1.eu.hivemq.cloud:8884/mqtt";
+    const options = {
+        username: "sergio",
+        password: "Prueba123",
+        protocol: "wss",
+        reconnectPeriod: 1000
+    };
+
+    // Conexión al servidor MQTT
+    const client = mqtt.connect(mqttUrl, options);
+
+    // Manejo de conexión exitosa
+    client.on("connect", () => {
+        Swal.fire({
+            icon: "success",
+            title: "Conexión exitosa",
+            text: "Conectado al servidor MQTT",
+            timer: 3000,
+            showConfirmButton: false
+        });
+
+        // Suscribirse al tópico /topic/rfid
+        client.subscribe("/topic/rfid", (err) => {
+            if (!err) {
+                Swal.fire({
+                    icon: "info",
+                    title: "Suscripción exitosa",
+                    text: "Te has suscrito al tópico: /topic/rfid",
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error de suscripción",
+                    text: `No se pudo suscribir al tópico: ${err.message}`,
+                });
+            }
+        });
+    });
+
+    
+    // Manejo de errores de conexión
+    client.on("error", (err) => {
+        Swal.fire({
+            icon: "error",
+            title: "Error de conexión",
+            text: `Error: ${err.message}`,
+        });
+    });
+
+    async function getCurrentInternalId() {
+        try {
+            // Referencia al documento del contador en Firestore
+            const contadorRef = doc(db, "configuracion", "contadorVacas");
+            const contadorSnapshot = await getDoc(contadorRef);
+    
+            let contadorActual = 0;
+    
+            // Verifica si el documento del contador existe
+            if (contadorSnapshot.exists()) {
+                contadorActual = contadorSnapshot.data().contador || 0;
+            }
+    
+            // Genera el número interno en el formato vaca-001 sin actualizar el contador
+            const numeroInterno = `vaca-${(contadorActual + 1).toString().padStart(3, "0")}`;
+            console.log(`Número interno generado temporalmente: ${numeroInterno}`);
+            return { numeroInterno, contadorRef, contadorActual };
+        } catch (error) {
+            console.error("Error al obtener el siguiente número interno:", error);
+            return { numeroInterno: null, contadorRef: null, contadorActual: null };
+        }
+    }
+
+    // Manejo de mensajes recibidos en /topic/rfid
+    client.on("message", async (topic, message) => {
+        if (topic === "/topic/rfid") {
+            const rfidValue = message.toString().trim();
+            console.log("Mensaje recibido desde /topic/rfid:", rfidValue);
+
+            // Inputs para registro y consulta
+            const registerRfidInput = document.getElementById("rfid");
+            const searchInput = document.getElementById("rfid-input");
+            const internalIdInput = document.getElementById("id-interno");
+
+            // Rellenar el input de registro si existe
+            if (registerRfidInput) {
+                console.log("Rellenando input de registro con:", rfidValue);
+                registerRfidInput.value = rfidValue;
+            }
+
+            // Rellenar el input de consulta si existe
+            if (searchInput) {
+                console.log("Rellenando input de consulta con:", rfidValue);
+                searchInput.value = rfidValue;
+            }
+
+            try {
+                const vacasRef = collection(db, "vacas");
+                const q = query(vacasRef, where("rfid", "==", rfidValue));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    // Si el RFID ya existe en la base de datos
+                    const doc = querySnapshot.docs[0];
+                    const vacaData = doc.data();
+                    const vacaId = doc.id;
+
+                    console.log("RFID encontrado. Datos de la vaca:", vacaData);
+
+                    // Rellenar el número interno en el input correspondiente (si aplica)
+                    if (internalIdInput) {
+                        console.log("Rellenando input de número interno con:", vacaData.idInterno || "N/A");
+                        internalIdInput.value = vacaData.idInterno || "N/A";
+                    }
+
+                    // Mensaje de confirmación
+                    const responseMessage = `RFID Escaneado, ID: ${vacaId}`;
+                    console.log(responseMessage);
+                    client.publish("/topic/datos", responseMessage);
+                } else {
+                    // Si el RFID no existe en la base de datos
+                    console.log("RFID no encontrado en la base de datos.");
+
+                    // Generar número interno temporal para registro
+                    const { numeroInterno } = await getCurrentInternalId();
+                    if (numeroInterno && internalIdInput) {
+                        console.log("Generando número interno temporal:", numeroInterno);
+                        internalIdInput.value = numeroInterno;
+                    }
+
+                    // Mensaje para RFID no registrado
+                    const responseMessage = `RFID Escaneado, No registrado`;
+                    console.log(responseMessage);
+                    client.publish("/topic/datos", responseMessage);
+                }
+            } catch (error) {
+                console.error("Error al consultar Firestore:", error);
+            }
+        }
+    });
+
+
+    // Botón para enviar mensajes al tópico /topic/datos
+    const sendButton = document.getElementById("sendMessage");
+    const messageInput = document.getElementById("messageInput");
+    if (sendButton && messageInput) {
+        sendButton.addEventListener("click", () => {
+            const message = messageInput.value.trim();
+            if (message) {
+                client.publish("/topic/datos", message, (err) => {
+                    if (!err) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Mensaje enviado",
+                            text: `Mensaje: ${message} enviado al tópico: /topic/datos`,
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error al enviar mensaje",
+                            text: `Error: ${err.message}`,
+                        });
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Campo vacío",
+                    text: "Por favor, escribe un mensaje antes de enviarlo.",
+                });
+            }
+        });
+    }
+    
     onAuthStateChanged(auth, (user) => {
         const userInfo = document.querySelector(".user-info span");
         const profileIcon = document.getElementById("profile-icon");
@@ -62,26 +264,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (headerTitle && pageTitles[currentPage]) {
         headerTitle.textContent = pageTitles[currentPage];
     }
-
-    // Manejo de modales
-    window.openModal = (modalId) => {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.classList.add("active");
-            document.getElementById("overlay").classList.add("active");
-        }
-    };
-
-    window.closeModal = (modalId) => {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.classList.remove("active");
-            const activeModals = document.querySelectorAll(".modal.active");
-            if (activeModals.length === 0) {
-                document.getElementById("overlay").classList.remove("active");
-            }
-        }
-    };
 
     // Crear nuevo usuario
     const createUserForm = document.getElementById("create-user-form");
@@ -162,194 +344,138 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+document.querySelectorAll('.form-input').forEach(input => {
+    input.removeAttribute('readonly');
+    input.disabled = false;
+});
+
+document.getElementById("sexo").addEventListener("change", () => {
+    const estadoReproductivo = document.getElementById("estado-reproductivo");
+    const fechaUltimoParto = document.getElementById("fecha-ultimo-parto");
+    const numeroCrias = document.getElementById("numero-crias");
+
+    if (document.getElementById("sexo").value === "macho") {
+        // Desactivar y ocultar campos
+        estadoReproductivo.disabled = true;
+        fechaUltimoParto.disabled = true;
+        numeroCrias.disabled = true;
+
+        estadoReproductivo.value = "N/A";
+        fechaUltimoParto.value = "N/A";
+        numeroCrias.value = "N/A";
+    } else {
+        // Activar campos
+        estadoReproductivo.disabled = false;
+        fechaUltimoParto.disabled = false;
+        numeroCrias.disabled = false;
+
+        estadoReproductivo.value = "";
+        fechaUltimoParto.value = "";
+        numeroCrias.value = "";
+    }
+});
+
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Firebase Authentication Logic (ya está bien definido en tu código)
+    cargarVacas();
 
-    // Manejo del menú lateral en móviles
-    const navToggle = document.getElementById('nav-toggle');
-    const navMenu = document.getElementById('nav-menu');
+    const imageModal = document.getElementById("image-modal");
+    const modalImage = document.getElementById("modal-image");
+    const closeImageModal = document.getElementById("close-image-modal");
 
-    if (navToggle && navMenu) {
-        navToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('show'); // Agregar o quitar la clase "show"
+    // Agrega evento a todas las imágenes en la tabla
+    document.querySelectorAll(".data-grid td img").forEach((img) => {
+        img.addEventListener("click", () => {
+            modalImage.src = img.src; // Establece la imagen en el modal
+            imageModal.style.display = "flex"; // Muestra el modal
         });
-    }
-});
+    });
 
-async function registrarVaca(data) {
-    try {
-        const vacasCollection = collection(db, "vacas");
-        const docRef = await addDoc(vacasCollection, data);
-        alert(`Registro completado con éxito. ID de la vaca: ${data.rfid}`);
-    } catch (error) {
-        console.error("Error al registrar la vaca:", error);
-        alert("Error al registrar la vaca. Por favor, intenta de nuevo.");
-    }
-}
+    // Cierra el modal cuando se hace clic en el botón de cerrar
+    closeImageModal.addEventListener("click", () => {
+        imageModal.style.display = "none";
+    });
 
-// Función para registrar una vaca con un ID personalizado
-async function registrarVacaConId(data) {
-    try {
-        const vacasCollection = "vacas"; // Nombre de la colección
-        const vacaId = data.rfid.toString().padStart(3, '0'); // Formatear el ID (ejemplo: 001, 002)
+    // Cierra el modal si se hace clic fuera de la imagen
+    imageModal.addEventListener("click", (e) => {
+        if (e.target === imageModal) {
+            imageModal.style.display = "none";
+        }
+    });
 
-        const vacaDocRef = doc(db, vacasCollection, vacaId); // Definir el documento con el ID formateado
-        await setDoc(vacaDocRef, data);
+    // Modificar la función `openModal` para incluir limpieza de campos
+    window.openModal = (modalId) => {
+        console.log("Abriendo modal:", modalId);
+        if (modalId === "modal-registrar") {
+            limpiarCamposRegistrar();
+        } else if (modalId === "modal-consultar") {
+            limpiarCamposConsultar();
+        }
 
-        alert(`Registro completado con éxito. ID de la vaca: ${vacaId}`);
-    } catch (error) {
-        console.error("Error al registrar la vaca con ID personalizado:", error);
-        alert("Error al registrar la vaca. Por favor, intenta de nuevo.");
-    }
-}
-
-
-document.getElementById("submit-btn").addEventListener("click", async (e) => {
-    e.preventDefault();
-
-    // Obtén los valores del formulario
-    const rfid = await getNextVacaId(); // Generar el próximo ID
-    const formattedRfid = rfid.toString().padStart(3, '0'); // Formatear el ID (ejemplo: 001)
-    const raza = document.getElementById("raza").value.trim();
-    const sexo = document.getElementById("sexo").value;
-    const peso = parseFloat(document.getElementById("peso").value);
-    const fechaIngreso = document.getElementById("fecha-ingreso").value;
-    const estadoSalud = document.getElementById("estado-salud").value;
-    const ubicacion = document.getElementById("corral").value;
-
-    // Validar los campos requeridos
-    if (!raza || !sexo || !peso || !fechaIngreso || !estadoSalud || !ubicacion) {
-        alert("Por favor, completa todos los campos requeridos.");
-        return;
-    }
-
-    // Estructurar los datos
-    const vacaData = {
-        rfid: formattedRfid,
-        raza,
-        sexo,
-        peso,
-        fechaIngreso,
-        estadoSalud,
-        ubicacion,
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add("active");
+            document.getElementById("overlay").classList.add("active");
+        } else {
+            console.warn("Modal no encontrado:", modalId);
+        }
     };
 
-    // Registrar la vaca con el ID personalizado
-    await registrarVacaConId(vacaData);
-
-    // Restablecer el formulario
-    document.getElementById("raza").value = "";
-    document.getElementById("sexo").value = "";
-    document.getElementById("peso").value = "";
-    document.getElementById("fecha-ingreso").value = "";
-    document.getElementById("estado-salud").value = "";
-    document.getElementById("corral").value = "";
-});
-
-
-
-document.addEventListener("DOMContentLoaded", function () {
-    // Referencias a elementos del DOM
-    const rfidInput = document.getElementById("rfid");
-    const modal = document.getElementById("modal-registrar");
-    const overlay = document.getElementById("overlay"); // Overlay de fondo
-    const closeBtn = document.querySelector(".modal-close");
-    const submitBtn = document.getElementById("submit-btn");
     const steps = document.querySelectorAll(".step");
     const stepContents = document.querySelectorAll(".step-content");
     const prevBtn = document.getElementById("prev-btn");
     const nextBtn = document.getElementById("next-btn");
+    const submitBtn = document.getElementById("submit-btn");
+    const formInputs = document.querySelectorAll(".form-input");
 
     let currentStep = 0;
 
-    // Función para restablecer el formulario
-    function resetForm() {
-        document.querySelectorAll(".form-input").forEach((field) => {
-            if (field.type === "file") {
-                field.value = ""; // Limpiar archivos seleccionados
-            } else {
-                field.value = ""; // Limpiar campos de texto, select y textarea
-            }
-        });
+    // Habilitar la edición en todos los campos del formulario
+    formInputs.forEach((input) => {
+        input.removeAttribute("readonly");
+    });
 
-        // Restaurar el placeholder y permitir edición en RFID
-        if (rfidInput) {
-            rfidInput.placeholder = "Esperando lectura...";
-            rfidInput.removeAttribute("readonly"); // Asegurar que sea editable
-        }
-
-        currentStep = 0; // Reiniciar el paso actual
-        updateStep(); // Volver al primer paso
-    }
-
-    // Actualizar el estado de los pasos
+    // Actualiza el estado de los pasos
     function updateStep() {
+        const steps = document.querySelectorAll(".step");
+        const stepContents = document.querySelectorAll(".step-content");
+        const prevBtn = document.getElementById("prev-btn");
+        const nextBtn = document.getElementById("next-btn");
+        const submitBtn = document.getElementById("submit-btn");
+    
         steps.forEach((step, index) => {
             step.classList.toggle("active", index === currentStep);
         });
         stepContents.forEach((content, index) => {
             content.classList.toggle("active", index === currentStep);
-        });
 
+            // Oculta los mensajes de error de los pasos no activos
+            const errorMessage = content.querySelector(".error-message");
+            if (errorMessage) errorMessage.classList.add("hidden");
+        });
+    
         prevBtn.disabled = currentStep === 0;
+        nextBtn.disabled = currentStep === steps.length - 1; // Desactivar "Siguiente" en el último paso
         nextBtn.classList.toggle("hidden", currentStep === steps.length - 1);
-        nextBtn.disabled = currentStep === steps.length - 1; // Deshabilitar "Siguiente" en el último paso
         submitBtn.classList.toggle("hidden", currentStep !== steps.length - 1);
-        submitBtn.disabled = currentStep !== steps.length - 1; // Habilitar solo en el último paso
-    }
-
-    // Confirmar cancelación al cerrar
-    closeBtn.addEventListener("click", function () {
-        const confirmCancel = confirm("¿Está seguro de que desea cancelar el registro?");
-        if (confirmCancel) {
-            resetForm(); // Restablecer formulario
-            modal.classList.remove("active"); // Cerrar el modal
-            overlay.classList.remove("active"); // Ocultar el overlay
+    
+        if (currentStep === steps.length - 1) {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
         }
-    });
-
-    // Enviar el formulario
-    submitBtn.addEventListener("click", function (e) {
-        e.preventDefault(); // Evitar envío real
-        alert("Registro completado con éxito.");
-        resetForm(); // Restablecer formulario
-        modal.classList.remove("active"); // Cerrar el modal
-        overlay.classList.remove("active"); // Ocultar el overlay
-    });
-
-    // Ocultar placeholder dinámicamente mientras el usuario escribe
-    if (rfidInput) {
-        rfidInput.addEventListener("input", function () {
-            if (rfidInput.value.trim()) {
-                rfidInput.placeholder = ""; // Ocultar placeholder cuando hay texto
-            } else {
-                rfidInput.placeholder = "Esperando lectura..."; // Restaurar placeholder
-            }
-        });
     }
-
-    // Eventos de los botones de navegación
-    prevBtn.addEventListener("click", () => {
-        if (currentStep > 0) currentStep--;
-        updateStep();
-    });
-
-    nextBtn.addEventListener("click", () => {
-        if (validateStep(currentStep)) {
-            if (currentStep < steps.length - 1) currentStep++;
-            updateStep();
-        }
-    });
+    
 
     // Validar campos requeridos para cada paso
     function validateStep(step) {
         let isValid = true;
         const fieldsToValidate = [];
-
+    
+        // Define los campos requeridos por paso
         switch (step) {
-            case 0: // Paso 1: RFID Escaneado
-                fieldsToValidate.push(rfidInput);
+            case 0: // Paso 1: Identificación
+                fieldsToValidate.push(document.getElementById("rfid"));
                 break;
             case 1: // Paso 2: Datos Generales
                 fieldsToValidate.push(
@@ -360,203 +486,554 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
                 break;
             case 2: // Paso 3: Datos Sanitarios
-                fieldsToValidate.push(document.getElementById("estado-salud"));
+                fieldsToValidate.push(
+                    document.getElementById("historial-vacunacion"),
+                    document.getElementById("fecha-desparasitacion"),
+                    document.getElementById("estado-salud")
+                );
                 break;
             case 3: // Paso 4: Reproducción
-                fieldsToValidate.push(document.getElementById("estado-reproductivo"));
+                const estadoReproductivo = document.getElementById("estado-reproductivo");
+                const fechaUltimoParto = document.getElementById("fecha-ultimo-parto");
+                const numeroCrias = document.getElementById("numero-crias");
+    
+                if (!estadoReproductivo.disabled) {
+                    fieldsToValidate.push(estadoReproductivo);
+                }
+                if (!fechaUltimoParto.disabled) {
+                    fieldsToValidate.push(fechaUltimoParto);
+                }
+                if (!numeroCrias.disabled) {
+                    fieldsToValidate.push(numeroCrias);
+                }
                 break;
             case 4: // Paso 5: Ubicación
                 fieldsToValidate.push(document.getElementById("corral"));
                 break;
-            case 5: // Paso 6: Subir Foto
+            case 5: // Paso 6: Foto del animal (opcional en este ejemplo)
                 fieldsToValidate.push(document.getElementById("foto-animal"));
                 break;
         }
-
+    
+        // Validar cada campo requerido
         fieldsToValidate.forEach((field) => {
-            if (!field || !field.value.trim()) {
+            if (!field.value || field.value.trim() === "") {
                 markFieldError(field);
                 isValid = false;
             } else {
                 clearFieldError(field);
             }
         });
-
+    
         return isValid;
     }
-
-    // Marcar campo con error
+    
+    // Marca un campo como error y agrega eventos para corregirlo
     function markFieldError(field) {
-        if (field) field.classList.add("error");
+        if (field) {
+            field.classList.add("error");
+            // Elimina el estado de error al escribir o enfocar
+            field.addEventListener("input", () => clearFieldError(field));
+            field.addEventListener("focus", () => clearFieldError(field));
+        }
     }
 
-    // Remover error de un campo
+    // Elimina el estado de error
     function clearFieldError(field) {
-        if (field) field.classList.remove("error");
+        if (field) {
+            field.classList.remove("error");
+        }
     }
 
-    // Inicializar el formulario
+    // Supongamos que quieres iterar sobre varios campos de formulario
+    document.querySelectorAll(".form-input").forEach((field) => {
+        field.addEventListener("input", () => {
+            console.log(`Corrigiendo error en ${field.id}`);
+            clearFieldError(field);
+        });
+    });
+
+    const errorMessage = document.getElementById("error-message");
+
+    nextBtn.addEventListener("click", () => {
+        const currentErrorMessage = document.querySelector(`#error-message-${currentStep + 1}`);
+    
+        if (validateStep(currentStep)) {
+            // Oculta el mensaje de error si todo está validado
+            currentErrorMessage.classList.add("hidden");
+            currentStep++;
+            updateStep();
+        } else {
+            // Muestra el mensaje de error solo en el paso actual
+            currentErrorMessage.textContent = "Por favor, completa todos los campos requeridos para avanzar.";
+            currentErrorMessage.classList.remove("hidden");
+        }
+    });
+    
+    
+
+    prevBtn.addEventListener("click", () => {
+        const errorMessage = document.querySelector(`#error-message-${currentStep + 1}`);
+        if (currentStep > 0) {
+            if (errorMessage) {
+                errorMessage.textContent = ""; // Limpia el mensaje de error
+                errorMessage.classList.add("hidden"); // Oculta el mensaje
+            }
+            currentStep--;
+            updateStep();
+        }
+    });
+    
+
+    async function getCurrentInternalId() {
+        try {
+            // Referencia al documento del contador en Firestore
+            const contadorRef = doc(db, "configuracion", "contadorVacas");
+            const contadorSnapshot = await getDoc(contadorRef);
+    
+            let contadorActual = 0;
+    
+            // Verifica si el documento del contador existe
+            if (contadorSnapshot.exists()) {
+                contadorActual = contadorSnapshot.data().contador || 0;
+            }
+    
+            // Genera el número interno en el formato vaca-001 sin actualizar el contador
+            const numeroInterno = `vaca-${(contadorActual + 1).toString().padStart(3, "0")}`;
+            console.log(`Número interno generado temporalmente: ${numeroInterno}`);
+            return { numeroInterno, contadorRef, contadorActual };
+        } catch (error) {
+            console.error("Error al obtener el siguiente número interno:", error);
+            return { numeroInterno: null, contadorRef: null, contadorActual: null };
+        }
+    }
+
+    // Función para registrar datos
+    async function registrarDatos() {
+        // Captura todos los campos del formulario
+        const rfid = document.getElementById("rfid").value.trim();
+        const idInterno = document.getElementById("id-interno").value.trim(); // Nuevo campo
+        const raza = document.getElementById("raza").value.trim();
+        const sexo = document.getElementById("sexo").value;
+        const peso = parseFloat(document.getElementById("peso").value);
+        const fechaIngreso = document.getElementById("fecha-ingreso").value;
+        const estadoSalud = document.getElementById("estado-salud").value;
+        const historialVacunacion = document.getElementById("historial-vacunacion").value.trim();
+        const fechaDesparasitacion = document.getElementById("fecha-desparasitacion").value;
+        // Verificar los campos relacionados con reproducción
+        const estadoReproductivo = document.getElementById("estado-reproductivo").disabled
+            ? "N/A"
+            : document.getElementById("estado-reproductivo").value;
+        const fechaUltimoParto = document.getElementById("fecha-ultimo-parto").disabled
+            ? "N/A"
+            : document.getElementById("fecha-ultimo-parto").value || "N/A";
+        const numeroCrias = document.getElementById("numero-crias").disabled
+            ? "N/A"
+            : parseInt(document.getElementById("numero-crias").value) || 0;
+
+        const ubicacion = document.getElementById("corral").value.trim();
+        const observaciones = document.getElementById("observaciones").value.trim();
+        const fotoAnimal = document.getElementById("foto-animal").files[0];
+
+        if (!rfid || !idInterno || !raza || !sexo || !peso || !fechaIngreso || !estadoSalud || !ubicacion) {
+            alert("Por favor completa todos los campos obligatorios.");
+            return;
+        }
+    
+        // Subir imagen a Firebase Storage
+        let fotoURL = null;
+        if (fotoAnimal) {
+            try {
+                const storage = getStorage();
+                const storageRef = ref(storage, `vacas/${rfid}_${Date.now()}`);
+                await uploadBytes(storageRef, fotoAnimal);
+                fotoURL = await getDownloadURL(storageRef);
+                console.log(`Imagen subida con éxito: ${fotoURL}`);
+            } catch (error) {
+                console.error("Error al subir la imagen:", error);
+                alert("Ocurrió un error al subir la imagen. Por favor, intenta nuevamente.");
+                return;
+            }
+        }
+    
+        // Estructura de datos para guardar en Firestore
+        const vacaData = {
+            rfid,
+            idInterno,
+            raza,
+            sexo,
+            peso,
+            fechaIngreso,
+            estadoSalud,
+            historialVacunacion: historialVacunacion || "N/A",
+            fechaDesparasitacion: fechaDesparasitacion || "N/A",
+            estadoReproductivo,
+            fechaUltimoParto,
+            numeroCrias,
+            ubicacion,
+            observaciones: observaciones || "Sin observaciones",
+            fotoURL: fotoURL || "Sin imagen",
+        };
+    
+        try {
+            // Guarda los datos en Firestore usando `setDoc` y un ID personalizado
+            const docRef = doc(db, "vacas", idInterno); // Usa el número interno como ID del documento
+            await setDoc(docRef, vacaData);
+    
+            // Actualiza el contador solo después de un registro exitoso
+            const { contadorRef, contadorActual } = await getCurrentInternalId();
+            await setDoc(contadorRef, { contador: contadorActual + 1 });
+    
+            alert(`Registro completado con éxito. ID del documento: ${idInterno}`);
+    
+            // Limpia el formulario y vuelve al paso inicial
+            document.getElementById("register-form").reset();
+            currentStep = 0;
+            updateStep();
+            closeModal("modal-registrar");
+        } catch (error) {
+            console.error("Error al registrar datos:", error);
+            alert("Ocurrió un error al registrar los datos. Por favor, intenta nuevamente.");
+        }
+    }
+    
+    // Manejo del botón Registrar
+    submitBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        await registrarDatos();
+    });
+
+    // Inicializa los pasos
     updateStep();
 });
 
+// Función para cargar las vacas en el DataGridView
+async function cargarVacas() {
+    const vacasTableBody = document.querySelector(".data-grid tbody");
+    const imageModal = document.getElementById("image-modal");
+    const modalImage = document.getElementById("modal-image");
+    const closeImageModal = document.getElementById("close-image-modal");
 
-document.addEventListener("DOMContentLoaded", function () {
-    const consultaForm = document.getElementById("consulta-form");
-    const consultaResult = document.getElementById("consulta-result");
-    const infoVacaModal = document.getElementById("modal-informacion-vaca");
-    const infoVacaContainer = document.getElementById("info-vaca");
+    try {
+        // Obtén todos los documentos de la colección "vacas"
+        const querySnapshot = await getDocs(collection(db, "vacas"));
 
-    // Evento para manejar la consulta
-    consultaForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const rfid = document.getElementById("consulta-rfid").value.trim();
+        // Limpia la tabla antes de llenarla
+        vacasTableBody.innerHTML = "";
 
-        if (!rfid) {
-            consultaResult.textContent = "Por favor, introduce un identificador válido.";
-            return;
-        }
+        // Itera sobre cada documento y agrega una fila a la tabla
+        querySnapshot.forEach((doc) => {
+            const vaca = doc.data();
 
-        consultaResult.textContent = "Buscando...";
+            // Crea una nueva fila
+            const row = document.createElement("tr");
 
-        try {
-            // Supongamos que tienes una API o base de datos que devuelve datos por RFID
-            const response = await fetch(`/api/ganado?rfid=${rfid}`); // Cambia según tu API
-            const data = await response.json();
+            // Si hay una URL para la foto, muestra la imagen, de lo contrario, un texto
+            const fotoCell = document.createElement("td");
+            if (vaca.fotoURL && vaca.fotoURL !== "Sin imagen") {
+                const img = document.createElement("img");
+                img.src = vaca.fotoURL;
+                img.alt = "Foto de la vaca";
+                img.style.width = "100px"; // Tamaño ajustado para hacerlas más visibles
+                img.style.height = "100px";
+                img.style.cursor = "pointer"; // Indicador visual de clic
+                fotoCell.appendChild(img);
 
-            if (data) {
-                // Muestra los datos en el modal de información
-                infoVacaContainer.innerHTML = `
-                    <h4>Detalles del Registro</h4>
-                    <p><strong>RFID:</strong> ${data.rfid}</p>
-                    <p><strong>Raza:</strong> ${data.raza}</p>
-                    <p><strong>Sexo:</strong> ${data.sexo}</p>
-                    <p><strong>Peso:</strong> ${data.peso} kg</p>
-                    <p><strong>Fecha de Ingreso:</strong> ${data.fechaIngreso}</p>
-                    <p><strong>Estado de Salud:</strong> ${data.estadoSalud}</p>
-                    <p><strong>Ubicación:</strong> ${data.ubicacion}</p>
-                    <p><strong>Historial de Vacunación:</strong> ${data.historialVacunacion}</p>
-                `;
-                openModal("modal-informacion-vaca");
+                // Añade evento para abrir el modal al hacer clic en la imagen
+                img.addEventListener("click", () => {
+                    modalImage.src = img.src; // Muestra la imagen en el modal
+                    imageModal.style.display = "flex"; // Muestra el modal
+                });
             } else {
-                consultaResult.textContent = "No se encontró ningún registro con este identificador.";
+                fotoCell.textContent = "Sin imagen";
             }
-        } catch (error) {
-            consultaResult.textContent = "Error al realizar la consulta.";
-            console.error(error);
-        }
-    });
-});
 
-// Funciones para manejar modales
-function openModal(modalId) {
-    const modal = document.getElementById(modalId);
-    const overlay = document.getElementById("overlay");
-    if (modal) {
-        modal.classList.add("active");
-        if (overlay) overlay.classList.add("active");
+            // Agrega las demás celdas con la información de la vaca
+            const rfidCell = document.createElement("td");
+            rfidCell.textContent = vaca.rfid || "N/A";
+
+            const razaCell = document.createElement("td");
+            razaCell.textContent = vaca.raza || "N/A";
+
+            const fechaIngresoCell = document.createElement("td");
+            fechaIngresoCell.textContent = vaca.fechaIngreso || "N/A";
+
+            const pesoCell = document.createElement("td");
+            pesoCell.textContent = vaca.peso ? `${vaca.peso} kg` : "N/A";
+
+            const estadoSaludCell = document.createElement("td");
+            estadoSaludCell.textContent = vaca.estadoSalud || "N/A";
+
+            const observacionesCell = document.createElement("td");
+            observacionesCell.textContent = vaca.observaciones || "N/A";
+
+            // Añade las celdas a la fila
+            row.appendChild(fotoCell);
+            row.appendChild(rfidCell);
+            row.appendChild(razaCell);
+            row.appendChild(fechaIngresoCell);
+            row.appendChild(pesoCell);
+            row.appendChild(estadoSaludCell);
+            row.appendChild(observacionesCell);
+
+            // Añade la fila al cuerpo de la tabla
+            vacasTableBody.appendChild(row);
+        });
+
+        // Evento para cerrar el modal
+        closeImageModal.addEventListener("click", () => {
+            imageModal.style.display = "none";
+        });
+
+        // Cierra el modal si se hace clic fuera de la imagen
+        imageModal.addEventListener("click", (e) => {
+            if (e.target === imageModal) {
+                imageModal.style.display = "none";
+            }
+        });
+
+        console.log("Datos cargados correctamente.");
+    } catch (error) {
+        console.error("Error al cargar los datos:", error);
+        alert("Hubo un error al cargar los datos. Por favor, intenta nuevamente.");
     }
 }
 
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    const overlay = document.getElementById("overlay");
-    if (modal) {
-        modal.classList.remove("active");
-        if (overlay) overlay.classList.remove("active");
-    }
-}
+document.addEventListener("DOMContentLoaded", () => {
+    const consultBtn = document.getElementById("consult-btn");
+    const searchInput = document.getElementById("rfid-input");
+    const vacaDetails = document.getElementById("vaca-details");
+    const modalFullImage = document.getElementById("modal-full-image");
 
-document.addEventListener("DOMContentLoaded", function () {
-    const eliminarBtn = document.getElementById("btn-eliminar");
-    const confirmYesBtn = document.getElementById("confirm-yes");
-    const razonEliminacion = document.getElementById("razon-eliminacion");
-    const comentarioContainer = document.getElementById("comentario-container");
-    const comentario = document.getElementById("comentario");
-
-    let currentRecordId = null; // ID del registro que se desea eliminar
-
-    // Mostrar campo de comentario si se selecciona "Otro"
-    razonEliminacion.addEventListener("change", function () {
-        if (razonEliminacion.value === "otro") {
-            comentarioContainer.style.display = "block";
-        } else {
-            comentarioContainer.style.display = "none";
-            comentario.value = ""; // Limpiar el comentario
-        }
-    });
-
-    // Abrir el modal de eliminación
-    eliminarBtn.addEventListener("click", function () {
-        currentRecordId = "12345ABCDE"; // Simula obtener el ID del registro seleccionado
-        openModal("modal-eliminar");
-    });
-
-    // Confirmar eliminación con razón
-    confirmYesBtn.addEventListener("click", async function () {
-        const razon = razonEliminacion.value;
-        const comentarioAdicional = comentario.value.trim();
-
-        if (!razon) {
-            alert("Por favor, selecciona una razón para la eliminación.");
-            return;
-        }
+    // Función para buscar vaca por RFID o número interno
+    async function buscarVacaPorRFIDoID(searchValue) {
+        console.log("Iniciando búsqueda...");
+        console.log("Valor ingresado para buscar:", searchValue);
 
         try {
-            // Registrar la eliminación (simulación)
-            console.log("Eliminando registro con ID:", currentRecordId);
-            console.log("Razón:", razon);
-            if (comentarioAdicional) {
-                console.log("Comentario adicional:", comentarioAdicional);
+            if (!searchValue || searchValue.trim() === "") {
+                console.log("Campo vacío. Mostrando alerta.");
+                Swal.fire({
+                    icon: "warning",
+                    title: "Campo vacío",
+                    text: "Por favor, ingrese un RFID o un número interno válido.",
+                });
+                return;
             }
 
-            // Firebase Firestore (ejemplo):
-            // const docRef = doc(db, "vacas", currentRecordId);
-            // await deleteDoc(docRef);
-            // Opcional: Mover el registro eliminado a una colección "eliminados"
-            // await addDoc(collection(db, "eliminados"), { id: currentRecordId, razon, comentarioAdicional });
+            const vacasRef = collection(db, "vacas");
 
-            alert("Registro eliminado con éxito.");
-            closeModal("modal-eliminar");
-            currentRecordId = null;
+            // Realizamos las dos consultas (por RFID y por ID Interno)
+            console.log("Creando consultas...");
+            const queryRFID = query(vacasRef, where("rfid", "==", searchValue.trim()));
+            const queryIDInterno = query(vacasRef, where("idInterno", "==", searchValue.trim()));
 
-            // Actualiza la tabla visualmente (simulación)
-            const row = document.querySelector(`[data-id="${currentRecordId}"]`);
-            if (row) row.remove();
+            // Ejecutamos ambas consultas en paralelo
+            console.log("Ejecutando consultas...");
+            const [resultRFID, resultIDInterno] = await Promise.all([
+                getDocs(queryRFID),
+                getDocs(queryIDInterno),
+            ]);
+
+            console.log("Resultados de las consultas obtenidos.");
+            console.log("Resultado RFID:", resultRFID.empty ? "Sin resultados" : resultRFID.docs);
+            console.log("Resultado ID Interno:", resultIDInterno.empty ? "Sin resultados" : resultIDInterno.docs);
+
+            // Verificamos si hay resultados en alguna de las consultas
+            const querySnapshot = !resultRFID.empty ? resultRFID : resultIDInterno;
+
+            if (querySnapshot.empty) {
+                console.log("No se encontró ninguna vaca.");
+                Swal.fire({
+                    icon: "error",
+                    title: "No encontrada",
+                    text: "No se encontró ninguna vaca con el dato proporcionado.",
+                });
+                return;
+            }
+
+            console.log("Vaca encontrada. Procesando datos...");
+
+            // Limpia el contenido del modal
+            vacaDetails.innerHTML = "";
+
+            // Procesa los datos de la vaca
+            querySnapshot.forEach((doc) => {
+                const vacaData = doc.data();
+                console.log("Datos de la vaca:", vacaData);
+
+                // Genera contenido dinámico para la tarjeta con icono de basura
+                const vacaCard = `
+                    <div class="vaca-header">
+                        <img class="vaca-image" src="${vacaData.fotoURL || 'https://via.placeholder.com/150'}" alt="Foto de la vaca" onclick="openImage('${vacaData.fotoURL || ''}')">
+                    </div>
+                    <div class="vaca-info">
+                        <p><strong>RFID:</strong> ${vacaData.rfid || 'N/A'}</p>
+                        <p><strong>ID Interno:</strong> ${vacaData.idInterno || 'N/A'}</p>
+                        <p><strong>Raza:</strong> ${vacaData.raza || 'N/A'}</p>
+                        <p><strong>Sexo:</strong> ${vacaData.sexo || 'N/A'}</p>
+                        <p><strong>Peso:</strong> ${vacaData.peso ? `${vacaData.peso} kg` : 'N/A'}</p>
+                        <p><strong>Estado de Salud:</strong> ${vacaData.estadoSalud || 'N/A'}</p>
+                        <p><strong>Historial Vacunación:</strong> ${vacaData.historialVacunacion || 'N/A'}</p>
+                        <p><strong>Fecha Ingreso:</strong> ${vacaData.fechaIngreso || 'N/A'}</p>
+                        <p><strong>Estado Reproductivo:</strong> ${vacaData.estadoReproductivo || 'N/A'}</p>
+                        <p><strong>Ubicación:</strong> ${vacaData.ubicacion || 'N/A'}</p>
+                        <p><strong>Observaciones:</strong> ${vacaData.observaciones || 'N/A'}</p>
+                    </div>
+                    <div class="vaca-actions">
+                    <button class="delete-vaca-btn" onclick="confirmDelete('${doc.id}')">
+                        <span class="material-icons">delete</span> Eliminar
+                    </button>
+                </div>
+
+                `;
+                vacaDetails.innerHTML = vacaCard;
+            });
+
+            console.log("Datos procesados. Abriendo modal.");
+            // Abre el modal de datos
+            openModal("modal-datos-vaca");
         } catch (error) {
-            console.error("Error al eliminar el registro:", error);
-            alert("Ocurrió un error al intentar eliminar el registro.");
+            console.error("Error al buscar vaca:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Ocurrió un error al buscar la vaca. Inténtelo nuevamente.",
+            });
         }
+    }
+
+     // Función para confirmar eliminación
+     window.confirmDelete = (vacaId) => {
+        console.log("Intentando eliminar vaca con ID:", vacaId);
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Esta acción eliminará permanentemente todos los datos de esta vaca.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                console.log("Confirmado. Procediendo a eliminar vaca...");
+                await deleteVaca(vacaId);
+            }
+        });
+    };
+
+    // Función para eliminar vaca por ID
+    async function deleteVaca(vacaId) {
+        try {
+            await deleteDoc(doc(db, "vacas", vacaId));
+            console.log("Vaca eliminada exitosamente.");
+            Swal.fire({
+                icon: "success",
+                title: "Eliminada",
+                text: "La vaca ha sido eliminada correctamente.",
+            });
+            closeModal("modal-datos-vaca");
+        } catch (error) {
+            console.error("Error al eliminar la vaca:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Ocurrió un error al eliminar la vaca. Inténtelo nuevamente.",
+            });
+        }
+    }
+
+    // Evento al hacer clic en el botón Consultar
+    consultBtn.addEventListener("click", () => {
+        const searchValue = searchInput.value.trim(); // Puede ser RFID o número interno
+        console.log("Botón de consulta presionado. Valor ingresado:", searchValue);
+        buscarVacaPorRFIDoID(searchValue);
     });
-});
 
-async function getNextVacaId() {
-    const counterDocRef = doc(db, "metadata", "counters");
-
-    try {
-        const counterDoc = await getDoc(counterDocRef);
-
-        if (counterDoc.exists()) {
-            const lastVacaId = counterDoc.data().lastVacaId || 0;
-            await updateDoc(counterDocRef, { lastVacaId: increment(1) });
-            return lastVacaId + 1;
-        } else {
-            // Si el documento no existe, crearlo con el valor inicial
-            await setDoc(counterDocRef, { lastVacaId: 1 });
-            return 1;
+    // Función para abrir la imagen en el modal flotante
+    window.openImage = (imageUrl) => {
+        console.log("Intentando abrir imagen en modal:", imageUrl);
+        if (imageUrl) {
+            modalFullImage.src = imageUrl;
+            openModal("modal-image");
         }
-    } catch (error) {
-        console.error("Error al obtener o inicializar el ID de vaca:", error);
-        throw error;
-    }
-}
+    };
 
+    // Función para abrir un modal
+    window.openModal = (modalId) => {
+        console.log("Abriendo modal:", modalId);
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add("active");
+            document.getElementById("overlay").classList.add("active");
+        } else {
+            console.warn("Modal no encontrado:", modalId);
+        }
+    };
 
-document.getElementById("add-vaca-btn").addEventListener("click", async () => {
-    try {
-        const nextId = await getNextVacaId();
-        document.getElementById("rfid").value = nextId; // Mostrar el ID en el campo RFID
-        openModal("modal-registrar");
-    } catch (error) {
-        alert("Error al obtener el ID para la nueva vaca. Intenta nuevamente.");
-    }
+    window.closeModal = (modalId) => {
+        console.log("Cerrando modal con ID:", modalId);
+        if (modalId === "modal-registrar") {
+            console.log("Limpiando modal de registro:", modalId);
+            limpiarCamposRegistrar();
+        } else if (modalId === "modal-consultar") {
+            console.log("Limpiando modal de consulta:", modalId);
+            limpiarCamposConsultar();
+        } else {
+            console.warn("Modal ID no reconocido:", modalId);
+        }
+    
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove("active");
+            const overlay = document.getElementById("overlay");
+            if (overlay) overlay.classList.remove("active");
+        } else {
+            console.warn("Modal no encontrado para cerrar:", modalId);
+        }
+    };
 });
+
+    // Función para limpiar los campos del modal Registrar
+    function limpiarCamposRegistrar() {
+        console.log("Limpiando campos del modal Registrar...");
+        const registerRfidInput = document.getElementById("rfid");
+        const internalIdInput = document.getElementById("id-interno");
+        const razaInput = document.getElementById("raza");
+        const sexoInput = document.getElementById("sexo");
+        const pesoInput = document.getElementById("peso");
+        const fechaIngresoInput = document.getElementById("fecha-ingreso");
+        const estadoSaludInput = document.getElementById("estado-salud");
+        const historialVacunacionInput = document.getElementById("historial-vacunacion");
+        const fechaDesparasitacionInput = document.getElementById("fecha-desparasitacion");
+        const estadoReproductivoInput = document.getElementById("estado-reproductivo");
+        const fechaUltimoPartoInput = document.getElementById("fecha-ultimo-parto");
+        const numeroCriasInput = document.getElementById("numero-crias");
+        const ubicacionInput = document.getElementById("corral");
+        const observacionesInput = document.getElementById("observaciones");
+        const fotoAnimalInput = document.getElementById("foto-animal");
+
+        if (registerRfidInput) registerRfidInput.value = "";
+        if (internalIdInput) internalIdInput.value = "";
+        if (razaInput) razaInput.value = "";
+        if (sexoInput) sexoInput.value = "";
+        if (pesoInput) pesoInput.value = "";
+        if (fechaIngresoInput) fechaIngresoInput.value = "";
+        if (estadoSaludInput) estadoSaludInput.value = "";
+        if (historialVacunacionInput) historialVacunacionInput.value = "";
+        if (fechaDesparasitacionInput) fechaDesparasitacionInput.value = "";
+        if (estadoReproductivoInput) estadoReproductivoInput.value = "";
+        if (fechaUltimoPartoInput) fechaUltimoPartoInput.value = "";
+        if (numeroCriasInput) numeroCriasInput.value = "";
+        if (ubicacionInput) ubicacionInput.value = "";
+        if (observacionesInput) observacionesInput.value = "";
+        if (fotoAnimalInput) fotoAnimalInput.value = null;
+    }
+
+// Función para limpiar los campos del modal Consultar
+function limpiarCamposConsultar() {
+    console.log("Limpiando campos del modal Consultar...");
+    const searchInput = document.getElementById("rfid-input");
+    if (searchInput) searchInput.value = "";
+}

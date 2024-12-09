@@ -17,6 +17,30 @@ body {
     font-size: 18px;
 }
 
+
+.form-input.error {
+    border: 2px solid red;
+    background-color: #ffe6e6;
+    transition: border 0.3s ease, background-color 0.3s ease;
+}
+
+.form-input.error:focus {
+    outline: none;
+    background-color: white;
+}
+
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+
+
 .header .title {
     font-weight: bold;
 }
@@ -111,30 +135,32 @@ body {
 }
 
 
-/* DataGridView */
+/* Estilo para el DataGridView */
 .data-grid {
     width: 100%;
     border-collapse: collapse;
-    margin: 20px 0;
-    background: white;
-    border-radius: 5px;
-    overflow: hidden;
+    text-align: center;
+    font-size: 16px;
 }
 
-.data-grid th, .data-grid td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
-}
-
-.data-grid th {
-    background-color: #f4f4f4;
-    color: #333;
-}
-
+.data-grid th,
 .data-grid td {
-    color: #555;
+    border: 1px solid #ccc;
+    padding: 15px;
 }
+
+/* Ajustar tamaño de la columna de fotos */
+.foto-columna {
+    width: 150px; /* Ancho de la columna */
+}
+
+.data-grid td img {
+    width: 120px; /* Ancho de las imágenes */
+    height: 120px; /* Alto de las imágenes */
+    object-fit: cover; /* Mantiene las proporciones al recortar */
+    border-radius: 5px; /* Bordes redondeados */
+}
+
 
 /* Estilo general para el modal */
 .modal {
@@ -583,18 +609,13 @@ label {
     border: 1px solid #ccc;
     border-radius: 5px;
     box-sizing: border-box;
+    pointer-events: auto;
 }
 
 /* Botón deshabilitado */
 .nav-btn[disabled] {
     background-color: #ccc;
     cursor: not-allowed;
-}
-
-/* Estilo para campos con error */
-.form-input.error {
-    border: 2px solid red;
-    background-color: #ffe6e6;
 }
 
 /* Estilo para campos corregidos */
@@ -632,6 +653,137 @@ label {
         content: "Esperando lectura...";
     }
 }
+.image-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+}
 
+.modal-content {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 90%;
+    max-height: 90%;
+}
 
+#modal-image {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 10px;
+}
 
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 30px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.vaca-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.vaca-header {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.vaca-image {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.vaca-info {
+    width: 100%;
+}
+
+.vaca-info p {
+    margin: 8px 0;
+    font-size: 16px;
+}
+
+.modal-body img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Estilo del modal para la imagen ampliada */
+#modal-image {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+#modal-image.active {
+    display: flex;
+}
+
+#modal-full-image {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.delete-vaca-btn {
+    background-color: #d33; /* Rojo */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espacio entre icono y texto */
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra */
+    transition: all 0.3s ease; /* Transición */
+}
+
+.delete-vaca-btn:hover {
+    background-color: #b71c1c; /* Rojo más oscuro al pasar el mouse */
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2); /* Más sombra */
+    transform: translateY(-2px); /* Efecto de elevación */
+}
+
+.delete-vaca-btn:active {
+    background-color: #8e0000; /* Rojo más intenso al hacer clic */
+    transform: translateY(0); /* Regresa a su posición */
+}
+
+.delete-vaca-btn .material-icons {
+    font-size: 18px; /* Tamaño del icono */
+}
