@@ -1039,52 +1039,69 @@ function limpiarCamposConsultar() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const cameraBtn = document.getElementById("camera-btn");
-    const fileInput = document.getElementById("foto-animal");
+    const video = document.getElementById("camera-stream");
+    const canvas = document.getElementById("photo-canvas");
+    const photoPreview = document.getElementById("photo-preview");
+    const takePhotoBtn = document.getElementById("take-photo-btn");
 
-    // Evento para abrir la cámara al hacer clic en el botón
-    cameraBtn.addEventListener("click", () => {
-        console.log("Abriendo la cámara...");
-        if (fileInput) {
-            fileInput.click(); // Simula el clic en el input de archivo
+    // Solicita acceso a la cámara
+    async function startCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            console.log("Cámara activada");
+        } catch (error) {
+            console.error("Error al acceder a la cámara:", error);
+            alert("No se pudo acceder a la cámara. Por favor, verifica los permisos.");
         }
+    }
+
+    // Captura la foto
+    takePhotoBtn.addEventListener("click", (event) => {
+        // Prevenir comportamiento predeterminado (por ejemplo, reiniciar la página)
+        event.preventDefault();
+
+        const context = canvas.getContext("2d");
+
+        // Establece las dimensiones del canvas igual al video
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // Dibuja el fotograma actual del video en el canvas
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Convierte la imagen en base64
+        const photoData = canvas.toDataURL("image/png");
+
+        // Muestra la imagen en el elemento <img>
+        photoPreview.src = photoData;
+        photoPreview.style.display = "block";
+
+        console.log("Foto tomada:", photoData);
+
+        // Aquí puedes subir la foto a tu backend o almacenarla
+        uploadPhoto(photoData);
     });
 
-    // Evento para manejar la selección de la imagen
-    fileInput.addEventListener("change", (event) => {
-        console.log("Foto seleccionada desde la cámara.");
-        const file = event.target.files[0]; // Obtiene el archivo seleccionado
+    // Función para subir la foto (opcional)
+    async function uploadPhoto(photoData) {
+        try {
+            // Simulación de subida a un backend (ejemplo con Firebase Storage)
+            const storageRef = ref(storage, `fotos/${Date.now()}.png`);
+            const response = await fetch(photoData);
+            const blob = await response.blob();
+            await uploadBytes(storageRef, blob);
+            const downloadURL = await getDownloadURL(storageRef);
 
-        if (file) {
-            console.log("Nombre del archivo:", file.name);
-            console.log("Tamaño del archivo:", file.size, "bytes");
-
-            // Aquí puedes agregar más validaciones si es necesario
-            if (file.size > 5 * 1024 * 1024) { // 5 MB como tamaño máximo
-                alert("El archivo es demasiado grande. Seleccione una imagen de menos de 5 MB.");
-                fileInput.value = ""; // Limpia el input si no cumple con los requisitos
-                return;
-            }
-
-            // Si necesitas mostrar una vista previa de la imagen capturada:
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                console.log("Mostrando vista previa de la imagen capturada...");
-                const previewImg = document.createElement("img");
-                previewImg.src = e.target.result;
-                previewImg.alt = "Vista previa";
-                previewImg.style.width = "100px";
-                previewImg.style.height = "100px";
-
-                // Agrega la vista previa al DOM (por ejemplo, en el contenedor del formulario)
-                const formGroup = document.querySelector(".form-group");
-                if (formGroup) {
-                    formGroup.appendChild(previewImg);
-                }
-            };
-            reader.readAsDataURL(file); // Lee el archivo como una URL base64
-        } else {
-            console.log("No se seleccionó ninguna foto.");
+            console.log("Foto subida exitosamente. URL:", downloadURL);
+            alert("Foto subida correctamente.");
+        } catch (error) {
+            console.error("Error al subir la foto:", error);
+            alert("No se pudo subir la foto. Intenta nuevamente.");
         }
-    });
+    }
+
+    // Inicia la cámara
+    startCamera();
 });
+

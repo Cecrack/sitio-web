@@ -214,12 +214,11 @@
             <div class="step-content" id="step-content-6">
                 <h3>Subir Foto</h3>
                 <div id="error-message-6" class="error-message hidden"></div>
-                <div class="form-group">
-                    <button type="button" class="camera-btn">
-                        <span class="material-icons camera-icon">photo_camera</span>
-                        Abrir cámara
-                    </button>
-                </div>
+                <button id="take-photo-btn" class="camera-btn">
+                    <span class="material-icons camera-icon">photo_camera</span>
+                    Abrir cámara
+                </button>
+                
                 <!-- Subir archivo -->
                 <label for="foto-animal">Subir archivo</label>
                 <input type="file" id="foto-animal" class="form-input hidden" accept="image/*" capture="camera">
@@ -242,6 +241,13 @@
             </div>
         </form>
     </div>
+</div>
+
+<div class="camera-container">
+    <video id="camera-stream" autoplay playsinline></video>
+    <canvas id="photo-canvas" style="display: none;"></canvas>
+    <button id="take-photo-btn">Tomar Foto</button>
+    <img id="photo-preview" alt="Previsualización de la foto" style="display: none;"/>
 </div>
 
 <!-- Modal para consultar vaca -->
