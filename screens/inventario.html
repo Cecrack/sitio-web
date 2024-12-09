@@ -210,20 +210,34 @@
                 <input type="text" id="corral" class="form-input">
             </div>
 
-            <!-- Paso 6: Foto del animal -->
+            <!-- Paso 6: Foto -->
             <div class="step-content" id="step-content-6">
                 <h3>Subir Foto</h3>
                 <div id="error-message-6" class="error-message hidden"></div>
-                <button id="take-photo-btn" class="camera-btn">
+                
+                <!-- Para activar cámara -->
+                <button id="activate-camera-btn" class="camera-btn" type="button">
                     <span class="material-icons camera-icon">photo_camera</span>
-                    Abrir cámara
+                    Activar cámara
                 </button>
                 
-                <!-- Subir archivo -->
+                <!-- Vista previa de la cámara -->
+                <div id="camera-preview" class="hidden">
+                    <video id="camera-stream" autoplay></video>
+                    <button id="capture-photo-btn" class="camera-btn" type="button">Tomar foto</button>
+                </div>
+                
+                <!-- Vista previa de la foto capturada -->
+                <div id="photo-preview-container" class="hidden">
+                    <img id="photo-preview" alt="Vista previa de la foto" />
+                </div>
+                
+                <!-- Opción de subir archivo manualmente -->
                 <label for="foto-animal">Subir archivo</label>
-                <input type="file" id="foto-animal" class="form-input hidden" accept="image/*" capture="camera">
-
+                <input type="file" id="foto-animal" class="form-input" accept="image/*" capture="camera">
             </div>
+            
+            
 
             <!-- Paso 7: Observaciones generales -->
             <div class="step-content" id="step-content-7">
@@ -241,13 +255,6 @@
             </div>
         </form>
     </div>
-</div>
-
-<div class="camera-container">
-    <video id="camera-stream" autoplay playsinline></video>
-    <canvas id="photo-canvas" style="display: none;"></canvas>
-    <button id="take-photo-btn">Tomar Foto</button>
-    <img id="photo-preview" alt="Previsualización de la foto" style="display: none;"/>
 </div>
 
 <!-- Modal para consultar vaca -->
@@ -287,20 +294,6 @@
     </div>
 </div>
 
-<!-- Modal para ver imagen ampliada -->
-<div class="modal" id="modal-image">
-    <div class="modal-header">
-        Imagen
-        <button class="modal-close" onclick="closeModal('modal-image')">
-            <span class="material-icons">close</span>
-        </button>
-    </div>
-    <div class="modal-body">
-        <img id="modal-full-image" src="" alt="Imagen de la vaca" style="width: 100%; height: auto;">
-    </div>
-</div>
-
-
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -309,10 +302,6 @@
 
 <!-- Tu script principal -->
 <script type="module" src="../script.js"></script>
-
-
-
-
 
 <script>
     // Función para abrir o cerrar el menú desplegable del perfil
@@ -343,7 +332,6 @@
         }
     });
 </script>
-
 
 </body>
 </html>

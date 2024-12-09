@@ -787,3 +787,18 @@ label {
 .delete-vaca-btn .material-icons {
     font-size: 18px; /* Tamaño del icono */
 }
+
+#camera-preview video {
+    width: 100%;
+    max-height: 300px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#photo-preview-container img {
+    width: 100%;
+    max-height: 300px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}

@@ -43,9 +43,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-document.addEventListener("DOMContentLoaded", () => {
-
-    // --- Código de MQTT Integrado ---
+// --- Código de MQTT Integrado ---
 
     // Configuración de MQTT
     const mqttUrl = "wss://d5e57d2e51ce444ea8dd953e6f0ef5a6.s1.eu.hivemq.cloud:8884/mqtt";
@@ -98,6 +96,9 @@ document.addEventListener("DOMContentLoaded", () => {
             text: `Error: ${err.message}`,
         });
     });
+
+
+document.addEventListener("DOMContentLoaded", () => {
 
     async function getCurrentInternalId() {
         try {
@@ -383,6 +384,100 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalImage = document.getElementById("modal-image");
     const closeImageModal = document.getElementById("close-image-modal");
 
+
+
+    const activateCameraBtn = document.getElementById("activate-camera-btn");
+    const cameraPreview = document.getElementById("camera-preview");
+    const cameraStream = document.getElementById("camera-stream");
+    const capturePhotoBtn = document.getElementById("capture-photo-btn");
+    const photoPreviewContainer = document.getElementById("photo-preview-container");
+    const photoPreview = document.getElementById("photo-preview");
+    const fotoAnimalInput = document.getElementById("foto-animal");
+
+    let stream = null; // Variable para mantener el stream de la cámara
+
+    // Activa la cámara en PC
+    activateCameraBtn.addEventListener("click", async (e) => {
+        e.preventDefault(); // Previene el comportamiento predeterminado del botón
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            cameraStream.srcObject = stream;
+            cameraPreview.classList.remove("hidden");
+            photoPreviewContainer.classList.add("hidden"); // Oculta la vista previa si ya existía
+            console.log("Cámara activada");
+        } catch (error) {
+            console.error("Error al activar la cámara:", error);
+            alert("No se pudo activar la cámara. Verifica los permisos.");
+        }
+    });
+
+    // Captura la foto en PC
+    capturePhotoBtn.addEventListener("click", () => {
+        if (!stream) {
+            alert("La cámara no está activada.");
+            return;
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = cameraStream.videoWidth;
+        canvas.height = cameraStream.videoHeight;
+
+        const context = canvas.getContext("2d");
+        context.drawImage(cameraStream, 0, 0, canvas.width, canvas.height);
+
+        // Detiene la cámara
+        stream.getTracks().forEach((track) => track.stop());
+        stream = null; // Limpia el stream para evitar problemas
+
+        // Convierte el canvas a Blob
+        canvas.toBlob((blob) => {
+            capturedPhotoBlob = blob; // Guarda la foto en la variable global
+            console.log("Foto capturada y almacenada temporalmente:", blob);
+
+            // Muestra la foto en la vista previa
+            const photoDataURL = URL.createObjectURL(blob);
+            photoPreview.src = photoDataURL;
+            photoPreviewContainer.classList.remove("hidden");
+            cameraPreview.classList.add("hidden");
+        }, "image/png");
+    });
+
+    // Manejo de la cámara en móviles
+    fotoAnimalInput.addEventListener("change", () => {
+        const file = fotoAnimalInput.files[0];
+        if (file) {
+            capturedPhotoBlob = file; // Guarda el archivo en la variable global
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                photoPreview.src = e.target.result;
+                photoPreviewContainer.classList.remove("hidden");
+                console.log("Foto cargada desde móvil:", file.name);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Convierte base64 a File (utilidad opcional)
+    function dataURLtoFile(dataurl, filename) {
+        const arr = dataurl.split(",");
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new File([u8arr], filename, { type: mime });
+    }
+
+    // Exponer `capturedPhotoBlob` para su uso posterior en el registro
+    window.getCapturedPhotoBlob = () => capturedPhotoBlob;
+
+
+
+
+
+
     // Agrega evento a todas las imágenes en la tabla
     document.querySelectorAll(".data-grid td img").forEach((img) => {
         img.addEventListener("click", () => {
@@ -511,7 +606,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 fieldsToValidate.push(document.getElementById("corral"));
                 break;
             case 5: // Paso 6: Foto del animal (opcional en este ejemplo)
-                fieldsToValidate.push(document.getElementById("foto-animal"));
+                //fieldsToValidate.push(document.getElementById("foto-animal"));
                 break;
         }
     
@@ -583,7 +678,6 @@ document.addEventListener("DOMContentLoaded", () => {
             updateStep();
         }
     });
-    
 
     async function getCurrentInternalId() {
         try {
@@ -612,7 +706,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function registrarDatos() {
         // Captura todos los campos del formulario
         const rfid = document.getElementById("rfid").value.trim();
-        const idInterno = document.getElementById("id-interno").value.trim(); // Nuevo campo
+        const idInterno = document.getElementById("id-interno").value.trim();
         const raza = document.getElementById("raza").value.trim();
         const sexo = document.getElementById("sexo").value;
         const peso = parseFloat(document.getElementById("peso").value);
@@ -620,7 +714,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const estadoSalud = document.getElementById("estado-salud").value;
         const historialVacunacion = document.getElementById("historial-vacunacion").value.trim();
         const fechaDesparasitacion = document.getElementById("fecha-desparasitacion").value;
-        // Verificar los campos relacionados con reproducción
         const estadoReproductivo = document.getElementById("estado-reproductivo").disabled
             ? "N/A"
             : document.getElementById("estado-reproductivo").value;
@@ -630,23 +723,20 @@ document.addEventListener("DOMContentLoaded", () => {
         const numeroCrias = document.getElementById("numero-crias").disabled
             ? "N/A"
             : parseInt(document.getElementById("numero-crias").value) || 0;
-
         const ubicacion = document.getElementById("corral").value.trim();
         const observaciones = document.getElementById("observaciones").value.trim();
-        const fotoAnimal = document.getElementById("foto-animal").files[0];
-
+    
         if (!rfid || !idInterno || !raza || !sexo || !peso || !fechaIngreso || !estadoSalud || !ubicacion) {
             alert("Por favor completa todos los campos obligatorios.");
             return;
         }
     
-        // Subir imagen a Firebase Storage
+        // Subir la foto si fue capturada
         let fotoURL = null;
-        if (fotoAnimal) {
+        if (capturedPhotoBlob) {
             try {
-                const storage = getStorage();
-                const storageRef = ref(storage, `vacas/${rfid}_${Date.now()}`);
-                await uploadBytes(storageRef, fotoAnimal);
+                const storageRef = ref(storage, `vacas/${rfid}_${Date.now()}.png`);
+                await uploadBytes(storageRef, capturedPhotoBlob); // Sube la foto como un Blob
                 fotoURL = await getDownloadURL(storageRef);
                 console.log(`Imagen subida con éxito: ${fotoURL}`);
             } catch (error) {
@@ -676,13 +766,32 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     
         try {
-            // Guarda los datos en Firestore usando `setDoc` y un ID personalizado
-            const docRef = doc(db, "vacas", idInterno); // Usa el número interno como ID del documento
+             // Referencia al documento del contador en Firestore
+            const contadorRef = doc(db, "configuracion", "contadorVacas");
+            const contadorSnapshot = await getDoc(contadorRef);
+
+            let contadorActual = 0;
+
+            // Verifica si el documento del contador existe
+            if (contadorSnapshot.exists()) {
+                contadorActual = contadorSnapshot.data().contador || 0;
+            }
+
+            // Genera el nuevo ID interno basado en el contador
+            const nuevoIdInterno = `vaca-${(contadorActual + 1).toString().padStart(3, "0")}`;
+            vacaData.idInterno = nuevoIdInterno;
+
+            // Guarda los datos en Firestore usando el nuevo ID interno
+            const docRef = doc(db, "vacas", nuevoIdInterno); // Usa el nuevo número interno como ID del documento
             await setDoc(docRef, vacaData);
-    
-            // Actualiza el contador solo después de un registro exitoso
-            const { contadorRef, contadorActual } = await getCurrentInternalId();
+
+            // Actualiza el contador en Firestore
             await setDoc(contadorRef, { contador: contadorActual + 1 });
+            
+            // Publica mensaje MQTT de confirmacion de registro
+            const responseMessage = `RFID Registrado`;
+            console.log(responseMessage);
+            client.publish("/topic/datos", responseMessage);
     
             alert(`Registro completado con éxito. ID del documento: ${idInterno}`);
     
@@ -691,11 +800,17 @@ document.addEventListener("DOMContentLoaded", () => {
             currentStep = 0;
             updateStep();
             closeModal("modal-registrar");
+    
+            // Limpia la foto capturada
+            capturedPhotoBlob = null;
+            photoPreview.style.display = "none";
+            photoPreview.src = "";
         } catch (error) {
             console.error("Error al registrar datos:", error);
             alert("Ocurrió un error al registrar los datos. Por favor, intenta nuevamente.");
         }
     }
+    
     
     // Manejo del botón Registrar
     submitBtn.addEventListener("click", async (e) => {
@@ -1038,70 +1153,8 @@ function limpiarCamposConsultar() {
     if (searchInput) searchInput.value = "";
 }
 
+let capturedPhotoBlob = null; // Variable para almacenar temporalmente la foto capturada
+
 document.addEventListener("DOMContentLoaded", () => {
-    const video = document.getElementById("camera-stream");
-    const canvas = document.getElementById("photo-canvas");
-    const photoPreview = document.getElementById("photo-preview");
-    const takePhotoBtn = document.getElementById("take-photo-btn");
-
-    // Solicita acceso a la cámara
-    async function startCamera() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream;
-            console.log("Cámara activada");
-        } catch (error) {
-            console.error("Error al acceder a la cámara:", error);
-            alert("No se pudo acceder a la cámara. Por favor, verifica los permisos.");
-        }
-    }
-
-    // Captura la foto
-    takePhotoBtn.addEventListener("click", (event) => {
-        // Prevenir comportamiento predeterminado (por ejemplo, reiniciar la página)
-        event.preventDefault();
-
-        const context = canvas.getContext("2d");
-
-        // Establece las dimensiones del canvas igual al video
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-
-        // Dibuja el fotograma actual del video en el canvas
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        // Convierte la imagen en base64
-        const photoData = canvas.toDataURL("image/png");
-
-        // Muestra la imagen en el elemento <img>
-        photoPreview.src = photoData;
-        photoPreview.style.display = "block";
-
-        console.log("Foto tomada:", photoData);
-
-        // Aquí puedes subir la foto a tu backend o almacenarla
-        uploadPhoto(photoData);
-    });
-
-    // Función para subir la foto (opcional)
-    async function uploadPhoto(photoData) {
-        try {
-            // Simulación de subida a un backend (ejemplo con Firebase Storage)
-            const storageRef = ref(storage, `fotos/${Date.now()}.png`);
-            const response = await fetch(photoData);
-            const blob = await response.blob();
-            await uploadBytes(storageRef, blob);
-            const downloadURL = await getDownloadURL(storageRef);
-
-            console.log("Foto subida exitosamente. URL:", downloadURL);
-            alert("Foto subida correctamente.");
-        } catch (error) {
-            console.error("Error al subir la foto:", error);
-            alert("No se pudo subir la foto. Intenta nuevamente.");
-        }
-    }
-
-    // Inicia la cámara
-    startCamera();
+    
 });
-
