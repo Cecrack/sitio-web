@@ -1037,3 +1037,54 @@ function limpiarCamposConsultar() {
     const searchInput = document.getElementById("rfid-input");
     if (searchInput) searchInput.value = "";
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    const cameraBtn = document.getElementById("camera-btn");
+    const fileInput = document.getElementById("foto-animal");
+
+    // Evento para abrir la cámara al hacer clic en el botón
+    cameraBtn.addEventListener("click", () => {
+        console.log("Abriendo la cámara...");
+        if (fileInput) {
+            fileInput.click(); // Simula el clic en el input de archivo
+        }
+    });
+
+    // Evento para manejar la selección de la imagen
+    fileInput.addEventListener("change", (event) => {
+        console.log("Foto seleccionada desde la cámara.");
+        const file = event.target.files[0]; // Obtiene el archivo seleccionado
+
+        if (file) {
+            console.log("Nombre del archivo:", file.name);
+            console.log("Tamaño del archivo:", file.size, "bytes");
+
+            // Aquí puedes agregar más validaciones si es necesario
+            if (file.size > 5 * 1024 * 1024) { // 5 MB como tamaño máximo
+                alert("El archivo es demasiado grande. Seleccione una imagen de menos de 5 MB.");
+                fileInput.value = ""; // Limpia el input si no cumple con los requisitos
+                return;
+            }
+
+            // Si necesitas mostrar una vista previa de la imagen capturada:
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                console.log("Mostrando vista previa de la imagen capturada...");
+                const previewImg = document.createElement("img");
+                previewImg.src = e.target.result;
+                previewImg.alt = "Vista previa";
+                previewImg.style.width = "100px";
+                previewImg.style.height = "100px";
+
+                // Agrega la vista previa al DOM (por ejemplo, en el contenedor del formulario)
+                const formGroup = document.querySelector(".form-group");
+                if (formGroup) {
+                    formGroup.appendChild(previewImg);
+                }
+            };
+            reader.readAsDataURL(file); // Lee el archivo como una URL base64
+        } else {
+            console.log("No se seleccionó ninguna foto.");
+        }
+    });
+});
