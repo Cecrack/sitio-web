@@ -1,0 +1,432 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    height: 100vh;
+    overflow: hidden; /* Evitar que aparezca scroll innecesario */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Styles */
+.header {
+    background-color: #d7c7b3;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.header .title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.header .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-circle {
+    width: 30px;
+    height: 30px;
+    background-color: #b17457;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Main Container */
+.main-container {
+    display: flex;
+    height: calc(100vh - 60px); /* Resta la altura del encabezado */
+    overflow: hidden;
+}
+
+/* Navbar/Menu Styles */
+.menu-container {
+    width: 250px;
+    background-color: #3e3e3e;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    overflow-y: auto; /* Permitir scroll si el menú es largo */
+}
+
+.menu-container button {
+    background-color: #c1815d;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    margin: 5px 0;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.menu-container button.active {
+    background-color: #a56039;
+    font-weight: bold;
+}
+
+.menu-container button:hover {
+    background-color: #a56039;
+}
+
+/* Content Area */
+.content {
+    flex: 1; /* Ocupar todo el espacio restante */
+    padding: 20px;
+    overflow-y: auto; /* Permitir scroll si el contenido es largo */
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+thead {
+    background-color: #f4f4f4;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+}
+
+th {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+    background-color: #e8e8e8;
+}
+
+/* Floating Button */
+.floating-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.floating-btn:hover {
+    background-color: #45a049;
+}
+
+/* Modal general */
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 90%;
+    max-width: 600px;
+    overflow-y: auto; /* Habilitar scroll si hay muchos campos */
+    max-height: 80vh; /* Evitar que el modal se salga de la pantalla */
+}
+
+/* Activar el modal */
+.modal.active {
+    display: block;
+}
+
+/* Encabezado del modal */
+.modal-content h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Estilo del formulario */
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Espacio entre los campos */
+}
+
+/* Estilos para los inputs, select y textarea */
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: none; /* Evitar que los textarea se puedan redimensionar */
+}
+
+/* Estilo para labels */
+.modal-content label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* Botón de guardar */
+.modal-content button[type="submit"] {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.modal-content button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Botón de cerrar */
+.modal .close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.modal .close-button:hover {
+    color: #000;
+}
+
+/* Responsividad para pantallas pequeñas */
+@media (max-width: 768px) {
+    .modal {
+        width: 100%; /* Usar todo el ancho disponible */
+        max-width: 90%; /* Dejar un pequeño margen en los lados */
+    }
+
+    .modal-content {
+        gap: 10px; /* Reducir el espacio entre campos */
+    }
+}
+
+
+/* Overlay */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.overlay.active {
+    display: block;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .menu-container {
+        display: none; /* Ocultar menú por defecto */
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 70%;
+        z-index: 1000;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .menu-container.show {
+        display: flex; /* Mostrar menú al activarse */
+    }
+
+    .nav-toggle {
+        display: block;
+        font-size: 24px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #333;
+    }
+
+    .content {
+        overflow-x: auto;
+    }
+}
+
+.nav-toggle {
+    display: none;
+}
+
+/* Contenedor principal de las tarjetas */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Estilo para las tarjetas */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: scale(1.02);
+}
+
+.card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.card-header {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.card-content p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.card-actions {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.card .edit-btn {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.card .edit-btn:hover {
+    background-color: #45a049;
+}
+
+
+/* Contenedor de Filtros */
+.filters-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    justify-content: space-between; /* Espacio uniforme entre los filtros */
+}
+
+/* Estilo de los Labels */
+.filters-container label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    display: block; /* Asegura que los labels estén separados de los inputs */
+    margin-bottom: 5px;
+}
+
+/* Estilo de Inputs y Selects */
+.filters-container input,
+.filters-container select {
+    width: 100%; /* Ocupa todo el ancho disponible */
+    max-width: 250px; /* Limitar el ancho en escritorio */
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.filters-container input:focus,
+.filters-container select:focus {
+    border-color: #b17457;
+    box-shadow: 0 0 5px rgba(177, 116, 87, 0.5);
+    outline: none;
+}
+
+/* Estilo para Móviles */
+@media (max-width: 768px) {
+    .filters-container {
+        flex-direction: column; /* Cambia a apilado */
+        align-items: stretch; /* Asegura que ocupen todo el ancho del contenedor */
+    }
+
+    .filters-container input,
+    .filters-container select {
+        max-width: none; /* Quita el límite de ancho */
+    }
+}

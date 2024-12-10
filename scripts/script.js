@@ -25,8 +25,6 @@ import {
     getDownloadURL 
 } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-storage.js';
 
-
-
 // Tu configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBGlP6JI7CnJh-MXVrzNfuZlVDUnW51jHc",
@@ -46,67 +44,31 @@ const storage = getStorage(app);
 
 // --- Código de MQTT Integrado ---
 
-    // Configuración de MQTT
-    const mqttUrl = "wss://d5e57d2e51ce444ea8dd953e6f0ef5a6.s1.eu.hivemq.cloud:8884/mqtt";
-    const options = {
-        username: "sergio",
-        password: "Prueba123",
-        protocol: "wss",
-        reconnectPeriod: 1000
-    };
+const mqttUrl = "wss://d5e57d2e51ce444ea8dd953e6f0ef5a6.s1.eu.hivemq.cloud:8884/mqtt";
+const options = {
+    username: "sergio",
+    password: "Prueba123",
+    protocol: "wss",
+    reconnectPeriod: 1000
+};
 
-    // Conexión al servidor MQTT
-    const client = mqtt.connect(mqttUrl, options);
+const client = mqtt.connect(mqttUrl, options);
 
-    // Manejo de conexión exitosa
-    client.on("connect", () => {
-        /*
-        Swal.fire({
-            
-            icon: "success",
-            title: "Conexión exitosa",
-            text: "Conectado al servidor MQTT",
-            timer: 3000,
-            showConfirmButton: false
-            
-        });
-         */   
-        // Suscribirse al tópico /topic/rfid
-        client.subscribe("/topic/rfid", (err) => {
-            if (!err) {
-                /*
-                Swal.fire({
-                    icon: "info",
-                    title: "Suscripción exitosa",
-                    text: "Te has suscrito al tópico: /topic/rfid",
-                    timer: 3000,
-                    showConfirmButton: false
-                });
-                */
-            } else {
-                /*
-                Swal.fire({
-                    icon: "error",
-                    title: "Error de suscripción",
-                    text: `No se pudo suscribir al tópico: ${err.message}`,
-                });
-                */
-            }
-        });
+client.on("connect", () => {
+    console.log("Conexión MQTT exitosa.");
+    client.subscribe("/topic/rfid", (err) => {
+        if (!err) {
+            console.log("Suscripción exitosa al tópico /topic/rfid");
+        } else {
+            console.error("Error al suscribirse al tópico:", err);
+        }
     });
+});
 
+client.on("error", (err) => {
+    console.error("Error en la conexión MQTT:", err);
+});
 
-    
-    // Manejo de errores de conexión
-    client.on("error", (err) => {
-        /*
-        Swal.fire({
-            icon: "error",
-            title: "Error de conexión",
-            text: `Error: ${err.message}`,
-        });
-        */
-    });
 
 
 document.addEventListener("DOMContentLoaded", () => {
