@@ -1,0 +1,88 @@
+/* Reseteo */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Encabezado */
+.header {
+    background-color: #d7c7b3;
+    padding: 10px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Contenedor principal */
+.main-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Barra lateral */
+.sidebar {
+    width: 250px;
+    background-color: #3e3e3e;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.sidebar .tab-button {
+    background-color: #c1815d;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    margin: 5px 0;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.sidebar .tab-button:hover {
+    background-color: #a56039;
+}
+
+.sidebar .tab-button.active {
+    background-color: #a56039;
+    font-weight: bold;
+}
+
+/* Contenido */
+.content {
+    flex: 1;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.status {
+    font-weight: bold;
+}
+
+.status.good {
+    color: green;
+}
+
+.status.bad {
+    color: red;
+}

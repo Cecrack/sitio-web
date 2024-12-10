@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reportes - Ganadería Inteligente</title>
-    <link rel="stylesheet" href="../styles/style.css">
+    <link rel="stylesheet" href="../styles/styleReportes.css">
 </head>
 <body>
 
@@ -26,27 +26,67 @@
                 <button id="create-user-btn" onclick="openModal('create-user-form')">Crear cuenta</button>
             
                 <!-- Botón para cerrar sesión (inicialmente oculto) -->
+                <button id="perfil-btn" class="hidden">Informacion</button>
                 <button id="logout-btn" class="hidden">Cerrar sesión</button>
             </div>
         </div>
     </div>
-
+    
+<!-- Contenedor principal -->
+<div class="main-container">
     <!-- Menú lateral izquierdo -->
     <nav class="menu-container" id="nav-menu">
         <button id="btn-inicio" onclick="window.location.href='../index.html';">Inicio</button>
         <button id="btn-inventario" onclick="window.location.href='../screens/inventario.html';">Gestión de Inventario</button>
         <button id="btn-reportes" class="active" onclick="window.location.href='../screens/reportes.html';">Reportes</button>
         <button id="btn-consulta" onclick="window.location.href='../screens/consulta.html';">Consulta</button>
+        <button id="btn-historialMedico" onclick="window.location.href='../screens/historialMedico.html';">Historial Medico</button>
         <button id="btn-panel" onclick="window.location.href='../screens/panelAdministracion.html';">Panel de Administración</button>
     </nav>
-
-    <!-- Contenedor principal -->
-    <div class="main-container">
-        <!-- Área de contenido principal -->
-        <div class="content" id="content">
-            <h1>Bienvenido a Reportes</h1>
+    
+    <div class="content" id="content">
+        <h1>Reportes - Ganadería</h1>   
+        <div class="chart-section">
+            <div class="gender-chart-section">
+                <h2>Distribución por Género</h2>
+                <canvas id="gender-chart" width="400" height="200"></canvas>
+            </div>
+            
+            <div class="corral-chart-section">
+                <h2>Distribución de Vacas por Corral</h2>
+                <div class="corrales-container">
+                    <div class="corral" id="corral-a">
+                        <h3>Corral A</h3>
+                        <div class="vacas"></div>
+                    </div>
+                    <div class="corral" id="corral-b">
+                        <h3>Corral B</h3>
+                        <div class="vacas"></div>
+                    </div>
+                    <div class="corral" id="corral-c">
+                        <h3>Corral C</h3>
+                        <div class="vacas"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+  <div class="chart-section">
+        <div class="health-status-chart-section">
+            <h2>Estado de Salud de las Vacas</h2>
+            <canvas id="health-status-chart" width="600" height="300"></canvas>
+        </div>
+        <div class="bar-chart-section">
+            <h2>Cantidad de vacas ingresadas en los últimos 6 meses</h2>
+            <canvas id="bar-chart" width="400" height="200"></canvas>
         </div>
     </div>
+        
+        
+    </div>
+</div>
+
+    
 
     <!-- Overlay para modales -->
     <div id="overlay" class="overlay"></div>
@@ -85,7 +125,8 @@
         </div>
     </div>
 
-    <script type="module" src="../script.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="../scripts/scriptReportes.js"></script>
+     
 </body>
 </html>

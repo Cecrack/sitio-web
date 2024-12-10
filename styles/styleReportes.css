@@ -13,7 +13,7 @@ body {
     flex-direction: column;
     height: 100vh;
     width: 100vw;
-    overflow: hidden;
+    overflow: auto;
 }
 
 /* Estilos del encabezado */
@@ -69,6 +69,72 @@ body {
     display: flex;
 }
 
+.content {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+.filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #f4f4f4;
+}
+
+.chart-section {
+    display: flex; /* Utiliza flexbox para alinear los gráficos */
+    flex-wrap: wrap; /* Permite que los gráficos pasen a una nueva fila si no caben */
+    gap: 20px; /* Espacio entre cada gráfico */
+    justify-content: center; /* Alinea los gráficos al centro */
+    margin: 20px 0; /* Espacio entre la sección de gráficos y otros elementos */
+}
+
+/* Estilo para las gráficas individuales */
+.chart-section > div {
+    flex: 1 1 calc(50% - 20px); /* Ocupan el 50% del ancho disponible */
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Centrar título y contenido */
+}
+
+/* Ajuste del canvas */
+.chart-section canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Responsividad para pantallas pequeñas */
+@media (max-width: 768px) {
+    .chart-section > div {
+        flex: 1 1 100%; /* Cada gráfica ocupa toda la fila en pantallas pequeñas */
+    }
+}
+
+
 /* Menú lateral izquierdo */
 .menu-container {
     background-color: #3e3e3e;
@@ -100,36 +166,6 @@ body {
 
 .menu-container button.active {
     background-color: #a56039;
-}
-
-/* Área de contenido principal */
-.content {
-    flex: 1;
-    background-color: #f9f9f9;
-    padding: 40px;
-    border-left: 2px solid #ccc;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    text-align: left;
-}
-
-.content h1 {
-    font-size: 32px;
-    margin-bottom: 20px;
-}
-
-.content h3 {
-    font-size: 20px;
-    margin-bottom: 15px;
-    color: #555;
-}
-
-.content p {
-    font-size: 16px;
-    line-height: 1.6;
-    color: #333;
 }
 
 /* Estilos para el menú de perfil desplegable */
@@ -412,6 +448,24 @@ body {
     font-size: 20px;
     cursor: pointer;
 }
+.no-permission {
+    text-align: center;
+    padding: 2rem;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    margin: 2rem auto;
+    max-width: 600px;
+}
+.no-permission h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+.no-permission p {
+    font-size: 1rem;
+    margin: 0;
+}
 
 /* Estilo responsivo para pantallas pequeñas */
 @media (max-width: 768px) {
@@ -462,4 +516,46 @@ body {
         cursor: pointer;
         color: #333;
     }
+}
+
+.corrales-container {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.corral {
+    width: 150px;
+    height: 200px;
+    border: 2px solid #b17457;
+    border-radius: 10px;
+    background-color: #f5e6d7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px;
+}
+
+.corral h3 {
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+.vacas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    width: 100%;
+}
+
+.vaca {
+    width: 20px;
+    height: 20px;
+    background-color: #ff5733;
+    border-radius: 50%;
 }

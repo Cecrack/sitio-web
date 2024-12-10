@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Historial Médico - Ganadería Inteligente</title>
+    <link rel="stylesheet" href="../styles/styleInventarios.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+       /* Estilo para pantallas pequeñas */
+@media (max-width: 768px) {
+    /* Ajustar la tabla a bloques */
+    .history-table {
+        display: block;
+        overflow-x: auto;
+    }
+    .history-table thead {
+        display: none; /* Ocultar encabezados de columna */
+    }
+    .history-table tr {
+        display: block;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 10px;
+        background-color: #f9f9f9;
+    }
+    .history-table td {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px;
+        font-size: 14px;
+    }
+    .history-table td::before {
+        content: attr(data-label); /* Agrega un prefijo con el nombre de la columna */
+        font-weight: bold;
+        flex: 0 0 50%;
+        text-align: left;
+    }
+    .history-table td:last-child {
+        display: flex;
+        justify-content: space-between;
+    }
+    .actions-container {
+        display: flex;
+        justify-content: space-between;
+    }
+}
+
+
+
+        /* Estilos adicionales para el historial médico */
+        .data-grid th, .data-grid td {
+            text-align: center;
+        }
+
+        .history-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        .history-table th, .history-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        .history-table th {
+            background-color: #f4f4f4;
+        }
+
+        .btn-add-record {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .add-record-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+
+        .add-record-btn:hover {
+            background-color: #45a049;
+        }
+
+        /* Ajustar la barra de búsqueda */
+        .search-bar {
+            display: flex;
+            justify-content: flex-end; /* Alinear a la derecha */
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-input:focus {
+            border-color: #d08a5a;
+            outline: none;
+        }
+
+
+        /* Estilo para los filtros en la tabla */
+        .filter-input {
+            width: 100%;
+            margin-top: 5px;
+            padding: 5px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-group {
+    display: flex; /* Coloca los elementos en una fila */
+    align-items: center; /* Alinea verticalmente */
+    gap: 10px; /* Espaciado entre el buscador y el botón */
+}
+
+.charts-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.chart {
+    flex: 1 1 calc(50% - 20px);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #fff;
+}
+
+
+.form-input {
+    height: 40px; /* Altura fija para que coincida con el botón */
+    padding: 0 10px; /* Espaciado interno */
+    font-size: 16px; /* Tamaño del texto */
+    border: 1px solid #ccc; /* Borde del campo */
+    border-radius: 4px; /* Bordes redondeados */
+    box-sizing: border-box; /* Incluye padding y borde en el tamaño total */
+}
+
+.consult-btn {
+    display: inline-flex; /* Flexbox para alinear el icono y el texto */
+    align-items: center; /* Centra el contenido verticalmente */
+    justify-content: center; /* Centra el contenido horizontalmente */
+    height: 40px; /* Altura igual a la del campo de entrada */
+    padding: 0 20px; /* Espaciado interno lateral */
+    font-size: 16px; /* Tamaño del texto */
+    font-weight: bold; /* Negrita para el texto */
+    background-color: #d08a5a; /* Color de fondo */
+    color: white; /* Color del texto */
+    border: none; /* Sin bordes */
+    border-radius: 4px; /* Bordes redondeados */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    transition: background-color 0.3s ease; /* Transición suave para el hover */
+}
+
+.consult-btn .btn-icon {
+    font-size: 20px; /* Tamaño del icono */
+    margin-right: 5px; /* Espaciado entre el icono y el texto */
+}
+
+.consult-btn:hover {
+    background-color: #bf7a4c; /* Color de fondo al pasar el mouse */
+}
+
+.filter-input {
+    margin-top: 5px;
+    width: 100%;
+    padding: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.filter-input:focus {
+    border-color: #d08a5a;
+    outline: none;
+}
+
+/* Contenedor de acciones */
+.actions-container {
+    display: flex;
+    justify-content: space-between; /* Posiciona uno a la izquierda y otro a la derecha */
+    align-items: center; /* Asegura la alineación vertical */
+    width: 100%; /* Asegura que ocupe toda la celda */
+}
+
+/* Estilos para los iconos */
+.action-icon {
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-icon {
+    color: inherit; /* Mantiene el color por defecto */
+}
+
+.delete-icon {
+    color: inherit; /* Mantiene el color por defecto */
+}
+
+.action-icon:hover {
+    opacity: 0.8; /* Cambia ligeramente la opacidad al pasar el mouse */
+}
+
+.chart-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Dos columnas */
+    gap: 20px; /* Espacio entre gráficas */
+    margin: 20px auto;
+    max-width: 1200px; /* Ancho máximo del contenedor */
+}
+
+.chart-container canvas {
+    width: 100%; /* Ajusta el ancho de las gráficas */
+    height: 250px; /* Altura fija */
+    border: 1px solid #ddd; /* Borde ligero para separarlas visualmente */
+    border-radius: 8px; /* Esquinas redondeadas */
+    background-color: #f9f9f9; /* Fondo claro */
+    padding: 10px; /* Espaciado interno */
+}
+
+.chart-title {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.chart-container canvas {
+    height: 400px; /* Reducir altura */
+}
+
+
+/* Botón para abrir filtros en móviles */
+.open-filters-btn {
+    display: none;
+    width: 100%;
+    background-color: #d08a5a;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.open-filters-btn:hover {
+    background-color: #bf7a4c;
+}
+
+/* Estilos generales para los filtros */
+.filters-container {
+    display: flex;
+    flex-wrap: wrap; /* Permitir que los elementos se ajusten según el espacio disponible */
+    gap: 10px; /* Espacio entre los elementos */
+    margin-bottom: 20px;
+}
+
+/* Estilo de los elementos de los filtros */
+.filters-container label {
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 5px;
+}
+
+.filters-container input,
+.filters-container select {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 200px; /* Ancho fijo para todos los filtros */
+    box-sizing: border-box;
+}
+
+/* Vista en PC/Laptop (ancho mayor a 768px) */
+@media (min-width: 769px) {
+    .filters-container {
+        flex-direction: row; /* Colocar todos los elementos en una sola fila */
+        justify-content: space-between; /* Espaciado uniforme entre filtros */
+        align-items: center; /* Alinear verticalmente en el centro */
+    }
+}
+
+/* Vista en móviles (ancho menor o igual a 768px) */
+@media (max-width: 768px) {
+    .filters-container {
+        flex-direction: column; /* Colocar los elementos en una columna (uno debajo del otro) */
+        align-items: flex-start; /* Alinear los filtros a la izquierda */
+    }
+
+    .filters-container input,
+    .filters-container select {
+        width: 100%; /* Hacer que los filtros ocupen todo el ancho disponible */
+    }
+}
+
+
+/* Estilos generales para los filtros */
+.filters-container {
+    display: flex;
+    flex-wrap: wrap; /* Permitir que los elementos se ajusten según el espacio disponible */
+    gap: 10px; /* Espacio entre los elementos */
+    margin-bottom: 20px;
+}
+
+/* Estilo de los elementos de los filtros */
+.filters-container label {
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 5px;
+}
+
+.filters-container input,
+.filters-container select {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 200px; /* Ancho fijo para todos los filtros */
+    box-sizing: border-box;
+}
+
+/* Vista en PC/Laptop (ancho mayor a 768px) */
+@media (min-width: 769px) {
+    .filters-container {
+        flex-direction: row; /* Colocar todos los elementos en una sola fila */
+        justify-content: space-between; /* Espaciado uniforme entre filtros */
+        align-items: center; /* Alinear verticalmente en el centro */
+    }
+}
+
+/* Vista en móviles (ancho menor o igual a 768px) */
+@media (max-width: 768px) {
+    .filters-container {
+        flex-direction: column; /* Colocar los elementos en una columna (uno debajo del otro) */
+        align-items: flex-start; /* Alinear los filtros a la izquierda */
+    }
+
+    .filters-container input,
+    .filters-container select {
+        width: 100%; /* Hacer que los filtros ocupen todo el ancho disponible */
+    }
+}
+
+
+/* Ocultar filtros en dispositivos pequeños */
+@media (max-width: 768px) {
+    .filters-container {
+        display: none;
+    }
+
+    .open-filters-btn {
+        display: block;
+    }
+}
+
+/* Mostrar filtros cuando estén activos */
+.filters-container.active {
+    display: flex;
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú">&#9776;</button>
+        <div class="title" id="page-title">Historial Médico</div>
+        <div class="user-info">
+            <span id="session-status">Iniciar sesión</span>
+            <div class="profile-circle" id="profile-icon" onclick="toggleDropdown()"></div>
+            <div class="dropdown-menu" id="dropdown-menu">
+                <button id="login-btn" onclick="openModal('login-form')">Iniciar sesión</button>
+                <button id="create-user-btn" onclick="openModal('create-user-form')">Crear cuenta</button>
+                <button id="logout-btn" class="hidden">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor principal -->
+    <div class="main-container">
+        <!-- Menú lateral -->
+        <nav class="menu-container" id="nav-menu">
+            <button id="btn-inicio" onclick="window.location.href='../index.html';">Inicio</button>
+            <button id="btn-inventario" onclick="window.location.href='inventario.html';">Gestión de Inventario</button>
+            <button id="btn-reportes" onclick="window.location.href='reportes.html';">Reportes</button>
+            <button id="btn-consulta" onclick="window.location.href='consulta.html';">Consulta</button>
+            <button id="btn-historialMedico" class="active" onclick="window.location.href='historialMedico.html';">Historial Médico</button>
+            <button id="btn-panel" onclick="window.location.href='panelAdministracion.html';">Panel de Administración</button>
+        </nav>
+
+        <!-- Área de contenido principal -->
+        <div class="content" id="content">
+            <h2>Gestión del Historial Médico</h2>
+        
+            <!-- Botón para agregar nuevo registro -->
+         <div class="btn-add-record">
+            <button id="add-record-btn" class="add-record-btn">
+                <span class="material-icons">add_circle_outline</span> Agregar registro
+            </button>
+        </div>
+
+            <!-- Botón para abrir filtros (visible solo en móviles) -->
+        <button class="open-filters-btn" onclick="toggleFilters()">Filtros</button>
+        
+         
+
+        <!-- Contenedor de filtros -->
+        <div class="filters-container" id="filters-container">
+            <label for="filter-rfid">RFID / Identificador</label>
+            <input type="text" class="filter-input" id="filter-rfid" placeholder="Filtrar RFID">
+
+            <label for="filter-date">Fecha</label>
+            <input type="date" class="filter-input" id="filter-date">
+
+            <label for="filter-event">Evento</label>
+            <select class="filter-input" id="filter-event">
+                <option value="" selected>Todos los eventos</option>
+                <option value="Vacunación">Vacunación</option>
+                <option value="Desparasitación">Desparasitación</option>
+                <option value="Diagnóstico">Diagnóstico</option>
+                <option value="Tratamiento">Tratamiento</option>
+                <option value="Cirugía">Cirugía</option>
+            </select>
+
+            <label for="filter-description">Descripción</label>
+            <input type="text" class="filter-input" id="filter-description" placeholder="Filtrar Descripción">
+
+            <label for="filter-veterinarian">Veterinario</label>
+            <input type="text" class="filter-input" id="filter-veterinarian" placeholder="Filtrar Veterinario">
+        </div>
+       
+            <!-- Tabla del historial médico -->
+            <table class="history-table" id="history-table">
+                <thead>
+                    <tr>
+                        <th>
+                            RFID / Identificador
+            
+                        </th>
+                        <th>
+                            Fecha
+                          
+                        </th>
+                        <th>
+                            Evento
+                          
+                        </th>
+                        <th>
+                            Descripción
+                           
+                        </th>
+                        <th>
+                            Veterinario
+
+                        </th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Los datos se cargarán dinámicamente aquí -->
+                </tbody>
+            </table>
+
+
+            
+
+            
+                
+                <div class="chart-container">
+                    
+                    <div>
+                        <canvas id="recuperacionChart"></canvas>
+                        <div class="chart-title">Tasa de Recuperación de Enfermedades</div>
+                    </div>
+                    <div>
+                        <canvas id="eventosFechaChart"></canvas>
+                        <div class="chart-title">Distribución de Eventos Médicos por Fecha</div>
+                    </div>
+                    <div>
+                        <canvas id="enfermedadesChart"></canvas>
+                        <div class="chart-title">Porcentaje de Enfermedades Recurrentes</div>
+                    </div>
+                    <div>
+                        <canvas id="estadoSaludChart"></canvas>
+                        <div class="chart-title">Porcentaje de Vacas por Estado de Salud</div>
+                    </div>
+                </div>
+                
+        </div>
+
+        
+        
+    </div>
+
+    <!-- Ventana emergente para agregar registro -->
+    <div class="modal" id="modal-add-record">
+        <div class="modal-header">
+            <h3>Agregar Registro Médico</h3>
+            <button class="modal-close" onclick="closeModal('modal-add-record')">X</button>
+        </div>
+        <div class="modal-body">
+            <form id="add-record-form">
+                <!-- Nuevo campo para RFID o Identificador interno -->
+                <label for="animal-id">RFID / Identificador Interno</label>
+                <input type="text" id="animal-id" class="form-input" placeholder="RFID o número interno" required>
+                
+                <label for="event-date">Fecha</label>
+                <input type="date" id="event-date" class="form-input" required>
+
+                <label for="event-type">Evento</label>
+                <select id="event-type" class="form-input" required>
+                    <option value="" disabled selected>Seleccionar evento</option>
+                    <option value="Vacunación">Vacunación</option>
+                    <option value="Desparasitación">Desparasitación</option>
+                    <option value="Diagnóstico">Diagnóstico</option>
+                    <option value="Tratamiento">Tratamiento</option>
+                    <option value="Cirugía">Cirugía</option>
+                </select>
+
+                <label for="description">Descripción</label>
+                <textarea id="description" class="form-input" placeholder="Detalles del evento" required></textarea>
+
+                <label for="veterinarian">Veterinario</label>
+                <input type="text" id="veterinarian" class="form-input" placeholder="Nombre del veterinario" required>
+
+                <button type="submit" class="add-record-btn">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para editar registro -->
+    <div class="modal" id="modal-edit-record">
+        <div class="modal-header">
+            <h3>Editar Registro Médico</h3>
+            <button class="modal-close" onclick="closeModal('modal-edit-record')">X</button>
+        </div>
+        <div class="modal-body">
+            <form id="edit-record-form">
+                <!-- Campo para RFID o Identificador Interno (solo lectura para evitar cambios) -->
+                <label for="edit-animal-id">RFID / Identificador Interno</label>
+                <input type="text" id="edit-animal-id" class="form-input" placeholder="RFID o número interno" readonly>
+                
+                <label for="edit-event-date">Fecha</label>
+                <input type="date" id="edit-event-date" class="form-input" required>
+
+                <label for="edit-event-type">Evento</label>
+                <select id="edit-event-type" class="form-input" required>
+                    <option value="" disabled>Seleccionar evento</option>
+                    <option value="Vacunación">Vacunación</option>
+                    <option value="Desparasitación">Desparasitación</option>
+                    <option value="Diagnóstico">Diagnóstico</option>
+                    <option value="Tratamiento">Tratamiento</option>
+                    <option value="Cirugía">Cirugía</option>
+                </select>
+
+                <label for="edit-description">Descripción</label>
+                <textarea id="edit-description" class="form-input" placeholder="Detalles del evento" required></textarea>
+
+                <label for="edit-veterinarian">Veterinario</label>
+                <input type="text" id="edit-veterinarian" class="form-input" placeholder="Nombre del veterinario" required>
+
+                <button type="submit" class="edit-record-btn">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+
+
+
+    <div class="overlay" id="overlay"></div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script type="module" src="../scripts/scriptHistorialMedico.js"></script>
+</body>
+</html>

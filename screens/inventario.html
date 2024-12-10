@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <title>Gestión de Inventario - Ganadería Inteligente</title>
     <link rel="stylesheet" href="../styles/styleInventarios.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -37,6 +38,100 @@
         .dropdown-menu button:hover {
             background-color: #f0f0f0;
         }
+
+        /* --- Estilos Generales --- */
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        /* --- Tabla en PC/Laptops --- */
+        .vacas-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .vacas-table th, .vacas-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .vacas-table th {
+            background-color: #f4f4f4;
+        }
+
+        /* Estilo para la columna de imágenes en la tabla */
+        .vacas-table td img {
+            width: 100px; /* Ajusta el tamaño según tus necesidades */
+            height: auto;
+            border-radius: 8px;
+        }
+        /* --- Tarjetas en Móviles --- */
+        @media (max-width: 768px) {
+            .vacas-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .vacas-table thead {
+                display: none;
+            }
+
+            .vacas-table tr {
+                display: block;
+                margin-bottom: 10px;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                padding: 10px;
+                background-color: #f9f9f9;
+            }
+
+            .vacas-table td img {
+                width: 50px; /* Tamaño más pequeño en móviles */
+                height: auto;
+                margin-right: 10px;
+            }
+
+            .vacas-table td {
+                display: flex;
+                align-items: center; /* Centra verticalmente */
+            }
+
+            .vacas-table td::before {
+                content: attr(data-label); /* Agrega el nombre de la columna */
+                font-weight: bold;
+                flex: 0 0 50%;
+            }
+        }
+        /* Estilos del modal */
+
+
+/* Texto de subtítulo */
+#caption {
+    margin: auto;
+    display: block;
+    text-align: center;
+    color: #fff;
+    font-size: 16px;
+    padding: 10px 0;
+}
+
+#image-modal img {
+    max-width: 90%;
+    max-height: 90%;
+    border: 3px solid white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+}
+
+/* Adaptación para pantallas pequeñas */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 90%; /* Más ancho en móviles */
+    }
+}
+
     </style>
 </head>
 <body>
@@ -64,7 +159,8 @@
     <button id="btn-inventario" class="active" onclick="window.location.href='inventario.html';">Gestión de Inventario</button>
     <button id="btn-reportes" onclick="window.location.href='reportes.html';">Reportes</button>
     <button id="btn-consulta" onclick="window.location.href='consulta.html';">Consulta</button>
-    <button id="btn-panel" onclick="window.location.href='panelAdministracion.html';">Panel de Administración</button>
+    <button id="btn-historialMedico" onclick="window.location.href='../screens/historialMedico.html';">Historial Medico</button>
+    <button id="btn-panel" onclick="window.location.href='../screens/panelAdministracion.html';">Panel de Administración</button>
 </nav>
 
     <!-- Área de contenido principal -->
@@ -84,36 +180,33 @@
             </button>
         </div>
         
+        <!-- Contenedor dinámico para tarjetas -->
+        <div class="card-container">
+            <!-- Las tarjetas se generarán dinámicamente aquí -->
+        </div>
 
-        <!-- DataGridView -->
-        <table class="data-grid">
-            <thead>
-                <tr>
-                    <th>Foto</th>
-                    <th>RFID #</th>
-                    <th>Raza</th>
-                    <th>Fecha Ingreso</th>
-                    <th>Peso Actual</th>
-                    <th>Estado Actual</th>
-                    <th>Observaciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Aquí se cargarán los datos dinámicamente -->
-            </tbody>
-        </table>     
-        
-        <!-- Modal para mostrar la imagen en grande -->
-        <div class="image-modal" id="image-modal">
-            <div class="modal-content">
-                <span class="close-modal" id="close-image-modal">&times;</span>
-                <img id="modal-image" src="" alt="Imagen en grande">
+        <div class="main-container">
+            <!-- Tabla para PC y tarjetas para móviles -->
+            <table class="vacas-table" id="vacas-table">
+                <thead>
+                    <tr>
+                        <th>Imagen</th>
+                        <th>RFID</th>
+                        <th>Raza</th>
+                        <th>Sexo</th>
+                        <th>Peso</th>
+                        <th>Estado de Salud</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Datos dinámicos cargados desde Firestore -->
+                </tbody>
+            </table>
+        </div>
+
             </div>
         </div>
-        
-
-    </div>
-</div>
 
 <!-- Ventanas emergentes -->
 <div class="overlay" id="overlay"></div>
@@ -257,6 +350,18 @@
     </div>
 </div>
 
+<!-- Modal de la imagen -->
+<div id="image-modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.8);">
+    <span style="position: absolute; top: 10px; right: 25px; color: white; font-size: 35px; font-weight: bold; cursor: pointer;" onclick="window.closeImageModal()">×</span>
+    <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+        <img id="modal-image" style="max-width: 90%; max-height: 90%; border: 2px solid white;" alt="Imagen de la vaca">
+    </div>
+</div>
+
+
+
+
+
 <!-- Modal para consultar vaca -->
 <div class="modal" id="modal-consultar">
     <div class="modal-header">
@@ -301,7 +406,7 @@
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
 <!-- Tu script principal -->
-<script type="module" src="../script.js"></script>
+<script type="module" src="../scripts/script.js"></script>
 
 <script>
     // Función para abrir o cerrar el menú desplegable del perfil

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario</title>
+    <link rel="stylesheet" href="../styles/perfil.css">
+</head>
+<body>
+    <header>
+        <h1>Perfil de Usuario</h1>
+        <button id="logout-btn">Cerrar sesión</button>
+    </header>
+    <main>
+        <section id="profile-section">
+            <h2>Información del Usuario</h2>
+            <div id="profile-info">
+                <!-- Imagen de perfil -->
+                <img id="profile-pic" src="" alt="Foto de perfil" />
+                
+                <!-- Botón para cambiar la foto de perfil -->
+                <div id="change-pic">
+                    <h3>Cambiar Foto de Perfil</h3>
+                    <form id="change-pic-form">
+                        <label for="profile-pic-file">Seleccionar una imagen:</label>
+                        <input type="file" id="profile-pic-file" accept="image/*" required>
+                        <button type="submit">Actualizar Foto</button>
+                    </form>
+                </div>
+
+                <!-- Mostrar correo electrónico -->
+                <p><strong>Correo:</strong> <span id="user-email">user@example.com</span></p>
+            </div>
+
+            <!-- Sección para cambiar la contraseña -->
+            <div id="change-password">
+                <h3>Cambiar Contraseña</h3>
+                <form id="change-password-form">
+                    <label for="current-password">Contraseña Actual:</label>
+                    <input type="password" id="current-password" required>
+                    
+                    <label for="new-password">Nueva Contraseña:</label>
+                    <input type="password" id="new-password" required>
+                    
+                    <button type="submit">Actualizar Contraseña</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    <script type="module" src="../scripts/perfil.js"></script> <!-- Ruta al archivo JavaScript -->
+    
+</body>
+</html>
