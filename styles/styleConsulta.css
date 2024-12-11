@@ -16,6 +16,87 @@ body {
     flex-direction: column;
 }
 
+
+/* Tabla responsive */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+thead {
+    background-color: #f4f4f4;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+}
+
+th {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+    background-color: #e8e8e8;
+}
+
+/* Contenedor para hacer la tabla desplazable */
+.table-container {
+    overflow-x: auto; /* Habilitar desplazamiento horizontal */
+    margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+    table {
+        width: 100%; /* Asegura que ocupe todo el ancho */
+    }
+
+    th, td {
+        font-size: 12px; /* Reducir el tamaño del texto */
+        padding: 8px;
+    }
+}
+
+
+/* Contenedor de las gráficas */
+.charts-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centrar gráficas horizontalmente */
+    gap: 20px; /* Espaciado entre las gráficas */
+    padding: 20px 10%;
+}
+
+.charts-container canvas {
+    width: 80%; /* Las gráficas ocuparán el 80% del ancho disponible */
+    max-width: 1000px; /* Ancho máximo para gráficas grandes */
+    height: 300px; /* Altura fija */
+    border: 1px solid #ddd; /* Borde ligero */
+    border-radius: 8px; /* Esquinas redondeadas */
+    background-color: #f9f9f9; /* Fondo claro */
+    padding: 10px; /* Espaciado interno */
+}
+
+/* Ajustes adicionales para móviles */
+@media (max-width: 768px) {
+    .charts-container canvas {
+        width: 70%; /* Ocupa todo el ancho en pantallas pequeñas */
+        height: 950px; /* Altura reducida */
+    }
+}
+
 /* Header Styles */
 .header {
     background-color: #d7c7b3;
@@ -61,6 +142,54 @@ body {
     flex-direction: column;
     padding: 10px;
     overflow-y: auto; /* Permitir scroll si el menú es largo */
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center; /* Centra los botones horizontalmente */
+    gap: 20px; /* Espaciado entre los botones */
+    margin-top: 20px;
+}
+
+/* Estilo general para los botones */
+.styled-button {
+    display: flex;
+    align-items: center; /* Centra verticalmente el icono y el texto */
+    justify-content: center; /* Centra horizontalmente el contenido */
+    background-color: #B17457; /* Color cafe */
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px; /* Bordes redondeados */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Cambios al pasar el ratón */
+.styled-button:hover {
+    background-color: #B17457; /* Verde más oscuro */
+    transform: scale(1.05); /* Efecto de zoom */
+}
+
+/* Estilo para los iconos */
+.styled-button .material-icons {
+    font-size: 24px; /* Tamaño del icono */
+    margin-right: 10px; /* Espacio entre el icono y el texto */
+}
+
+/* Estilo responsivo para pantallas pequeñas */
+@media (max-width: 768px) {
+    .styled-button {
+        font-size: 14px; /* Reducir tamaño del texto */
+        padding: 10px 20px; /* Reducir padding */
+    }
+
+    .styled-button .material-icons {
+        font-size: 20px; /* Reducir tamaño del icono */
+    }
 }
 
 .menu-container button {
@@ -131,7 +260,7 @@ tbody tr:hover {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: #4CAF50;
+    background-color: #B17457;
     color: white;
     border: none;
     border-radius: 50%;
@@ -148,10 +277,13 @@ tbody tr:hover {
 .floating-btn:hover {
     background-color: #45a049;
 }
+.modal.show {
+    visibility: visible; /* Visible cuando se abre */
+    opacity: 1; /* Totalmente opaco cuando se abre */
+}
 
-/* Modal general */
 .modal {
-    display: none;
+    display: none; /* Oculta el modal por defecto */
     position: fixed;
     top: 50%;
     left: 50%;
@@ -166,6 +298,15 @@ tbody tr:hover {
     overflow-y: auto; /* Habilitar scroll si hay muchos campos */
     max-height: 80vh; /* Evitar que el modal se salga de la pantalla */
 }
+
+.modal.show {
+    display: block; /* Muestra el modal cuando se agrega la clase .show */
+}
+
+.modal.hidden {
+    display: none; /* Oculta el modal cuando se agrega la clase .hidden */
+}
+
 
 /* Activar el modal */
 .modal.active {
@@ -209,7 +350,7 @@ tbody tr:hover {
 /* Botón de guardar */
 .modal-content button[type="submit"] {
     padding: 10px 20px;
-    background-color: #4CAF50;
+    background-color: #B17457;
     color: white;
     border: none;
     border-radius: 5px;
@@ -219,7 +360,7 @@ tbody tr:hover {
 }
 
 .modal-content button[type="submit"]:hover {
-    background-color: #45a049;
+    background-color: #B17457;
 }
 
 /* Botón de cerrar */
@@ -330,6 +471,12 @@ tbody tr:hover {
     overflow: hidden;
 }
 
+/* Estilo especial para las tarjetas de vacas vendidas */
+.card.sold {
+    background-color: #ffe6e6; /* Color rojo bajito */
+    border-color: #ff9999;
+}
+
 .card:hover {
     transform: scale(1.02);
 }
@@ -363,7 +510,7 @@ tbody tr:hover {
 }
 
 .card .edit-btn {
-    background-color: #4caf50;
+    background-color: #B17457;
     color: white;
     padding: 10px 15px;
     border: none;
@@ -374,6 +521,39 @@ tbody tr:hover {
 
 .card .edit-btn:hover {
     background-color: #45a049;
+}
+
+.filters {
+    margin-bottom: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 200px;
+}
+.filter-group label {
+    font-size: 14px;
+    color: #333;
+}
+
+.filter-input {
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.filter-input {
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 200px;
 }
 
 

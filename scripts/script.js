@@ -65,11 +65,20 @@ client.on("connect", () => {
     });
 });
 
+client.on("connect", () => {
+    console.log("Conexión MQTT exitosa.");
+    client.subscribe("/topic/datos", (err) => {
+        if (!err) {
+            console.log("Suscripción exitosa al tópico /topic/datos");
+        } else {
+            console.error("Error al suscribirse al tópico:", err);
+        }
+    });
+});
+
 client.on("error", (err) => {
     console.error("Error en la conexión MQTT:", err);
 });
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -759,11 +768,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 icon: "warning",
                 title: "Campos obligatorios faltantes",
                 text: "Por favor, completa todos los campos obligatorios antes de continuar.",
-                confirmButtonText: "Aceptar"
+                confirmButtonText: "Aceptar",
             });
             return;
         }
-        
     
         // Subir la foto si fue capturada
         let fotoURL = null;
@@ -779,11 +787,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     icon: "error",
                     title: "Error al subir la imagen",
                     text: "Ocurrió un error al subir la imagen. Por favor, intenta nuevamente.",
-                    confirmButtonText: "Aceptar"
+                    confirmButtonText: "Aceptar",
                 });
                 return;
             }
-            
         }
     
         // Estructura de datos para guardar en Firestore
@@ -803,47 +810,46 @@ document.addEventListener("DOMContentLoaded", () => {
             ubicacion,
             observaciones: observaciones || "Sin observaciones",
             fotoURL: fotoURL || "Sin imagen",
+            estado: "registrada", // Campo nuevo que indica el estado inicial
         };
     
         try {
-             // Referencia al documento del contador en Firestore
+            // Referencia al documento del contador en Firestore
             const contadorRef = doc(db, "configuracion", "contadorVacas");
             const contadorSnapshot = await getDoc(contadorRef);
-
+    
             let contadorActual = 0;
-
+    
             // Verifica si el documento del contador existe
             if (contadorSnapshot.exists()) {
                 contadorActual = contadorSnapshot.data().contador || 0;
             }
-
+    
             // Genera el nuevo ID interno basado en el contador
             const nuevoIdInterno = `vaca-${(contadorActual + 1).toString().padStart(3, "0")}`;
             vacaData.idInterno = nuevoIdInterno;
+            
+            const responseMessage = `RFID Registrado`;
+            console.log(responseMessage);
+            client.publish("/topic/datos", responseMessage);
 
             // Guarda los datos en Firestore usando el nuevo ID interno
             const docRef = doc(db, "vacas", nuevoIdInterno); // Usa el nuevo número interno como ID del documento
             await setDoc(docRef, vacaData);
-
+            
             // Actualiza el contador en Firestore
             await setDoc(contadorRef, { contador: contadorActual + 1 });
-            
-            // Publica mensaje MQTT de confirmacion de registro
-            const responseMessage = `RFID Registrado`;
-            console.log(responseMessage);
-            client.publish("/topic/datos", responseMessage);
     
             Swal.fire({
                 icon: "success",
                 title: "Registro completado",
                 text: `Registro completado con éxito. ID del documento: ${idInterno}`,
-                confirmButtonText: "Aceptar"
+                confirmButtonText: "Aceptar",
             });
-            
             
             // Actualiza la tabla después del registro
             await cargarVacas();
-
+    
             // Limpia el formulario y vuelve al paso inicial
             document.getElementById("register-form").reset();
             currentStep = 0;
@@ -860,11 +866,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 icon: "error",
                 title: "Error",
                 text: "Ocurrió un error al registrar los datos. Por favor, intenta nuevamente.",
-                confirmButtonText: "Aceptar"
+                confirmButtonText: "Aceptar",
             });
-            
         }
     }
+    
     
     
     // Manejo del botón Registrar
@@ -877,6 +883,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateStep();
 });
 
+// Función para cargar datos de las vacas
 // Función para cargar datos de las vacas
 async function cargarVacas() {
     const tableBody = document.querySelector("#vacas-table tbody");
@@ -901,21 +908,28 @@ async function cargarVacas() {
         querySnapshot.forEach((doc) => {
             const vaca = doc.data();
 
-            // Crear una fila en la tabla (compatible con tarjetas en móviles)
+            // Crear una fila en la tabla
             const row = document.createElement("tr");
-            // Dentro de cargarVacas o donde generes las filas de las vacas
-            row.innerHTML = `
-            <td data-label="Imagen">
-                <img src="${vaca.fotoURL || 'https://via.placeholder.com/100'}" alt="Imagen de la vaca" style="cursor: pointer; width: 100px; height: auto;" onclick="window.openImageModal('${vaca.fotoURL || 'https://via.placeholder.com/100'}')">
-            </td>
-            <td data-label="RFID">${vaca.rfid || "N/A"}</td>
-            <td data-label="Raza">${vaca.raza || "N/A"}</td>
-            <td data-label="Sexo">${vaca.sexo || "N/A"}</td>
-            <td data-label="Peso">${vaca.peso ? `${vaca.peso} kg` : "N/A"}</td>
-            <td data-label="Estado de Salud">${vaca.estadoSalud || "N/A"}</td>
-            <td data-label="Observaciones">${vaca.observaciones || "N/A"}</td>
-        `;
 
+            // Agregar una clase especial si el estado es "vendida"
+            if (vaca.estado === "vendida") {
+                row.classList.add("row-sold");
+                row.style.backgroundColor = "#ffe6e6"; // Fondo rojo claro
+                row.style.color = "#b30000"; // Texto rojo oscuro
+            }
+            
+
+            row.innerHTML = `
+                <td data-label="Imagen">
+                    <img src="${vaca.fotoURL || 'https://via.placeholder.com/100'}" alt="Imagen de la vaca" style="cursor: pointer; width: 100px; height: auto;" onclick="window.openImageModal('${vaca.fotoURL || 'https://via.placeholder.com/100'}')">
+                </td>
+                <td data-label="RFID">${vaca.rfid || "N/A"}</td>
+                <td data-label="Raza">${vaca.raza || "N/A"}</td>
+                <td data-label="Sexo">${vaca.sexo || "N/A"}</td>
+                <td data-label="Peso">${vaca.peso ? `${vaca.peso} kg` : "N/A"}</td>
+                <td data-label="Estado de Salud">${vaca.estadoSalud || "N/A"}</td>
+                <td data-label="Observaciones">${vaca.observaciones || "N/A"}</td>
+            `;
 
             tableBody.appendChild(row);
         });
@@ -930,6 +944,7 @@ async function cargarVacas() {
         `;
     }
 }
+
 // Función para abrir el modal de la imagen
 window.openImageModal = function (imageUrl) {
     console.log("Abriendo modal de imagen con URL:", imageUrl);

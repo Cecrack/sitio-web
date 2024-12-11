@@ -45,6 +45,7 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 
+
 document.addEventListener("DOMContentLoaded", async () => {
     const historialTableBody = document.querySelector("#history-table tbody");
     const rfidInput = document.getElementById("rfid-search");
@@ -68,7 +69,7 @@ document.getElementById("nav-toggle").addEventListener("click", () => {
 
 // Función para cargar un historial médico específico por RFID
 async function cargarTodosLosHistoriales() {
-    const tableBody = document.querySelector("#history-table tbody"); // Define tableBody aquí
+    const tableBody = document.querySelector("#history-table tbody");
     console.log("Iniciando la función cargarTodosLosHistoriales...");
 
     try {
@@ -87,16 +88,33 @@ async function cargarTodosLosHistoriales() {
         }
 
         console.log("Recorriendo los documentos de la colección...");
-        querySnapshot.forEach((doc) => {
+        for (const doc of querySnapshot.docs) {
             const historial = doc.data();
             console.log(`Procesando historial con ID: ${doc.id}`, historial);
 
-            const row = crearFilaHistorial(historial, doc.id);
+            // Buscar información adicional de la vaca en la colección `vacas`
+            let vacaInfo = { idInterno: "N/A", rfid: "N/A" };
+            const rfidQuery = query(collection(db, "vacas"), where("rfid", "==", historial.rfid));
+            const idInternoQuery = query(collection(db, "vacas"), where("idInterno", "==", historial.rfid));
+
+            const [rfidSnapshot, idInternoSnapshot] = await Promise.all([
+                getDocs(rfidQuery),
+                getDocs(idInternoQuery),
+            ]);
+
+            if (!rfidSnapshot.empty) {
+                vacaInfo = rfidSnapshot.docs[0].data();
+            } else if (!idInternoSnapshot.empty) {
+                vacaInfo = idInternoSnapshot.docs[0].data();
+            }
+
+            // Crear fila con los datos de la vaca y el historial
+            const row = crearFilaHistorial(historial, doc.id, vacaInfo);
             console.log(`Fila creada para el historial con ID: ${doc.id}`, row);
 
             tableBody.appendChild(row);
             console.log(`Fila añadida a la tabla para el historial con ID: ${doc.id}`);
-        });
+        }
 
         console.log("Todos los historiales médicos han sido cargados exitosamente.");
     } catch (error) {
@@ -105,11 +123,13 @@ async function cargarTodosLosHistoriales() {
     }
 }
 
-
-function crearFilaHistorial(historial, id) {
+function crearFilaHistorial(historial, id, vacaInfo) {
     const row = document.createElement("tr");
     row.innerHTML = `
-        <td data-label="RFID / Identificador">${historial.rfid || "N/A"}</td>
+        <td data-label="RFID / Identificador">
+            <strong>ID Interno:</strong> ${vacaInfo.idInterno || "N/A"}<br>
+            <strong>RFID:</strong> ${vacaInfo.rfid || historial.rfid || "N/A"}
+        </td>
         <td data-label="Fecha">${historial.fecha || "N/A"}</td>
         <td data-label="Evento">${historial.evento || "N/A"}</td>
         <td data-label="Descripción">${historial.descripcion || "N/A"}</td>
@@ -168,27 +188,67 @@ async function eliminarHistorial(id) {
         reconnectPeriod: 1000
     };
 
-    // Conexión al servidor MQTT
     const client = mqtt.connect(mqttUrl, options);
 
-    // Manejo de conexión exitosa
     client.on("connect", () => {
-        
-
-        // Suscribirse al tópico /topic/rfid
+        console.log("Conexión MQTT exitosa.");
         client.subscribe("/topic/rfid", (err) => {
             if (!err) {
-                
+                console.log("Suscripción exitosa al tópico /topic/rfid");
             } else {
-                
+                console.error("Error al suscribirse al tópico:", err);
             }
         });
     });
 
-    
-    // Manejo de errores de conexión
-    client.on("error", (err) => {
-        
+    client.on("message", (topic, message) => {
+        if (topic === "/topic/rfid") {
+            const rfidValue = message.toString().trim(); // Obtener el valor recibido
+            console.log("RFID recibido:", rfidValue);
+
+            function filtrarRegistros() {
+                const rfidValue = document.getElementById("filter-rfid").value.toLowerCase().trim();
+                const dateValue = document.getElementById("filter-date").value;
+                const eventValue = document.getElementById("filter-event").value.toLowerCase().trim();
+                const descriptionValue = document.getElementById("filter-description").value.toLowerCase().trim();
+                const veterinarianValue = document.getElementById("filter-veterinarian").value.toLowerCase().trim();
+            
+                const rows = document.querySelectorAll("#history-table tbody tr");
+            
+                rows.forEach((row) => {
+                    const rfidCell = row.querySelector("td:nth-child(1)").textContent.toLowerCase();
+                    const dateCell = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+                    const eventCell = row.querySelector("td:nth-child(3)").textContent.toLowerCase();
+                    const descriptionCell = row.querySelector("td:nth-child(4)").textContent.toLowerCase();
+                    const veterinarianCell = row.querySelector("td:nth-child(5)").textContent.toLowerCase();
+            
+                    const matchesRfid = rfidValue === "" || rfidCell.includes(rfidValue);
+                    const matchesDate = dateValue === "" || dateCell.includes(dateValue);
+                    const matchesEvent = eventValue === "" || eventCell.includes(eventValue);
+                    const matchesDescription = descriptionValue === "" || descriptionCell.includes(descriptionValue);
+                    const matchesVeterinarian = veterinarianValue === "" || veterinarianCell.includes(veterinarianValue);
+            
+                    if (matchesRfid && matchesDate && matchesEvent && matchesDescription && matchesVeterinarian) {
+                        row.style.display = ""; // Mostrar la fila si coincide
+                    } else {
+                        row.style.display = "none"; // Ocultar la fila si no coincide
+                    }
+                });
+            }
+            
+            // Escribir el RFID en el campo de filtro
+            const rfidFilterInput = document.getElementById("filter-rfid");
+            if (rfidFilterInput) {
+                rfidFilterInput.value = rfidValue;
+                filtrarRegistros(); // Ejecuta la función de filtrado
+            }
+
+            // Escribir el RFID en el formulario de agregar registro
+            const animalIdInput = document.getElementById("animal-id");
+            if (animalIdInput && !animalIdInput.value) {
+                animalIdInput.value = rfidValue;
+            }
+        }
     });
 
     
@@ -308,11 +368,11 @@ async function eliminarHistorial(id) {
         const filterVeterinarian = document.getElementById("filter-veterinarian");
     
         // Cargar todos los historiales al inicio
-        cargarTodosLosHistoriales();
+        //cargarTodosLosHistoriales();
     
         // Añadir eventos de filtrado
         [filterRfid, filterDate, filterEvent, filterDescription, filterVeterinarian].forEach(filter => {
-            filter.addEventListener("input", filtrarHistoriales);
+            filter.addEventListener("input", filtrarRegistros);
         });
         
 
@@ -349,35 +409,40 @@ function toggleFilters() {
     filtersContainer.classList.toggle("active");
 }
 
-// Filtrar resultados en tiempo real
-function filtrarHistoriales() {
-    const rfidValue = document.getElementById("filter-rfid").value.trim().toLowerCase();
-    const dateValue = document.getElementById("filter-date").value.trim();
-    const eventValue = document.getElementById("filter-event").value.trim().toLowerCase();
-    const descriptionValue = document.getElementById("filter-description").value.trim().toLowerCase();
-    const veterinarianValue = document.getElementById("filter-veterinarian").value.trim().toLowerCase();
+function filtrarRegistros() {
+    const rfidValue = document.getElementById("filter-rfid").value.toLowerCase().trim();
+    const dateValue = document.getElementById("filter-date").value;
+    const eventValue = document.getElementById("filter-event").value.toLowerCase().trim();
+    const descriptionValue = document.getElementById("filter-description").value.toLowerCase().trim();
+    const veterinarianValue = document.getElementById("filter-veterinarian").value.toLowerCase().trim();
 
     const rows = document.querySelectorAll("#history-table tbody tr");
-    rows.forEach(row => {
-        const [rfidCell, dateCell, eventCell, descriptionCell, veterinarianCell] = row.children;
 
-        const matchesRfid = rfidCell.textContent.toLowerCase().includes(rfidValue);
-        const matchesDate = !dateValue || dateCell.textContent.includes(dateValue);
-        const matchesEvent = !eventValue || eventCell.textContent.toLowerCase().includes(eventValue);
-        const matchesDescription = descriptionCell.textContent.toLowerCase().includes(descriptionValue);
-        const matchesVeterinarian = veterinarianCell.textContent.toLowerCase().includes(veterinarianValue);
+    rows.forEach((row) => {
+        const rfidCell = row.querySelector("td:nth-child(1)").textContent.toLowerCase();
+        const dateCell = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+        const eventCell = row.querySelector("td:nth-child(3)").textContent.toLowerCase();
+        const descriptionCell = row.querySelector("td:nth-child(4)").textContent.toLowerCase();
+        const veterinarianCell = row.querySelector("td:nth-child(5)").textContent.toLowerCase();
+
+        const matchesRfid = rfidValue === "" || rfidCell.includes(rfidValue);
+        const matchesDate = dateValue === "" || dateCell.includes(dateValue);
+        const matchesEvent = eventValue === "" || eventCell.includes(eventValue);
+        const matchesDescription = descriptionValue === "" || descriptionCell.includes(descriptionValue);
+        const matchesVeterinarian = veterinarianValue === "" || veterinarianCell.includes(veterinarianValue);
 
         if (matchesRfid && matchesDate && matchesEvent && matchesDescription && matchesVeterinarian) {
-            row.style.display = "";
+            row.style.display = ""; // Mostrar la fila si coincide
         } else {
-            row.style.display = "none";
+            row.style.display = "none"; // Ocultar la fila si no coincide
         }
     });
 }
 
+
 // Escuchar cambios en los filtros
 document.querySelectorAll(".filter-input").forEach(filter => {
-    filter.addEventListener("input", filtrarHistoriales);
+    filter.addEventListener("input", filtrarRegistros);
 });
 });
 

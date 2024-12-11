@@ -65,9 +65,49 @@ client.on("connect", () => {
     });
 });
 
+// Escucha datos del lector RFID
+client.on("message", (topic, message) => {
+    if (topic === "/topic/rfid") {
+        const rfidValue = message.toString().trim();
+        console.log("RFID recibido:", rfidValue);
+
+        // Identifica el input activo según el modal abierto
+        const crecimientoModal = document.getElementById("modal-crecimiento");
+        const salidaModal = document.getElementById("modal-salida");
+
+        if (crecimientoModal && !crecimientoModal.classList.contains("hidden")) {
+            const crecimientoInput = document.getElementById("id-interno-crecimiento");
+            crecimientoInput.value = rfidValue;
+        } else if (salidaModal && !salidaModal.classList.contains("hidden")) {
+            const salidaInput = document.getElementById("id-interno-salida");
+            salidaInput.value = rfidValue;
+        } else {
+            console.warn("Ningún modal abierto para manejar el RFID.");
+        }
+    }
+});
+
+
 client.on("error", (err) => {
     console.error("Error en la conexión MQTT:", err);
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    // Escucha datos del lector RFID
+    client.on("message", (topic, message) => {
+        if (topic === "/topic/rfid") {
+            const rfidValue = message.toString().trim();
+            console.log("RFID recibido:", rfidValue);
+
+            const rfidFilterInput = document.getElementById("filter-rfid");
+            rfidFilterInput.value = rfidValue;
+
+            filtrarTarjetas(); // Aplica el filtro
+        }
+    });
+});
+
 
 document.addEventListener("DOMContentLoaded", () => {
     const cardsContainer = document.getElementById("cards-container");
@@ -76,40 +116,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Función para cargar las vacas como tarjetas
     async function loadVacas() {
-        const vacasSnapshot = await getDocs(collection(db, "vacas"));
-        cardsContainer.innerHTML = ""; // Limpiar contenedor de tarjetas
+    const vacasSnapshot = await getDocs(collection(db, "vacas"));
+    cardsContainer.innerHTML = ""; // Limpiar contenedor de tarjetas
 
-        vacasSnapshot.forEach((doc) => {
-            const vaca = doc.data();
-            const card = document.createElement("div");
-            card.classList.add("card");
+    vacasSnapshot.forEach((doc) => {
+        const vaca = doc.data();
+        const card = document.createElement("div");
 
-            card.innerHTML = `
-                <img src="${vaca.fotoURL}" alt="Foto de ${vaca.idInterno}">
-                <div class="card-header">${vaca.idInterno}</div>
-                <div class="card-content">
-                    <p><strong>RFID:</strong> ${vaca.rfid}</p>
-                    <p><strong>Raza:</strong> ${vaca.raza}</p>
-                    <p><strong>Sexo:</strong> ${vaca.sexo}</p>
-                    <p><strong>Estado de Salud:</strong> ${vaca.estadoSalud}</p>
-                    <p><strong>Estado Reproductivo:</strong> ${vaca.estadoReproductivo}</p>
-                    <p><strong>Peso:</strong> ${vaca.peso} kg</p>
-                    <p><strong>Ubicación:</strong> ${vaca.ubicacion}</p>
-                    <p><strong>Historial de Vacunación:</strong> ${vaca.historialVacunacion}</p>
-                    <p><strong>Último Parto:</strong> ${vaca.fechaUltimoParto}</p>
-                    <p><strong>Ingreso:</strong> ${vaca.fechaIngreso}</p>
-                    <p><strong>Desparasitación:</strong> ${vaca.fechaDesparasitacion}</p>
-                    <p><strong>Número de Crías:</strong> ${vaca.numeroCrias}</p>
-                    <p><strong>Observaciones:</strong> ${vaca.observaciones}</p>
-                </div>
-                <div class="card-actions">
-                    <button class="edit-btn" onclick="editVaca('${doc.id}')">Editar</button>
-                </div>
-            `;
+        // Añadir una clase especial si el estado es "vendida"
+        const cardClass = vaca.estado === "vendida" ? "card sold" : "card";
 
-            cardsContainer.appendChild(card);
-        });
-    }
+        card.classList.add(...cardClass.split(" ")); // Añadir clases dinámicas
+
+        card.innerHTML = `
+            <img src="${vaca.fotoURL}" alt="Foto de ${vaca.idInterno}">
+            <div class="card-header">${vaca.idInterno}</div>
+            <div class="card-content">
+                <p><strong>RFID:</strong> ${vaca.rfid}</p>
+                <p><strong>Raza:</strong> ${vaca.raza}</p>
+                <p><strong>Sexo:</strong> ${vaca.sexo}</p>
+                <p><strong>Estado de Salud:</strong> ${vaca.estadoSalud}</p>
+                <p><strong>Estado Reproductivo:</strong> ${vaca.estadoReproductivo}</p>
+                <p><strong>Peso:</strong> ${vaca.peso} kg</p>
+                <p><strong>Ubicación:</strong> ${vaca.ubicacion}</p>
+                <p><strong>Historial de Vacunación:</strong> ${vaca.historialVacunacion}</p>
+                <p><strong>Último Parto:</strong> ${vaca.fechaUltimoParto}</p>
+                <p><strong>Ingreso:</strong> ${vaca.fechaIngreso}</p>
+                <p><strong>Desparasitación:</strong> ${vaca.fechaDesparasitacion}</p>
+                <p><strong>Número de Crías:</strong> ${vaca.numeroCrias}</p>
+                <p><strong>Observaciones:</strong> ${vaca.observaciones}</p>
+                <p><strong>Estado:</strong> ${vaca.estado}</p>
+            </div>
+            <div class="card-actions">
+                <button class="edit-btn" onclick="editVaca('${doc.id}')">Editar</button>
+            </div>
+        `;
+
+        cardsContainer.appendChild(card);
+    });
+}
+
     loadVacas();
     // Función para editar los datos de una vaca
     window.editVaca = async (id) => {

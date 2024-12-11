@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguimiento de Crecimiento</title>
+    <link rel="stylesheet" href="../styles/styleConsulta.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <!-- Encabezado superior -->
+    <div class="header">
+        <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú">&#9776;</button>
+        <div class="title" id="page-title">Seguimiento de Crecimiento</div>
+        <div class="user-info">
+            <span>Iniciar sesión</span>
+            <div class="profile-circle" id="profile-icon"></div>
+            <div id="profile-menu" class="profile-menu">
+                <button id="login-btn">Iniciar sesión</button>
+                <button id="create-user-btn">Crear cuenta</button>
+                <button id="perfil-btn" class="hidden">Información</button>
+                <button id="logout-btn" class="hidden">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor principal -->
+    <div class="main-container">
+        <!-- Menú lateral izquierdo -->
+        <nav class="menu-container" id="nav-menu">
+            <button id="btn-inicio" onclick="window.location.href='../index.html';">Inicio</button>
+            <button id="btn-inventario" onclick="window.location.href='../screens/inventario.html';">Gestión de Inventario</button>
+            <button id="btn-reportes"  onclick="window.location.href='../screens/reportes.html';">Reportes</button>
+            <button id="btn-consulta" onclick="window.location.href='../screens/consulta.html';">Consulta</button>
+            <button id="btn-historialMedico" onclick="window.location.href='../screens/historialMedico.html';">Historial Médico</button>
+            <button id="btn-Salidaa" class="active" onclick="window.location.href='../screens/Seguimiento.html';">Seguimiento</button>
+            <button id="btn-panel" onclick="window.location.href='../screens/panelAdministracion.html';">Panel de Administración</button>
+        </nav>
+
+        <!-- Contenedor del contenido -->
+        <div class="content">
+            <div class="action-buttons">
+                <button id="btn-abrir-modal-crecimiento" class="styled-button">
+                    <span class="material-icons">add_circle</span> Registrar Crecimiento
+                </button>
+                <button id="btn-abrir-modal-salida" class="styled-button">
+                    <span class="material-icons">exit_to_app</span> Gestionar Salida
+                </button>
+            </div>
+            
+            
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="filter-fecha">Filtrar por Fecha:</label>
+                    <input type="datetime-local" id="filter-fecha" class="filter-input">
+                </div>
+                <div class="filter-group">
+                    <label for="filter-animal">Filtrar por Animal:</label>
+                    <input type="text" id="filter-animal" placeholder="Escribe el ID o RFID del animal" class="filter-input">
+                </div>
+                <div class="filter-group">
+                    <label for="filter-cambio">Filtrar por Cambio:</label>
+                    <select id="filter-cambio" class="filter-input">
+                        <option value="">Selecciona un cambio</option>
+                        <option value="Crecimiento">Crecimiento</option>
+                        <option value="Salida">Salida</option>
+                    </select>
+                </div>
+            </div>
+            
+            
+            <!-- Historial de Crecimiento -->
+            <div class="table-container">
+                <p>‎ </p>
+                <h2>Historial de Cambios</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Animal</th>
+                            <th>Cambio</th>
+                            <th>Detalles</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historial-table">
+                        <!-- Registros dinámicos aquí -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="charts-container">
+            <div class="charts-container">
+                <div class="chart">
+                    <h3>Comparación de Peso</h3>
+                    <canvas id="chart-peso"></canvas>
+                    
+                </div>
+                <div class="chart">
+                    <h3>Comparación de Tamaño</h3>
+                    <canvas id="chart-tamano"></canvas>
+                    
+                </div>
+                <div class="chart">
+                    <h3>Salidas por Mes</h3>
+                    <canvas id="chart-salidas"></canvas>
+                    
+                </div>
+            </div>
+            
+            
+        </div>
+
+        </div>
+    </div>
+
+   <!-- Modal para Registrar Crecimiento -->
+<div class="modal hidden" id="modal-crecimiento">
+    <div class="modal-content">
+        <button class="modal-close" onclick="cerrarModal('modal-crecimiento')">X</button>
+        <h2>Registrar Crecimiento</h2>
+        <form id="form-crecimiento">
+            <label for="id-interno-crecimiento">ID Interno o RFID:</label>
+            <input type="text" id="id-interno-crecimiento" required>
+
+            <label for="peso-crecimiento">Peso (kg):</label>
+            <input type="number" id="peso-crecimiento" required>
+
+            <label for="tamano-crecimiento">Tamaño (cm):</label>
+            <input type="number" id="tamano-crecimiento" required>
+
+            <div class="modal-actions">
+                <button type="submit" class="btn-save">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para Gestionar Salida -->
+<div class="modal hidden" id="modal-salida">
+    <div class="modal-content">
+        <button class="modal-close" onclick="cerrarModal('modal-salida')">X</button>
+        <h2>Gestionar Salida</h2>
+        <form id="form-salida">
+            <label for="id-interno-salida">ID Interno o RFID:</label>
+            <input type="text" id="id-interno-salida" required>
+
+            <label for="peso-salida">Peso de Salida (kg):</label>
+            <input type="number" id="peso-salida" required>
+
+            <label for="fecha-salida">Fecha de Salida:</label>
+            <input type="date" id="fecha-salida" required>
+
+            <label for="hora-salida">Hora de Salida:</label>
+            <input type="time" id="hora-salida" required>
+
+            <div class="modal-actions">
+                <button type="submit" class="btn-save">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+    <script type="module" src="../scripts/scriptSeguimiento.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>

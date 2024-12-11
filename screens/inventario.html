@@ -160,6 +160,7 @@
     <button id="btn-reportes" onclick="window.location.href='../screens/reportes.html';">Reportes</button>
     <button id="btn-consulta" onclick="window.location.href='../screens/consulta.html';">Consulta</button>
     <button id="btn-historialMedico" onclick="window.location.href='../screens/historialMedico.html';">Historial Medico</button>
+    <button id="btn-Salidaa" onclick="window.location.href='../screens/Seguimiento.html';">Seguimiento</button>
     <button id="btn-panel" onclick="window.location.href='../screens/panelAdministracion.html';">Panel de Administración</button>
 </nav>
 
@@ -295,13 +296,18 @@
                 <input type="number" id="numero-crias" class="form-input">
             </div>
 
-            <!-- Paso 5: Ubicación -->
+           <!-- Paso 5: Ubicación -->
             <div class="step-content" id="step-content-5">
                 <h3>Ubicación</h3>
                 <div id="error-message-5" class="error-message hidden"></div>
                 <label for="corral">Corral o ubicación</label>
-                <input type="text" id="corral" class="form-input">
+                <select id="corral" class="form-input">
+                    <option value="Corral A">Corral A</option>
+                    <option value="Corral B">Corral B</option>
+                    <option value="Corral C">Corral C</option>
+                </select>
             </div>
+
 
             <!-- Paso 6: Foto -->
             <div class="step-content" id="step-content-6">
