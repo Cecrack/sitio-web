@@ -236,6 +236,12 @@ async function eliminarHistorial(id) {
                 });
             }
             
+            // Escribir el RFID en el formulario de agregar registro
+            const animalIdInput = document.getElementById("animal-id");
+            if (animalIdInput && !animalIdInput.value) {
+                animalIdInput.value = rfidValue;
+            }
+            
             // Escribir el RFID en el campo de filtro
             const rfidFilterInput = document.getElementById("filter-rfid");
             if (rfidFilterInput) {
@@ -243,11 +249,7 @@ async function eliminarHistorial(id) {
                 filtrarRegistros(); // Ejecuta la función de filtrado
             }
 
-            // Escribir el RFID en el formulario de agregar registro
-            const animalIdInput = document.getElementById("animal-id");
-            if (animalIdInput && !animalIdInput.value) {
-                animalIdInput.value = rfidValue;
-            }
+            
         }
     });
 
@@ -643,11 +645,11 @@ async function graficarEstadoDeSalud() {
             const vaca = doc.data();
             const estado = vaca.estadoSalud || "Desconocido";
 
-            if (estado.toLowerCase() === "buen estado") {
+            if (estado.toLowerCase() === "bueno") {
                 buenEstado++;
             } else if (estado.toLowerCase() === "regular") {
                 regular++;
-            } else if (estado.toLowerCase() === "enfermas") {
+            } else if (estado.toLowerCase() === "enfermo") {
                 enfermas++;
             }
         });

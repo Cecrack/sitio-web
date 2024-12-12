@@ -315,7 +315,7 @@ async function fetchGenderData() {
 
         querySnapshot.forEach((doc) => {
             const vaca = doc.data();
-            if (vaca.sexo === 'Macho') {
+            if (vaca.sexo === 'macho') {
                 maleCount++;
             } else if (vaca.sexo === 'hembra') {
                 femaleCount++;
@@ -336,7 +336,7 @@ function drawGenderChart(maleCount, femaleCount) {
     new Chart(ctx, {
         type: 'bar', // Tipo de gráfica
         data: {
-            labels: ['Machos', 'Hembras'], // Etiquetas de las barras
+            labels: ['machos', 'Hembras'], // Etiquetas de las barras
             datasets: [{
                 label: 'Cantidad',
                 data: [maleCount, femaleCount], // Datos de las barras

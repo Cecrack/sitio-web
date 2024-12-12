@@ -402,12 +402,6 @@ async function cargarHistorial() {
 }
 
 
-
-// Llamar a la función para cargar los datos al cargar la página
-document.addEventListener('DOMContentLoaded', () => {
-    cargarHistorial();
-});
-
 // Variables para las gráficas
 let pesoChart, tamanoChart;
 
