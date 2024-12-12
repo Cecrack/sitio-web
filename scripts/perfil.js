@@ -35,7 +35,6 @@ onAuthStateChanged(auth, (user) => {
         window.location.href = "../index.html";
     }
 });
-
 // Cambiar la contraseña
 document.getElementById("change-password-form").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -53,17 +52,39 @@ document.getElementById("change-password-form").addEventListener("submit", async
 
         // Cambiar la contraseña
         await updatePassword(user, newPassword);
-        alert("Contraseña actualizada con éxito.");
+        
+        Swal.fire({
+            title: 'Éxito!',
+            text: 'Contraseña actualizada con éxito.',
+            icon: 'success',
+            confirmButtonText: 'Aceptar'
+        });
+
         document.getElementById("change-password-form").reset();
     } catch (error) {
         console.error("Error al cambiar la contraseña:", error);
 
         if (error.code === "auth/wrong-password") {
-            alert("La contraseña actual es incorrecta.");
+            Swal.fire({
+                title: 'Error',
+                text: 'La contraseña actual es incorrecta.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
         } else if (error.code === "auth/weak-password") {
-            alert("La nueva contraseña debe tener al menos 6 caracteres.");
+            Swal.fire({
+                title: 'Error',
+                text: 'La nueva contraseña debe tener al menos 6 caracteres.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
         } else {
-            alert("No se pudo cambiar la contraseña. Intenta nuevamente.");
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudo cambiar la contraseña. Intenta nuevamente.',
+                icon: 'error',
+                confirmButtonText: 'Aceptar'
+            });
         }
     }
 });
@@ -72,13 +93,24 @@ document.getElementById("change-password-form").addEventListener("submit", async
 document.getElementById("logout-btn").addEventListener("click", async () => {
     try {
         await signOut(auth);
-        alert("Has cerrado sesión.");
+        Swal.fire({
+            title: 'Hasta pronto!',
+            text: 'Has cerrado sesión.',
+            icon: 'success',
+            confirmButtonText: 'Aceptar'
+        });
         window.location.href = "../index.html";
     } catch (error) {
         console.error("Error al cerrar sesión:", error);
-        alert("No se pudo cerrar la sesión. Intenta nuevamente.");
+        Swal.fire({
+            title: 'Error',
+            text: 'No se pudo cerrar la sesión. Intenta nuevamente.',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+        });
     }
 });
+
 
 // Cambiar la foto de perfil
 document.getElementById("change-pic-form").addEventListener("submit", async (e) => {
@@ -88,7 +120,12 @@ document.getElementById("change-pic-form").addEventListener("submit", async (e) 
     const file = fileInput.files[0];
 
     if (!file) {
-        alert("Por favor, selecciona un archivo.");
+        Swal.fire({
+            title: 'Error',
+            text: 'Por favor, selecciona un archivo.',
+            icon: 'warning',
+            confirmButtonText: 'Aceptar'
+        });
         return;
     }
 
@@ -105,10 +142,21 @@ document.getElementById("change-pic-form").addEventListener("submit", async (e) 
         await updateProfile(auth.currentUser, { photoURL });
         document.getElementById("profile-pic").src = photoURL;
 
-        alert("Foto de perfil actualizada con éxito.");
+        Swal.fire({
+            title: 'Éxito!',
+            text: 'Foto de perfil actualizada con éxito.',
+            icon: 'success',
+            confirmButtonText: 'Aceptar'
+        });
+
         fileInput.value = ""; // Limpiar el campo de archivo
     } catch (error) {
         console.error("Error al actualizar la foto de perfil:", error);
-        alert("No se pudo actualizar la foto de perfil. Intenta nuevamente.");
+        Swal.fire({
+            title: 'Error',
+            text: 'No se pudo actualizar la foto de perfil. Intenta nuevamente.',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+        });
     }
 });

@@ -754,3 +754,227 @@ document.addEventListener('DOMContentLoaded', () => {
         configurarFiltrosTabla();
     });
 });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    let isAuthChecked = false; // Variable para saber si el estado de autenticación ha sido verificado
+
+   // Verifica el estado de autenticación
+   onAuthStateChanged(auth, async (user) => {
+       isAuthChecked = true;
+
+       
+       const userInfo = document.querySelector(".user-info span");
+       const profileIcon = document.getElementById("profile-icon");
+       const logoutBtn = document.getElementById("logout-btn");
+       const perfilbtn = document.getElementById("perfil-btn");
+       const iniciobtn = document.getElementById("btn-inicio");
+       const content = document.getElementById("content"); // Área de contenido principal
+
+       if (user) {
+           const idTokenResult = await user.getIdTokenResult();
+           const isAdmin = idTokenResult.claims.admin || false;
+
+           if (userInfo) userInfo.textContent = `Bienvenido, ${user.email}`;
+           iniciobtn.classList.add("hidden");
+           logoutBtn.classList.remove("hidden");
+           perfilbtn.classList.remove("hidden");
+
+           // Si el usuario es administrador
+           if (isAdmin) {
+               console.log("Usuario con rol de administrador detectado.");
+               const adminPanelBtn = document.getElementById("btn-panel");
+               if (adminPanelBtn) adminPanelBtn.classList.remove("hidden");
+                if(iniciobtn) iniciobtn.classList.add("hidden");
+
+               // Llamar a getUsers solo cuando el usuario es administrador
+               getUsers();
+           } else {
+               // Si no es administrador y está en el panel de administración
+               if (window.location.pathname.includes('panelAdministracion.html')) {
+                   if (content) {
+                       content.innerHTML = `
+                           <div class="no-permission">
+                               <h2>No tienes permisos para acceder a esta sección.</h2>
+                               <p>Por favor, contacta a un administrador para obtener más información.</p>
+                           </div>
+                       `;
+                   }
+                   console.log("Usuario no tiene permisos para acceder al panel.");
+               }
+           }
+       } else {
+           if (userInfo) userInfo.textContent = "Iniciar sesión";
+           if (profileIcon) profileIcon.style.backgroundImage = "none";
+           loginBtn.classList.remove("hidden");
+           createUserBtn.classList.remove("hidden");
+           logoutBtn.classList.add("hidden");
+           perfilbtn.classList.add("hidden");
+           iniciobtn.classList.add("hidden");
+           
+
+           if (window.location.pathname.includes('panelAdministracion.html')) {
+               window.location.href = "../index.html";
+           }
+       }
+   });
+   
+
+  const getUsers = async () => {
+       const tableBody = document.querySelector("#users-table tbody");
+   
+       try {
+           // Obtener el token del usuario actual
+           const user = auth.currentUser; // Usamos la instancia de `auth` inicializada
+           if (!user) {
+               throw new Error("No hay un usuario autenticado.");
+           }
+           const userToken = await user.getIdToken();
+   
+           // Cambiar el URL por el de tu Firebase Cloud Function
+           const response = await fetch("https://us-central1-ganaderia-d357d.cloudfunctions.net/getUsers", {
+               method: "GET",
+               headers: {
+                   "Content-Type": "application/json",
+                   "Authorization": `Bearer ${userToken}` // Incluimos el token de autenticación
+               }
+           });
+   
+           if (!response.ok) {
+               throw new Error("Error al obtener usuarios: " + response.statusText);
+           }
+   
+           const data = await response.json();
+           const users = data.users;
+   
+           // Limpiar y llenar la tabla con los datos de los usuarios
+           tableBody.innerHTML = "";
+   
+           users.forEach(user => {
+               const row = document.createElement("tr");
+               row.innerHTML = `
+                   <td>${user.email}</td>
+                   <td>${user.uid}</td>
+                   <td>${user.provider}</td>
+                   <td>${new Date(user.creationTime).toLocaleDateString()}</td>
+                   <td>${new Date(user.lastSignInTime).toLocaleDateString()}</td>
+               `;
+               tableBody.appendChild(row);
+           });
+       } catch (error) {
+       }
+   };
+
+   // Configuración de títulos de página
+   const pageTitles = {
+       "index.html": "Inicio",
+       "inventario.html": "Gestión de Inventario",
+       "reportes.html": "Reportes",
+       "consulta.html": "Consulta",
+       "panelAdministracion.html": "Panel de Administración",
+       "perfil.html": "Perfil de Usuario"
+   };
+
+   const currentPage = window.location.pathname.split("/").pop();
+   const headerTitle = document.getElementById("page-title");
+   if (headerTitle && pageTitles[currentPage]) {
+       headerTitle.textContent = pageTitles[currentPage];
+   }
+
+   // Manejo de modales
+   window.openModal = (modalId) => {
+       const modal = document.getElementById(modalId);
+       if (modal) {
+           modal.classList.add("active");
+           document.getElementById("overlay").classList.add("active");
+       }
+   };
+
+   window.closeModal = (modalId) => {
+       const modal = document.getElementById(modalId);
+       if (modal) {
+           modal.classList.remove("active");
+           const activeModals = document.querySelectorAll(".modal.active");
+           if (activeModals.length === 0) {
+               document.getElementById("overlay").classList.remove("active");
+           }
+       }
+   };
+
+
+   // Manejo del perfil
+   const profileIcon = document.getElementById("profile-icon");
+   const profileMenu = document.getElementById("profile-menu");
+
+   if (profileIcon) {
+       profileIcon.addEventListener("click", () => {
+           profileMenu.classList.toggle("active");
+       });
+   }
+      // Manejo del botón del Panel de Administración
+const adminPanelBtn = document.getElementById("btn-panel");
+if (adminPanelBtn) {
+   adminPanelBtn.addEventListener("click", async () => {
+       const currentPage = window.location.pathname.split("/").pop();
+       if (isAuthChecked && auth.currentUser) {
+           // Verificar si el usuario tiene el rol de administrador
+           const user = auth.currentUser;
+           const idTokenResult = await user.getIdTokenResult();
+           const isAdmin = idTokenResult.claims.admin || false;
+
+           if (isAdmin) {
+               // Si es administrador, redirigir al panel de administración
+               window.location.href = currentPage === 'index.html' ? 'screens/panelAdministracion.html' : '../screens/panelAdministracion.html';
+           } else {
+             
+           }
+       } else {
+       
+       }
+   });
+}
+// Botón para ir al perfil
+const perfilBtn = document.getElementById("perfil-btn");
+if (perfilBtn) {
+   perfilBtn.addEventListener("click", () => {
+       window.location.href = "../screens/perfil.html"; // Redirige a perfil.html en la carpeta screens
+   });
+}
+
+// Cerrar sesión
+const logoutBtn = document.getElementById("logout-btn");
+if (logoutBtn) {
+   logoutBtn.addEventListener("click", async () => {
+       await signOut(auth);
+
+       // Mostrar mensaje de éxito con SweetAlert2
+       Swal.fire({
+           title: 'Hasta pronto!',
+           text: 'Has cerrado sesión.',
+           icon: 'success',
+           confirmButtonText: 'Aceptar'
+       }).then(() => {
+           // Verificar si ya estás en index.html
+           if (window.location.pathname.includes("index.html")) {
+               window.location.reload(); // Recargar la página si ya estás en index.html
+           } else {
+               window.location.href = "../index.html"; // Redirigir si estás en otra página
+           }
+       });
+   });
+}
+
+});
+document.addEventListener("DOMContentLoaded", () => {
+    // Firebase Authentication Logic (ya está bien definido en tu código)
+
+    // Manejo del menú lateral en móviles
+    const navToggle = document.getElementById('nav-toggle');
+    const navMenu = document.getElementById('nav-menu');
+
+    if (navToggle && navMenu) {
+        navToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('show'); // Agregar o quitar la clase "show"
+        });
+    }
+});

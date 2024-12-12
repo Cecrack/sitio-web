@@ -69,6 +69,17 @@
                         <div class="vacas"></div>
                     </div>
                 </div>
+
+                <div id="corral-modal" class="modal">
+                    <div class="modal-content">
+                        <span id="close-modal" class="close">&times;</span>
+                        <h2 id="corral-title">Detalles del Corral</h2>
+                        <div id="vacas-details">
+                            <!-- Los detalles de las vacas se mostrarán aquí -->
+                        </div>
+                    </div>
+                </div>
+                <div id="overlay"></div>
             </div>
         </div>
         
@@ -82,9 +93,42 @@
             <canvas id="bar-chart" width="400" height="200"></canvas>
         </div>
     </div>
-        
-        
+    
+    <!-- Botón para generar el reporte PDF -->
+<div class="pdf-report-section">
+    <!-- Botón para generar el reporte PDF -->
+<button id="generate-report-btn">Generar Reporte en PDF</button>
+</div>
+
+<!-- Contenedor para visualizar el PDF antes de descargarlo -->
+<div id="pdf-viewer" style="display:none;">
+    <embed id="pdf-embed" width="100%" height="500px" />
+</div>
+
+
+                
+<div class="chart-section">
+    <div class="hidden">
+        <canvas id="recuperacionChart"></canvas>
+        <div class="chart-title">Tasa de Recuperación de Enfermedades</div>
     </div>
+    <div class="hidden">
+        <canvas id="eventosFechaChart"></canvas>
+        <div class="chart-title">Distribución de Eventos Médicos por Fecha</div>
+    </div>
+    <div class="hidden">
+        <canvas id="enfermedadesChart"></canvas>
+        <div class="chart-title">Porcentaje de Enfermedades Recurrentes</div>
+    </div>
+    <div class="hidden">
+        <canvas id="estadoSaludChart"></canvas>
+        <div class="chart-title">Porcentaje de Vacas por Estado de Salud</div>
+    </div>
+</div>
+
+</div>
+
+
 </div>
 
     
@@ -128,6 +172,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="../scripts/scriptReportes.js"></script>
-     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    
 </body>
 </html>

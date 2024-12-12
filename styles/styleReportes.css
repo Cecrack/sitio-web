@@ -517,7 +517,7 @@ th {
         color: #333;
     }
 }
-
+/* Estilo base para los corrales en pantallas grandes */
 .corrales-container {
     display: flex;
     justify-content: space-around;
@@ -559,3 +559,173 @@ th {
     background-color: #ff5733;
     border-radius: 50%;
 }
+
+/* Estilos responsivos para pantallas pequeñas */
+@media (max-width: 768px) {
+    .corrales-container {
+        flex-direction: column;  /* Los corrales estarán en una columna en lugar de fila */
+        align-items: center;     /* Centrar los corrales */
+    }
+
+    .corral {
+        width: 120px;    /* Hacer los corrales más pequeños */
+        height: 160px;
+        margin-bottom: 15px;  /* Añadir espacio entre los corrales */
+    }
+
+    .vacas {
+        gap: 10px;   /* Aumentar el espacio entre las vacas */
+    }
+
+    .vaca {
+        width: 15px;  /* Reducir el tamaño de las vacas */
+        height: 15px;
+    }
+}
+
+/* Estilos para pantallas más pequeñas */
+@media (max-width: 480px) {
+    .corrales-container {
+        padding: 0 10px;  /* Añadir un poco de padding a los lados */
+    }
+
+    .corral {
+        width: 100px;   /* Ajustar el tamaño de los corrales */
+        height: 140px;
+    }
+
+    .vacas {
+        gap: 8px;    /* Menor espacio entre las vacas */
+    }
+
+    .vaca {
+        width: 12px;  /* Más pequeño aún */
+        height: 12px;
+    }
+
+    .corral h3 {
+        font-size: 14px;  /* Reducir el tamaño de la fuente para los títulos */
+    }
+}
+
+/* Estilos generales para el modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    z-index: 1001;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 80%; /* Ajusta el ancho del modal */
+    max-width: 900px; /* Máximo ancho */
+    height: auto; /* Altura dinámica basada en el contenido */
+    max-height: 90%; /* Altura máxima en caso de mucho contenido */
+    overflow-y: auto; /* Scroll vertical si el contenido supera el máximo */
+}
+
+/* Fondo del overlay */
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+#overlay.active {
+    display: block;
+}
+
+/* Contenedor de las vacas dentro del modal */
+#vacas-details {
+    display: flex; /* Activar flexbox */
+    flex-wrap: wrap; /* Permitir que los elementos se ajusten */
+    gap: 15px; /* Espaciado entre elementos */
+    justify-content: flex-start; /* Alinear al inicio */
+    padding: 10px; /* Margen interno para espacio */
+}
+
+/* Tarjetas individuales de vacas */
+.vaca-detail {
+    flex: 0 0 calc(33.333% - 10px); /* Una vaca ocupa un tercio del espacio */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    background: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 300px;
+    text-align: center;
+}
+
+/* Ajuste de la imagen dentro de cada tarjeta */
+.vaca-detail img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%; /* Hacer imágenes circulares */
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+/* Responsividad para pantallas medianas */
+@media (max-width: 768px) {
+    .vaca-detail {
+        flex: 0 0 calc(50% - 10px); /* Dos vacas por fila */
+    }
+}
+
+/* Responsividad para pantallas pequeñas */
+@media (max-width: 480px) {
+    .vaca-detail {
+        flex: 0 0 100%; /* Una vaca por fila */
+    }
+}
+/* Estilo para la sección del reporte PDF */
+.pdf-report-section {
+    margin: 20px;
+    text-align: center;
+}
+
+#pdf-viewer {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#pdf-embed {
+    border: 1px solid #ddd;
+}
+
+.chart-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Dos columnas */
+    gap: 20px; /* Espacio entre gráficas */
+    margin: 20px auto;
+    max-width: 1200px; /* Ancho máximo del contenedor */
+}
+
+.chart-container canvas {
+    width: 100%; /* Ajusta el ancho de las gráficas */
+    height: 250px; /* Altura fija */
+    border: 1px solid #ddd; /* Borde ligero para separarlas visualmente */
+    border-radius: 8px; /* Esquinas redondeadas */
+    background-color: #f9f9f9; /* Fondo claro */
+    padding: 10px; /* Espaciado interno */
+}
+
+.chart-title {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.chart-container canvas {
+    height: 400px; /* Reducir altura */
+}
+

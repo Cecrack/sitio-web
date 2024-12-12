@@ -43,8 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const loginBtn = document.getElementById("login-btn");
         const createUserBtn = document.getElementById("create-user-btn");
         const logoutBtn = document.getElementById("logout-btn");
+        const inicbtn = document.getElementById("btn-inicio");
         const perfilbtn = document.getElementById("perfil-btn");
-        const adminList = document.getElementById("admin-list"); // Área de administradores
         const content = document.getElementById("content"); // Área de contenido principal
 
         if (user) {
@@ -54,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (userInfo) userInfo.textContent = `Bienvenido, ${user.email}`;
             loginBtn.classList.add("hidden");
             createUserBtn.classList.add("hidden");
+            inicbtn.classList.add("hidden");
             logoutBtn.classList.remove("hidden");
             perfilbtn.classList.remove("hidden");
 
@@ -84,6 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (profileIcon) profileIcon.style.backgroundImage = "none";
             loginBtn.classList.remove("hidden");
             createUserBtn.classList.remove("hidden");
+            inicbtn.classList.remove("hidden");
             logoutBtn.classList.add("hidden");
             perfilbtn.classList.add("hidden");
 
@@ -278,133 +280,28 @@ const logoutBtn = document.getElementById("logout-btn");
 if (logoutBtn) {
     logoutBtn.addEventListener("click", async () => {
         await signOut(auth);
-        alert("Has cerrado sesión.");
 
-        // Verificar si ya estás en index.html
-        if (window.location.pathname.includes("index.html")) {
-            window.location.reload(); // Recargar la página si ya estás en index.html
-        } else {
-            window.location.href = "../index.html"; // Redirigir si estás en otra página
-        }
-                });
-             }
- });
+        // Mostrar mensaje de éxito con SweetAlert2
+        Swal.fire({
+            title: 'Hasta pronto!',
+            text: 'Has cerrado sesión.',
+            icon: 'success',
+            confirmButtonText: 'Aceptar'
+        }).then(() => {
+            // Verificar si ya estás en index.html
+            if (window.location.pathname.includes("index.html")) {
+                window.location.reload(); // Recargar la página si ya estás en index.html
+            } else {
+                window.location.href = "../index.html"; // Redirigir si estás en otra página
+            }
+        });
+    });
+}
+
+});
 
 // Referencia a la colección 'vacas' en Firestore
 const vacasCollection = collection(db, 'vacas');
-
-// Función para obtener y filtrar datos
-async function fetchReports() {
-    try {
-        // Obtener valores de los filtros desde el DOM
-        const fecha = document.getElementById('date-filter').value;
-        const animalId = document.getElementById('animal-id-filter').value;
-
-        // Construir consulta base
-        let q = vacasCollection;
-
-        // Aplicar filtros condicionales
-        if (animalId) {
-            q = query(vacasCollection, where('rfid', '==', animalId));
-        }
-        if (fecha) {
-            q = query(q, where('ultimaRevision', '==', fecha));
-        }
-
-        // Ejecutar la consulta
-        const querySnapshot = await getDocs(q);
-
-        // Referencia al cuerpo de la tabla
-        const tableBody = document.getElementById('report-table-body');
-        tableBody.innerHTML = ''; // Limpiar la tabla
-
-        // Iterar sobre los documentos y llenar la tabla
-        querySnapshot.forEach((doc) => {
-            const vaca = doc.data();
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${doc.id}</td> <!-- Identificador único -->
-                <td><img src="${vaca.fotoURL}" alt="Foto de la vaca" width="100" height="100"></td> <!-- Mostrar la imagen -->
-                <td>${vaca.peso || 'N/A'}</td>
-                <td>${vaca.estadoSalud || 'N/A'}</td>
-                <td>${vaca.fechaIngreso || 'N/A'}</td>
-                <td>${vaca.sexo || 'N/A'}</td>
-            `;
-            tableBody.appendChild(row);
-        });
-
-        console.log('Datos filtrados correctamente');
-
-        // Llamar a la función de progreso del animal con el ID
-        if (animalId) {
-            fetchProgresoAnimal(animalId); // Aquí pasamos el `animalId` definido
-        }
-    } catch (error) {
-        console.error('Error al filtrar los datos:', error);
-    }
-}
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('btn-buscar').addEventListener('click', fetchReports);
-});
-// Función para mostrar el progreso con datos existentes
-async function fetchProgresoAnimal(animalId) {
-    try {
-        // Verificar si se proporcionó un ID de animal
-        if (!animalId) {
-            console.error('No se proporcionó un ID de animal');
-            limpiarTablaProgreso();
-            return;
-        }
-
-        // Construir la consulta para obtener el documento de la vaca
-        const q = query(vacasCollection, where('rfid', '==', animalId));
-        const querySnapshot = await getDocs(q);
-
-        // Referencia al cuerpo de la tabla de progreso
-        const tableBody = document.getElementById('weight-table-body');
-        tableBody.innerHTML = ''; // Limpiar la tabla antes de llenarla
-
-        if (querySnapshot.empty) {
-            console.warn('No se encontraron datos para el animal especificado');
-            limpiarTablaProgreso(); // Limpiar la tabla si no hay datos
-            return;
-        }
-
-        // Iterar sobre los documentos encontrados (aunque debería haber solo uno por `rfid`)
-        querySnapshot.forEach((doc) => {
-            const vaca = doc.data();
-
-            // Crear una fila para mostrar la fecha de ingreso
-            const ingresoRow = document.createElement('tr');
-            ingresoRow.innerHTML = `
-                <td>Fecha de Ingreso</td>
-                <td>${vaca.fechaIngreso || 'N/A'}</td>
-            `;
-            tableBody.appendChild(ingresoRow);
-
-            // Crear una fila para mostrar el peso actual
-            const pesoRow = document.createElement('tr');
-            pesoRow.innerHTML = `
-                <td>Peso Actual</td>
-                <td>${vaca.peso || 'N/A'}</td>
-            `;
-            tableBody.appendChild(pesoRow);
-
-            console.log('Información del animal cargada correctamente');
-        });
-    } catch (error) {
-        console.error('Error al cargar la información del animal:', error);
-        limpiarTablaProgreso(); // Limpiar la tabla en caso de error
-    }
-}
-
-// Función para limpiar la tabla de progreso
-function limpiarTablaProgreso() {
-    const tableBody = document.getElementById('weight-table-body');
-    tableBody.innerHTML = ''; // Limpiar todas las filas de la tabla
-}
 
 // Función para obtener datos de género y dibujar la gráfica
 async function fetchGenderData() {
@@ -418,7 +315,7 @@ async function fetchGenderData() {
 
         querySnapshot.forEach((doc) => {
             const vaca = doc.data();
-            if (vaca.sexo === 'macho') {
+            if (vaca.sexo === 'Macho') {
                 maleCount++;
             } else if (vaca.sexo === 'hembra') {
                 femaleCount++;
@@ -464,6 +361,16 @@ function drawGenderChart(maleCount, femaleCount) {
     });
 }
 
+
+// Llama a la función después de llenar los corrales
+document.addEventListener("DOMContentLoaded", async () => {
+    const corralCount = await countVacasByUbicacion();
+
+    if (corralCount) {
+        fillCorrales(corralCount);
+    }
+});
+
 async function countVacasByUbicacion() {
     try {
         // Crear un objeto contador para cada corral
@@ -492,8 +399,6 @@ async function countVacasByUbicacion() {
     }
 }
 
-
-
 function fillCorrales(corralCount) {
     // Iterar sobre cada corral y agregar las vacas
     Object.keys(corralCount).forEach(corralId => {
@@ -520,17 +425,118 @@ function fillCorrales(corralCount) {
     });
 }
 
+// Obtener todos los elementos de los corrales
+const corralElements = document.querySelectorAll(".corral");
 
-document.addEventListener('DOMContentLoaded', async () => {
-    // Primero contar las vacas por ubicación (corrales)
-    const corralCount = await countVacasByUbicacion();
+// Función principal para asociar eventos a los corrales
+async function setupCorralEvents() {
+    try {
+        // Obtener las vacas agrupadas por ubicación desde Firestore
+        const vacasByUbicacion = await getVacasByUbicacion();
 
-    // Asegurarse de que los datos estén disponibles
-    if (corralCount) {
-        // Llamar a la función para llenar los corrales con las vacas
-        fillCorrales(corralCount);
+        // Asociar evento a cada corral
+        corralElements.forEach((corralElement) => {
+            corralElement.addEventListener("click", () => {
+                const corralId = corralElement.querySelector("h3").textContent; // Ejemplo: 'Corral A'
+                const vacas = vacasByUbicacion[corralId] || []; // Vacas del corral o vacío si no hay
+
+                // Mostrar el modal con las vacas del corral seleccionado
+                showModal(corralId, vacas);
+            });
+        });
+    } catch (error) {
+        console.error("Error al configurar eventos para los corrales:", error);
     }
+}
+
+function showModal(corralId, vacas) {
+    const modal = document.getElementById("corral-modal");
+    const overlay = document.getElementById("overlay");
+    const modalTitle = document.getElementById("corral-title");
+    const vacasDetails = document.getElementById("vacas-details");
+
+    // Configurar el título y los detalles del modal
+    modalTitle.textContent = `Detalles del ${corralId}`;
+    vacasDetails.innerHTML = ""; // Limpiar contenido previo
+
+    if (vacas.length > 0) {
+        vacas.forEach((vaca, index) => {
+            const vacaDetail = document.createElement("div");
+            vacaDetail.classList.add("vaca-detail");
+            vacaDetail.innerHTML = `
+                <img src="${vaca.fotoURL || '#'}" alt="Foto de la vaca">
+                <p><strong>Vaca ${index + 1}:</strong></p>
+                <p>ID: ${vaca.id}</p>
+                <p>Peso: ${vaca.peso || 'N/A'} kg</p>
+                <p>Estado de Salud: ${vaca.estadoSalud || 'N/A'}</p>
+                <p>Fecha de Ingreso: ${vaca.fechaIngreso || 'N/A'}</p>
+            `;
+            vacasDetails.appendChild(vacaDetail);
+        });
+    } else {
+        vacasDetails.innerHTML = "<p>No hay vacas en este corral.</p>";
+    }
+
+    // Mostrar el modal
+    modal.classList.add("active");
+    overlay.classList.add("active");
+}
+
+
+// Función para cerrar el modal
+document.getElementById("close-modal").addEventListener("click", () => {
+    const modal = document.getElementById("corral-modal");
+    const overlay = document.getElementById("overlay");
+    modal.classList.remove("active");
+    overlay.classList.remove("active");
 });
+
+// Función para cerrar el modal si se hace clic fuera de él (en el overlay)
+document.getElementById("overlay").addEventListener("click", () => {
+    const modal = document.getElementById("corral-modal");
+    const overlay = document.getElementById("overlay");
+    modal.classList.remove("active");
+    overlay.classList.remove("active");
+});
+
+
+// Función para obtener vacas agrupadas por ubicación desde Firestore
+async function getVacasByUbicacion() {
+    try {
+        // Crear un objeto para almacenar las vacas agrupadas
+        const vacasByUbicacion = {};
+
+        // Obtener todos los documentos de la colección 'vacas'
+        const querySnapshot = await getDocs(vacasCollection);
+
+        // Agrupar las vacas por ubicación
+        querySnapshot.forEach((doc) => {
+            const vaca = doc.data();
+            const ubicacion = vaca.ubicacion; // Campo 'ubicacion' en Firestore
+
+            // Inicializar el arreglo de vacas en la ubicación si no existe
+            if (ubicacion) {
+                if (!vacasByUbicacion[ubicacion]) {
+                    vacasByUbicacion[ubicacion] = [];
+                }
+
+                // Agregar la vaca al grupo de la ubicación correspondiente
+                vacasByUbicacion[ubicacion].push({
+                    id: doc.id,
+                    ...vaca,
+                });
+            }
+        });
+
+        return vacasByUbicacion;
+    } catch (error) {
+        console.error("Error al obtener vacas por ubicación:", error);
+        return {};
+    }
+}
+
+// Llamar a la configuración de eventos al cargar la página
+setupCorralEvents();
 
 
 async function fetchHealthStatusData() {
@@ -580,35 +586,50 @@ function createHealthStatusChart(buenos, regular, enfermo) {
         }]
     };
 
-   // Configuración del gráfico de pastel
-const config = {
-    type: 'pie', // Tipo de gráfico
-    data: healthChartData,
-    options: {
-        responsive: false, // Desactivar la opción responsive para respetar el tamaño del canvas
-        plugins: {
-            legend: {
-                position: 'top', // Posición de la leyenda
-            },
-            tooltip: {
-                callbacks: {
-                    label: function (tooltipItem) {
-                        const label = tooltipItem.label;
-                        const value = tooltipItem.raw;
-                        return `${label}: ${value} vacas`; // Personaliza el tooltip
+    // Configuración del gráfico de pastel
+    const config = {
+        type: 'pie', // Tipo de gráfico
+        data: healthChartData,
+        options: {
+            responsive: false, // Desactivar la opción responsive para respetar el tamaño del canvas
+            plugins: {
+                legend: {
+                    position: 'top', // Posición de la leyenda
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            const label = tooltipItem.label;
+                            const value = tooltipItem.raw;
+                            return `${label}: ${value} vacas`; // Personaliza el tooltip
+                        }
                     }
+                },
+                // Plugin para agregar los valores dentro del gráfico de pastel
+                datalabels: {
+                    anchor: 'center', // Ancla los valores al centro de cada segmento
+                    align: 'center',  // Alinea los valores al centro
+                    formatter: (value, context) => {
+                        return `${context.chart.data.labels[context.dataIndex]}: ${value}`; // Muestra el valor con la etiqueta
+                    },
+                    font: {
+                        weight: 'bold',
+                        size: 14, // Tamaño de la fuente
+                    },
+                    color: 'white', // Color del texto
                 }
             }
-        }
-    }
-};
+        },
+        plugins: [ChartDataLabels] // Registra el plugin
+    };
 
-// Crear el gráfico en el canvas
-const healthStatusChart = new Chart(
-    document.getElementById('health-status-chart'), // El canvas donde se dibuja el gráfico
-    config
-);
+    // Crear el gráfico en el canvas
+    const healthStatusChart = new Chart(
+        document.getElementById('health-status-chart'), // El canvas donde se dibuja el gráfico
+        config
+    );
 }
+
 async function fetchDataForLastSixMonths() {
     try {
         const vacasCollection = collection(db, "vacas"); // Nombre de tu colección
@@ -688,10 +709,6 @@ function createBarChart(monthsCount) {
     );
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    await createUbicacionChart();
-});
-
 
 
 // Llamar a la función cuando la página se carga
@@ -714,274 +731,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-async function registrarVaca(data) {
-    try {
-        const vacasCollection = collection(db, "vacas");
-        const docRef = await addDoc(vacasCollection, data);
-        alert(`Registro completado con éxito. ID de la vaca: ${data.rfid}`);
-    } catch (error) {
-        console.error("Error al registrar la vaca:", error);
-        alert("Error al registrar la vaca. Por favor, intenta de nuevo.");
-    }
-}
 
-// Función para registrar una vaca con un ID personalizado
-async function registrarVacaConId(data) {
-    try {
-        const vacasCollection = "vacas"; // Nombre de la colección
-        const vacaId = data.rfid.toString().padStart(3, '0'); // Formatear el ID (ejemplo: 001, 002)
-
-        const vacaDocRef = doc(db, vacasCollection, vacaId); // Definir el documento con el ID formateado
-        await setDoc(vacaDocRef, data);
-
-        alert(`Registro completado con éxito. ID de la vaca: ${vacaId}`);
-    } catch (error) {
-        console.error("Error al registrar la vaca con ID personalizado:", error);
-        alert("Error al registrar la vaca. Por favor, intenta de nuevo.");
-    }
-}
-
-
-document.getElementById("submit-btn").addEventListener("click", async (e) => {
-    e.preventDefault();
-
-    // Obtén los valores del formulario
-    const rfid = await getNextVacaId(); // Generar el próximo ID
-    const formattedRfid = rfid.toString().padStart(3, '0'); // Formatear el ID (ejemplo: 001)
-    const raza = document.getElementById("raza").value.trim();
-    const sexo = document.getElementById("sexo").value;
-    const peso = parseFloat(document.getElementById("peso").value);
-    const fechaIngreso = document.getElementById("fecha-ingreso").value;
-    const estadoSalud = document.getElementById("estado-salud").value;
-    const ubicacion = document.getElementById("corral").value;
-
-    // Validar los campos requeridos
-    if (!raza || !sexo || !peso || !fechaIngreso || !estadoSalud || !ubicacion) {
-        alert("Por favor, completa todos los campos requeridos.");
-        return;
-    }
-
-    // Estructurar los datos
-    const vacaData = {
-        rfid: formattedRfid,
-        raza,
-        sexo,
-        peso,
-        fechaIngreso,
-        estadoSalud,
-        ubicacion,
-    };
-
-    // Registrar la vaca con el ID personalizado
-    await registrarVacaConId(vacaData);
-
-    // Restablecer el formulario
-    document.getElementById("raza").value = "";
-    document.getElementById("sexo").value = "";
-    document.getElementById("peso").value = "";
-    document.getElementById("fecha-ingreso").value = "";
-    document.getElementById("estado-salud").value = "";
-    document.getElementById("corral").value = "";
-});
-
-
-
-document.addEventListener("DOMContentLoaded", function () {
-    // Referencias a elementos del DOM
-    const rfidInput = document.getElementById("rfid");
-    const modal = document.getElementById("modal-registrar");
-    const overlay = document.getElementById("overlay"); // Overlay de fondo
-    const closeBtn = document.querySelector(".modal-close");
-    const submitBtn = document.getElementById("submit-btn");
-    const steps = document.querySelectorAll(".step");
-    const stepContents = document.querySelectorAll(".step-content");
-    const prevBtn = document.getElementById("prev-btn");
-    const nextBtn = document.getElementById("next-btn");
-
-    let currentStep = 0;
-
-    // Función para restablecer el formulario
-    function resetForm() {
-        document.querySelectorAll(".form-input").forEach((field) => {
-            if (field.type === "file") {
-                field.value = ""; // Limpiar archivos seleccionados
-            } else {
-                field.value = ""; // Limpiar campos de texto, select y textarea
-            }
-        });
-
-        // Restaurar el placeholder y permitir edición en RFID
-        if (rfidInput) {
-            rfidInput.placeholder = "Esperando lectura...";
-            rfidInput.removeAttribute("readonly"); // Asegurar que sea editable
-        }
-
-        currentStep = 0; // Reiniciar el paso actual
-        updateStep(); // Volver al primer paso
-    }
-
-    // Actualizar el estado de los pasos
-    function updateStep() {
-        steps.forEach((step, index) => {
-            step.classList.toggle("active", index === currentStep);
-        });
-        stepContents.forEach((content, index) => {
-            content.classList.toggle("active", index === currentStep);
-        });
-
-        prevBtn.disabled = currentStep === 0;
-        nextBtn.classList.toggle("hidden", currentStep === steps.length - 1);
-        nextBtn.disabled = currentStep === steps.length - 1; // Deshabilitar "Siguiente" en el último paso
-        submitBtn.classList.toggle("hidden", currentStep !== steps.length - 1);
-        submitBtn.disabled = currentStep !== steps.length - 1; // Habilitar solo en el último paso
-    }
-
-    // Confirmar cancelación al cerrar
-    closeBtn.addEventListener("click", function () {
-        const confirmCancel = confirm("¿Está seguro de que desea cancelar el registro?");
-        if (confirmCancel) {
-            resetForm(); // Restablecer formulario
-            modal.classList.remove("active"); // Cerrar el modal
-            overlay.classList.remove("active"); // Ocultar el overlay
-        }
-    });
-
-    // Enviar el formulario
-    submitBtn.addEventListener("click", function (e) {
-        e.preventDefault(); // Evitar envío real
-        alert("Registro completado con éxito.");
-        resetForm(); // Restablecer formulario
-        modal.classList.remove("active"); // Cerrar el modal
-        overlay.classList.remove("active"); // Ocultar el overlay
-    });
-
-    // Ocultar placeholder dinámicamente mientras el usuario escribe
-    if (rfidInput) {
-        rfidInput.addEventListener("input", function () {
-            if (rfidInput.value.trim()) {
-                rfidInput.placeholder = ""; // Ocultar placeholder cuando hay texto
-            } else {
-                rfidInput.placeholder = "Esperando lectura..."; // Restaurar placeholder
-            }
-        });
-    }
-
-    // Eventos de los botones de navegación
-    prevBtn.addEventListener("click", () => {
-        if (currentStep > 0) currentStep--;
-        updateStep();
-    });
-
-    nextBtn.addEventListener("click", () => {
-        if (validateStep(currentStep)) {
-            if (currentStep < steps.length - 1) currentStep++;
-            updateStep();
-        }
-    });
-
-    // Validar campos requeridos para cada paso
-    function validateStep(step) {
-        let isValid = true;
-        const fieldsToValidate = [];
-
-        switch (step) {
-            case 0: // Paso 1: RFID Escaneado
-                fieldsToValidate.push(rfidInput);
-                break;
-            case 1: // Paso 2: Datos Generales
-                fieldsToValidate.push(
-                    document.getElementById("raza"),
-                    document.getElementById("sexo"),
-                    document.getElementById("peso"),
-                    document.getElementById("fecha-ingreso")
-                );
-                break;
-            case 2: // Paso 3: Datos Sanitarios
-                fieldsToValidate.push(document.getElementById("estado-salud"));
-                break;
-            case 3: // Paso 4: Reproducción
-                fieldsToValidate.push(document.getElementById("estado-reproductivo"));
-                break;
-            case 4: // Paso 5: Ubicación
-                fieldsToValidate.push(document.getElementById("corral"));
-                break;
-            case 5: // Paso 6: Subir Foto
-                fieldsToValidate.push(document.getElementById("foto-animal"));
-                break;
-        }
-
-        fieldsToValidate.forEach((field) => {
-            if (!field || !field.value.trim()) {
-                markFieldError(field);
-                isValid = false;
-            } else {
-                clearFieldError(field);
-            }
-        });
-
-        return isValid;
-    }
-
-    // Marcar campo con error
-    function markFieldError(field) {
-        if (field) field.classList.add("error");
-    }
-
-    // Remover error de un campo
-    function clearFieldError(field) {
-        if (field) field.classList.remove("error");
-    }
-
-    // Inicializar el formulario
-    updateStep();
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    const consultaForm = document.getElementById("consulta-form");
-    const consultaResult = document.getElementById("consulta-result");
-    const infoVacaModal = document.getElementById("modal-informacion-vaca");
-    const infoVacaContainer = document.getElementById("info-vaca");
-
-    // Evento para manejar la consulta
-    consultaForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const rfid = document.getElementById("consulta-rfid").value.trim();
-
-        if (!rfid) {
-            consultaResult.textContent = "Por favor, introduce un identificador válido.";
-            return;
-        }
-
-        consultaResult.textContent = "Buscando...";
-
-        try {
-            // Supongamos que tienes una API o base de datos que devuelve datos por RFID
-            const response = await fetch(`/api/ganado?rfid=${rfid}`); // Cambia según tu API
-            const data = await response.json();
-
-            if (data) {
-                // Muestra los datos en el modal de información
-                infoVacaContainer.innerHTML = `
-                    <h4>Detalles del Registro</h4>
-                    <p><strong>RFID:</strong> ${data.rfid}</p>
-                    <p><strong>Raza:</strong> ${data.raza}</p>
-                    <p><strong>Sexo:</strong> ${data.sexo}</p>
-                    <p><strong>Peso:</strong> ${data.peso} kg</p>
-                    <p><strong>Fecha de Ingreso:</strong> ${data.fechaIngreso}</p>
-                    <p><strong>Estado de Salud:</strong> ${data.estadoSalud}</p>
-                    <p><strong>Ubicación:</strong> ${data.ubicacion}</p>
-                    <p><strong>Historial de Vacunación:</strong> ${data.historialVacunacion}</p>
-                `;
-                openModal("modal-informacion-vaca");
-            } else {
-                consultaResult.textContent = "No se encontró ningún registro con este identificador.";
-            }
-        } catch (error) {
-            consultaResult.textContent = "Error al realizar la consulta.";
-            console.error(error);
-        }
-    });
-});
 
 // Funciones para manejar modales
 function openModal(modalId) {
@@ -1002,101 +752,308 @@ function closeModal(modalId) {
     }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    const eliminarBtn = document.getElementById("btn-eliminar");
-    const confirmYesBtn = document.getElementById("confirm-yes");
-    const razonEliminacion = document.getElementById("razon-eliminacion");
-    const comentarioContainer = document.getElementById("comentario-container");
-    const comentario = document.getElementById("comentario");
-
-    let currentRecordId = null; // ID del registro que se desea eliminar
-
-    // Mostrar campo de comentario si se selecciona "Otro"
-    razonEliminacion.addEventListener("change", function () {
-        if (razonEliminacion.value === "otro") {
-            comentarioContainer.style.display = "block";
-        } else {
-            comentarioContainer.style.display = "none";
-            comentario.value = ""; // Limpiar el comentario
-        }
-    });
-
-    // Abrir el modal de eliminación
-    eliminarBtn.addEventListener("click", function () {
-        currentRecordId = "12345ABCDE"; // Simula obtener el ID del registro seleccionado
-        openModal("modal-eliminar");
-    });
-
-    // Confirmar eliminación con razón
-    confirmYesBtn.addEventListener("click", async function () {
-        const razon = razonEliminacion.value;
-        const comentarioAdicional = comentario.value.trim();
-
-        if (!razon) {
-            alert("Por favor, selecciona una razón para la eliminación.");
-            return;
-        }
-
-        try {
-            // Registrar la eliminación (simulación)
-            console.log("Eliminando registro con ID:", currentRecordId);
-            console.log("Razón:", razon);
-            if (comentarioAdicional) {
-                console.log("Comentario adicional:", comentarioAdicional);
-            }
-
-            // Firebase Firestore (ejemplo):
-            // const docRef = doc(db, "vacas", currentRecordId);
-            // await deleteDoc(docRef);
-            // Opcional: Mover el registro eliminado a una colección "eliminados"
-            // await addDoc(collection(db, "eliminados"), { id: currentRecordId, razon, comentarioAdicional });
-
-            alert("Registro eliminado con éxito.");
-            closeModal("modal-eliminar");
-            currentRecordId = null;
-
-            // Actualiza la tabla visualmente (simulación)
-            const row = document.querySelector(`[data-id="${currentRecordId}"]`);
-            if (row) row.remove();
-        } catch (error) {
-            console.error("Error al eliminar el registro:", error);
-            alert("Ocurrió un error al intentar eliminar el registro.");
-        }
-    });
-});
-
-async function getNextVacaId() {
-    const counterDocRef = doc(db, "metadata", "counters");
+async function graficarEnfermedadesRecurrentes() {
+    const enfermedades = {}; // Almacenar enfermedades y sus recuentos
 
     try {
-        const counterDoc = await getDoc(counterDocRef);
+        const querySnapshot = await getDocs(collection(db, "historialMedico"));
 
-        if (counterDoc.exists()) {
-            const lastVacaId = counterDoc.data().lastVacaId || 0;
-            await updateDoc(counterDocRef, { lastVacaId: increment(1) });
-            return lastVacaId + 1;
-        } else {
-            // Si el documento no existe, crearlo con el valor inicial
-            await setDoc(counterDocRef, { lastVacaId: 1 });
-            return 1;
+        querySnapshot.forEach((doc) => {
+            const registro = doc.data();
+            const evento = registro.evento || "Sin evento";
+
+            // Contar eventos de enfermedad
+            if (evento in enfermedades) {
+                enfermedades[evento]++;
+            } else {
+                enfermedades[evento] = 1;
+            }
+        });
+
+        // Configurar datos para la gráfica
+        const labels = Object.keys(enfermedades);
+        const data = Object.values(enfermedades);
+
+        const canvas = document.getElementById("enfermedadesChart");
+        if (!canvas) {
+            console.error("El canvas con ID 'enfermedadesChart' no existe en el DOM.");
+            return;
         }
+        const ctx = canvas.getContext("2d");
+
+        new Chart(ctx, {
+            type: "pie", // Cambia a "bar" si prefieres barras
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Porcentaje de Enfermedades Recurrentes",
+                    data: data,
+                    backgroundColor: [
+                        "rgba(255, 99, 132, 0.6)",
+                        "rgba(54, 162, 235, 0.6)",
+                        "rgba(255, 206, 86, 0.6)",
+                        "rgba(75, 192, 192, 0.6)",
+                        "rgba(153, 102, 255, 0.6)",
+                        "rgba(255, 159, 64, 0.6)"
+                    ],
+                }]
+            }
+        });
     } catch (error) {
-        console.error("Error al obtener o inicializar el ID de vaca:", error);
-        throw error;
+        console.error("Error al graficar enfermedades recurrentes:", error);
     }
 }
 
 
-document.getElementById("add-vaca-btn").addEventListener("click", async () => {
-    try {
-        const nextId = await getNextVacaId();
-        document.getElementById("rfid").value = nextId; // Mostrar el ID en el campo RFID
-        openModal("modal-registrar");
-    } catch (error) {
-        alert("Error al obtener el ID para la nueva vaca. Intenta nuevamente.");
-    }
+// Llamar a la función después de cargar el DOM
+document.addEventListener("DOMContentLoaded", () => {
+    graficarEnfermedadesRecurrentes();
 });
 
+async function graficarTasaRecuperacion() {
+    let recuperadas = 0;
+    let enTratamiento = 0;
+
+    try {
+        const querySnapshot = await getDocs(collection(db, "historialMedico"));
+
+        querySnapshot.forEach((doc) => {
+            const registro = doc.data();
+            const evento = registro.evento || "";
+
+            if (evento.toLowerCase().includes("recuperación")) {
+                recuperadas++;
+            } else if (evento.toLowerCase().includes("tratamiento")) {
+                enTratamiento++;
+            }
+        });
+
+        const ctx = document.getElementById("recuperacionChart").getContext("2d");
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: ["Recuperadas", "En Tratamiento"],
+                datasets: [{
+                    label: "Tasa de Recuperación",
+                    data: [recuperadas, enTratamiento],
+                    backgroundColor: ["rgba(75, 192, 192, 0.6)", "rgba(255, 99, 132, 0.6)"]
+                }]
+            }
+        });
+    } catch (error) {
+        console.error("Error al graficar tasa de recuperación:", error);
+    }
+}
+
+// Llamar a la función después de cargar el DOM
+document.addEventListener("DOMContentLoaded", () => {
+    graficarTasaRecuperacion();
+});
+
+async function graficarEstadoDeSalud() {
+    let buenEstado = 0;
+    let regular = 0;
+    let enfermas = 0;
+
+    try {
+        const querySnapshot = await getDocs(collection(db, "vacas"));
+
+        querySnapshot.forEach((doc) => {
+            const vaca = doc.data();
+            const estado = vaca.estadoSalud || "Desconocido";
+
+            if (estado.toLowerCase() === "buen estado") {
+                buenEstado++;
+            } else if (estado.toLowerCase() === "regular") {
+                regular++;
+            } else if (estado.toLowerCase() === "enfermas") {
+                enfermas++;
+            }
+        });
+
+        const ctx = document.getElementById("estadoSaludChart").getContext("2d");
+        new Chart(ctx, {
+            type: "pie", // Cambiar a "bar" si prefieres barras
+            data: {
+                labels: ["Buen Estado", "Regular", "Enfermas"],
+                datasets: [{
+                    label: "Estado de Salud de las Vacas",
+                    data: [buenEstado, regular, enfermas],
+                    backgroundColor: [
+                        "rgba(75, 192, 192, 0.6)", // Verde
+                        "rgba(255, 206, 86, 0.6)", // Amarillo
+                        "rgba(255, 99, 132, 0.6)"  // Rojo
+                    ],
+                }]
+            }
+        });
+    } catch (error) {
+        console.error("Error al graficar estado de salud:", error);
+    }
+}
+
+// Llamar a la función después de cargar el DOM
+document.addEventListener("DOMContentLoaded", () => {
+    graficarEstadoDeSalud();
+});
+
+async function graficarEventosPorFecha() {
+    const eventosPorMes = {}; // Almacenar recuento de eventos por mes
+
+    try {
+        const querySnapshot = await getDocs(collection(db, "historialMedico"));
+
+        querySnapshot.forEach((doc) => {
+            const registro = doc.data();
+            const fecha = registro.fecha || "";
+            const mes = fecha.split("-").slice(0, 2).join("-"); // Extraer año-mes (formato YYYY-MM)
+
+            if (mes in eventosPorMes) {
+                eventosPorMes[mes]++;
+            } else {
+                eventosPorMes[mes] = 1;
+            }
+        });
+
+        // Ordenar meses por fecha
+        const sortedMeses = Object.keys(eventosPorMes).sort();
+
+        const ctx = document.getElementById("eventosFechaChart").getContext("2d");
+        new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: sortedMeses,
+                datasets: [{
+                    label: "Eventos Médicos por Mes",
+                    data: sortedMeses.map((mes) => eventosPorMes[mes]),
+                    borderColor: "rgba(54, 162, 235, 0.8)",
+                    backgroundColor: "rgba(54, 162, 235, 0.2)",
+                    fill: true,
+                    tension: 0.3 // Suavizar las líneas
+                }]
+            }
+        });
+    } catch (error) {
+        console.error("Error al graficar eventos por fecha:", error);
+    }
+}
+
+// Llamar a la función después de cargar el DOM
+document.addEventListener("DOMContentLoaded", () => {
+    graficarEventosPorFecha();
+});
+
+async function generarReporteConGraficasYCorral() {
+    // Recupera los datos de la colección de vacas desde Firestore
+    const vacasCollectionRef = collection(db, "vacas");
+    const vacasSnapshot = await getDocs(vacasCollectionRef);
+    const vacasData = vacasSnapshot.docs.map(doc => doc.data());
+
+    // Crea una instancia de jsPDF
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Obtener la fecha actual
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+    const formattedDate = `${day}/${month}/${year}`;
+
+    // Título del reporte con la fecha actual
+    doc.setFontSize(18);
+    doc.text(`Reporte de Ganadería Inteligente del día ${formattedDate}`, 20, 20);
+
+    // Generar la primera gráfica (por ejemplo, de género)
+    await fetchGenderData();
+    const genderCanvas = document.getElementById('gender-chart');
+    const genderImage = genderCanvas.toDataURL("image/png");
+    doc.addImage(genderImage, 'PNG', 20, 30, 170, 100);
+
+    // Espaciado y nueva página si es necesario
+    let currentY = 130;
+    if (currentY + 100 > doc.internal.pageSize.height) {
+        doc.addPage();
+        currentY = 20;
+    }
+
+    // Generar la segunda gráfica (estado de salud)
+    await fetchHealthStatusData();
+    const healthCanvas = document.getElementById('health-status-chart');
+    const healthImage = healthCanvas.toDataURL("image/png");
+    doc.addImage(healthImage, 'PNG', 20, currentY, 170, 100);
+
+    currentY += 110;
+    if (currentY + 100 > doc.internal.pageSize.height) {
+        doc.addPage();
+        currentY = 20;
+    }
+
+    // Manejar los gráficos ocultos (hidden)
+    const hiddenCharts = document.querySelectorAll('.hidden');
+    hiddenCharts.forEach(chart => chart.classList.remove('hidden')); // Mostrar gráficos
+
+    // Esperar un momento para que los gráficos se rendericen
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Tasa de recuperación
+    const recoveryCanvas = document.getElementById('recuperacionChart');
+    const recoveryImage = recoveryCanvas.toDataURL("image/png");
+    doc.addImage(recoveryImage, 'PNG', 20, currentY, 170, 100);
+
+    currentY += 110;
+    if (currentY + 100 > doc.internal.pageSize.height) {
+        doc.addPage();
+        currentY = 20;
+    }
+
+    // Eventos médicos por fecha
+    const eventosFechaCanvas = document.getElementById('eventosFechaChart');
+    const eventosFechaImage = eventosFechaCanvas.toDataURL("image/png");
+    doc.addImage(eventosFechaImage, 'PNG', 20, currentY, 170, 100);
+
+    currentY += 110;
+    if (currentY + 100 > doc.internal.pageSize.height) {
+        doc.addPage();
+        currentY = 20;
+    }
+
+    // Enfermedades recurrentes
+    const enfermedadesCanvas = document.getElementById('enfermedadesChart');
+    const enfermedadesImage = enfermedadesCanvas.toDataURL("image/png");
+    doc.addImage(enfermedadesImage, 'PNG', 20, currentY, 170, 100);
+
+    currentY += 110;
+    if (currentY + 100 > doc.internal.pageSize.height) {
+        doc.addPage();
+        currentY = 20;
+    }
+
+    // Estado de salud
+    const estadoSaludCanvas = document.getElementById('estadoSaludChart');
+    const estadoSaludImage = estadoSaludCanvas.toDataURL("image/png");
+    doc.addImage(estadoSaludImage, 'PNG', 20, currentY, 170, 100);
+
+    // Ocultar nuevamente los gráficos
+    hiddenCharts.forEach(chart => chart.classList.add('hidden'));
+    currentY += 110;
+    if (currentY + 100 > doc.internal.pageSize.height) {
+        doc.addPage();
+        currentY = 20;
+    }
+
+    // Captura la sección del corral
+    const corralSection = document.querySelector('.corral-chart-section');
+    await html2canvas(corralSection).then(canvas => {
+        const corralImage = canvas.toDataURL("image/png");
+        doc.addImage(corralImage, 'PNG', 20, currentY, 170, 100);
+    });
 
 
+    // Guardar el PDF
+    doc.save('reporte_ganaderia.pdf');
+}
+
+// Llamar a la función cuando se haga clic en el botón para generar el reporte
+document.getElementById('generate-report-btn').addEventListener('click', generarReporteConGraficasYCorral);
 

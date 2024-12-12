@@ -566,3 +566,61 @@ th {
     background-color: #ff5733;
     border-radius: 50%;
 }
+
+/* Estilo responsivo para pantallas pequeñas */
+@media (max-width: 768px) {
+    .menu-container {
+        display: none; /* Ocultar el menú por defecto */
+        position: absolute;
+        top: 60px;
+        left: 0;
+        background: #3e3e3e;
+        width: 100%;
+        padding: 10px 0;
+        flex-direction: column;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        z-index: 100;
+    }
+
+    .menu-container.show {
+        display: flex; /* Mostrar el menú cuando se activa */
+    }
+
+    /* Estilo para filas con estado "vendida" */
+#vacas-table tbody tr.row-sold {
+    background-color: #ffe6e6 !important; /* Fondo rojo claro */
+    color: #b30000 !important; /* Texto rojo oscuro */
+}
+
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .nav-toggle {
+        font-size: 24px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #333;
+    }
+}
+
+/* Mostrar el botón hamburguesa solo en pantallas pequeñas */
+.nav-toggle {
+    display: none; /* Ocultar por defecto */
+}
+
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: block; /* Mostrar en pantallas pequeñas */
+        font-size: 24px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #333;
+    }
+}

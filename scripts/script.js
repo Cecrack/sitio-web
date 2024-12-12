@@ -213,6 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const profileIcon = document.getElementById("profile-icon");
         const loginBtn = document.getElementById("login-btn");
         const createUserBtn = document.getElementById("create-user-btn");
+        const iniciobtn = document.getElementById("btn-inicio"); // Área de contenido principal btn-inicio
         const logoutBtn = document.getElementById("logout-btn");
     
         if (loginBtn && createUserBtn && logoutBtn) {
@@ -221,12 +222,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (profileIcon) profileIcon.style.backgroundImage = "url('path_to_user_profile_picture')";
                 loginBtn.classList.add("hidden");
                 createUserBtn.classList.add("hidden");
+            iniciobtn.classList.add("hidden");
                 logoutBtn.classList.remove("hidden");
             } else {
                 if (userInfo) userInfo.textContent = "Iniciar sesión";
                 if (profileIcon) profileIcon.style.backgroundImage = "none";
                 loginBtn.classList.remove("hidden");
                 createUserBtn.classList.remove("hidden");
+                
+            iniciobtn.classList.remove("hidden");
                 logoutBtn.classList.add("hidden");
             }
         }
@@ -361,6 +365,7 @@ if (createUserForm) {
                     text: "Has cerrado sesión exitosamente.",
                     confirmButtonText: "Aceptar"
                 });
+                window.location.href = "../index.html";
             } catch (error) {
                 Swal.fire({
                     icon: "error",

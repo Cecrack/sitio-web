@@ -610,3 +610,97 @@ tbody tr:hover {
         max-width: none; /* Quita el límite de ancho */
     }
 }
+
+/* Estilos para el menú de perfil desplegable */
+.profile-menu {
+    display: none;
+    position: absolute;
+    top: 60px; /* Ajusta la posición del menú debajo del perfil */
+    right: 20px;
+    background-color: #140202;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    width: 200px;
+    z-index: 10;
+}
+
+.profile-menu button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #f4f4f4;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+}
+
+.profile-menu button:last-child {
+    border-bottom: none;
+}
+
+.profile-menu button:hover {
+    background-color: #c4bcbc;
+}
+
+.profile-menu.active {
+    display: block;
+}
+
+/* Estilo responsivo para pantallas pequeñas */
+@media (max-width: 768px) {
+    .menu-container {
+        display: none; /* Ocultar el menú por defecto */
+        position: absolute;
+        top: 60px;
+        left: 0;
+        background: #3e3e3e;
+        width: 100%;
+        padding: 10px 0;
+        flex-direction: column;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        z-index: 100;
+    }
+
+    .menu-container.show {
+        display: flex; /* Mostrar el menú cuando se activa */
+    }
+
+    /* Estilo para filas con estado "vendida" */
+#vacas-table tbody tr.row-sold {
+    background-color: #ffe6e6 !important; /* Fondo rojo claro */
+    color: #b30000 !important; /* Texto rojo oscuro */
+}
+
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .nav-toggle {
+        font-size: 24px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #333;
+    }
+}
+
+/* Mostrar el botón hamburguesa solo en pantallas pequeñas */
+.nav-toggle {
+    display: none; /* Ocultar por defecto */
+}
+
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: block; /* Mostrar en pantallas pequeñas */
+        font-size: 24px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #333;
+    }
+}

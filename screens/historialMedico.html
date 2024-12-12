@@ -390,19 +390,21 @@
     display: flex;
 }
 
-
-    </style>
+</style>
 </head>
-<body>
+<body><!-- Encabezado superior -->
     <div class="header">
+        <!-- Botón hamburguesa para móviles -->
         <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú">&#9776;</button>
-        <div class="title" id="page-title">Historial Médico</div>
+
+        <div class="title" id="page-title">Historial Medico</div>
         <div class="user-info">
-            <span id="session-status">Iniciar sesión</span>
-            <div class="profile-circle" id="profile-icon" onclick="toggleDropdown()"></div>
-            <div class="dropdown-menu" id="dropdown-menu">
-                <button id="login-btn" onclick="openModal('login-form')">Iniciar sesión</button>
-                <button id="create-user-btn" onclick="openModal('create-user-form')">Crear cuenta</button>
+            <span>Iniciar sesión</span>
+            <div class="profile-circle" id="profile-icon">
+                <!-- El círculo del perfil -->
+            </div>
+            <div id="profile-menu" class="profile-menu">
+                <button id="perfil-btn" class="hidden">Información</button>
                 <button id="logout-btn" class="hidden">Cerrar sesión</button>
             </div>
         </div>
