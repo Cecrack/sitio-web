@@ -19,6 +19,23 @@
             padding: 10px;
             z-index: 100;
         }
+    /* Centrar el contenido */
+    .content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        min-height: 80vh; /* Asegura que el contenido ocupe gran parte de la pantalla */
+    }
+
+    /* Ajustar el tamaño de la imagen */
+    .content .logo {
+        width: 800px; /* Aumenta el tamaño de la imagen */
+        height: auto; /* Mantiene la proporción de la imagen */
+        margin-bottom: 20px; /* Espacio entre la imagen y el título */
+    }
+
 </style>
 <body>
 
@@ -62,12 +79,12 @@
 
         <!-- Área de contenido principal -->
         <div class="content" id="content">
-            
-            <h1>Bienvenido a Ganadería Inteligente</h1>
-
-            <h3>Inicie sesion para empezar</h3>
+            <h1>Bienvenido a Ganaderia Raulaje</h1>
+            <h3>Inicie sesión para empezar</h3>
+            <img src="images/ganaderiaRaulaje.png" alt="Logo de Ganadería Raulaje" class="logo">
             
         </div>
+
     </div>
 
     <!-- Overlay para modales -->
