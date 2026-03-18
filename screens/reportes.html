@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes - Ganadería Inteligente</title>
+    <link rel="stylesheet" href="../styles/styleReportes.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+
+    <!-- Encabezado superior -->
+    <div class="header">
+        <!-- Botón hamburguesa para móviles -->
+        <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú"><i class="fas fa-bars"></i></button>
+        <div class="title" id="page-title">Reportes</div>
+        <div class="user-info">
+            <span>Iniciar sesión</span>
+            <div class="profile-circle" id="profile-icon">
+                <!-- El círculo del perfil -->
+            </div>
+            <div id="profile-menu" class="profile-menu">
+                <!-- Botón para iniciar sesión -->
+                <button id="login-btn" onclick="openModal('login-form')">Iniciar sesión</button>
+            
+                <!-- Botón para crear cuenta -->
+                <button id="create-user-btn" onclick="openModal('create-user-form')">Crear cuenta</button>
+            
+                <!-- Botón para cerrar sesión (inicialmente oculto) -->
+                <button id="perfil-btn" class="hidden">Informacion</button>
+                <button id="logout-btn" class="hidden">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+    
+<!-- Contenedor principal -->
+<div class="main-container">
+    <!-- Menú lateral izquierdo -->
+    <nav class="menu-container" id="nav-menu">
+        <button id="btn-inicio" onclick="window.location.href='../index.html';"><i class="fas fa-home"></i>Inicio</button>
+        <button id="btn-inventario" onclick="window.location.href='inventario.html';"><i class="fas fa-boxes-stacked"></i>Gestión de Inventario</button>
+        <button id="btn-reportes" class="active" onclick="window.location.href='reportes.html';"><i class="fas fa-chart-line"></i>Reportes</button>
+        <button id="btn-consulta" onclick="window.location.href='consulta.html';"><i class="fas fa-search"></i>Consulta</button>
+        <button id="btn-historialMedico" onclick="window.location.href='historialMedico.html';"><i class="fas fa-file-medical"></i>Historial Medico</button>
+        <button id="btn-Salidaa" onclick="window.location.href='Seguimiento.html';"><i class="fas fa-chart-bar"></i>Seguimiento</button>
+        <button id="btn-inventario-maquinaria" onclick="window.location.href='inventarioMaquinaria.html';"><i class="fas fa-tractor"></i>Inventario Maquinaria</button>
+        <button id="btn-calendario" onclick="window.location.href='calendario.html';"><i class="fas fa-calendar-alt"></i>Calendario</button>
+        <button id="btn-planes-mantenimiento" onclick="window.location.href='planesMantenimiento.html';"><i class="fas fa-tools"></i>Planes de Mantenimiento</button>
+        <button id="btn-panel" onclick="window.location.href='panelAdministracion.html';"><i class="fas fa-users-cog"></i>Panel de Administración</button>
+    </nav>
+    
+    <div class="content" id="content">
+        <h1><i class="fas fa-file-alt"></i> Reportes - Ganadería</h1>
+
+        <!-- Nueva sección de Mantenimiento -->
+        <div class="chart-section">
+            <div class="maintenance-kpi-section">
+                <h2><i class="fas fa-tachometer-alt"></i> Indicadores de Mantenimiento</h2>
+                <canvas id="maintenance-kpi-chart" width="400" height="200"></canvas>
+            </div>
+            <div class="export-section">
+                <h2><i class="fas fa-download"></i> Exportar Datos</h2>
+                <p>Descargue los datos de mantenimiento en formato CSV.</p>
+                <button id="export-equipos-csv" class="export-btn"><i class="fas fa-file-csv"></i> Exportar Equipos a CSV</button>
+                <button id="export-ordenes-csv" class="export-btn"><i class="fas fa-file-csv"></i> Exportar Órdenes a CSV</button>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="gender-chart-section">
+                <h2><i class="fas fa-venus-mars"></i> Distribución por Género</h2>
+                <canvas id="gender-chart" width="400" height="200"></canvas>
+            </div>
+            
+            <div class="corral-chart-section">
+                <h2><i class="fas fa-igloo"></i> Distribución de Vacas por Corral</h2>
+                <div class="corrales-container">
+                    <div class="corral" id="corral-a">
+                        <h3>Corral A</h3>
+                        <div class="vacas"></div>
+                    </div>
+                    <div class="corral" id="corral-b">
+                        <h3>Corral B</h3>
+                        <div class="vacas"></div>
+                    </div>
+                    <div class="corral" id="corral-c">
+                        <h3>Corral C</h3>
+                        <div class="vacas"></div>
+                    </div>
+                </div>
+
+                <div id="corral-modal" class="modal">
+                    <div class="modal-content">
+                        <span id="close-modal" class="close"><i class="fas fa-times"></i></span>
+                        <h2 id="corral-title">Detalles del Corral</h2>
+                        <div id="vacas-details">
+                            <!-- Los detalles de las vacas se mostrarán aquí -->
+                        </div>
+                    </div>
+                </div>
+                <div id="overlay"></div>
+            </div>
+        </div>
+        
+  <div class="chart-section">
+        <div class="health-status-chart-section">
+            <h2><i class="fas fa-heartbeat"></i> Estado de Salud de las Vacas</h2>
+            <canvas id="health-status-chart" width="600" height="300"></canvas>
+        </div>
+        <div class="bar-chart-section">
+            <h2><i class="fas fa-calendar-plus"></i> Cantidad de vacas ingresadas en los últimos 6 meses</h2>
+            <canvas id="bar-chart" width="400" height="200"></canvas>
+        </div>
+    </div>
+    
+    <!-- Botón para generar el reporte PDF -->
+<div class="pdf-report-section">
+    <!-- Botón para generar el reporte PDF -->
+<button id="generate-report-btn"><i class="fas fa-file-pdf"></i> Generar Reporte en PDF</button>
+</div>
+
+<!-- Contenedor para visualizar el PDF antes de descargarlo -->
+<div id="pdf-viewer" style="display:none;">
+    <embed id="pdf-embed" width="100%" height="500px" />
+</div>
+
+
+                
+<div class="chart-section">
+    <div class="hidden">
+        <canvas id="recuperacionChart"></canvas>
+        <div class="chart-title">Tasa de Recuperación de Enfermedades</div>
+    </div>
+    <div class="hidden">
+        <canvas id="eventosFechaChart"></canvas>
+        <div class="chart-title">Distribución de Eventos Médicos por Fecha</div>
+    </div>
+    <div class="hidden">
+        <canvas id="enfermedadesChart"></canvas>
+        <div class="chart-title">Porcentaje de Enfermedades Recurrentes</div>
+    </div>
+    <div class="hidden">
+        <canvas id="estadoSaludChart"></canvas>
+        <div class="chart-title">Porcentaje de Vacas por Estado de Salud</div>
+    </div>
+</div>
+
+</div>
+
+
+</div>
+
+    
+
+    <!-- Overlay para modales -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Modal de Iniciar sesión -->
+    <div id="login-form" class="modal">
+        <div class="modal-content">
+            <h2>Iniciar sesión</h2>
+            <form id="login-form-form">
+                <label for="username">Usuario</label>
+                <input type="text" id="login-username" name="username" required>
+                <label for="password">Contraseña</label>
+                <input type="password" id="login-password" name="password" required>
+                <button type="submit">Iniciar sesión</button>
+            </form>
+            <button class="close-button" onclick="closeModal('login-form')"><i class="fas fa-times"></i></button>
+            <p>¿No tienes cuenta? <span id="switch-to-create" onclick="switchToCreate()">Crea una aquí</span></p>
+        </div>
+    </div>
+
+    <!-- Modal de Crear cuenta -->
+    <div id="create-user-form" class="modal hidden">
+        <div class="modal-content">
+            <h2>Crear cuenta</h2>
+            <form id="create-user-form-form">
+                <label for="create-email">Correo electrónico</label>
+                <input type="email" id="create-email" required>
+                <label for="create-password">Contraseña</label>
+                <input type="password" id="create-password" required>
+                <label for="create-confirm-password">Confirmar contraseña</label>
+                <input type="password" id="create-confirm-password" required>
+                <button type="submit">Crear cuenta</button>
+            </form>
+            <button class="close-button" onclick="closeModal('create-user-form')"><i class="fas fa-times"></i></button>
+            <p>¿Ya tienes cuenta? <span id="switch-to-login" onclick="switchToLogin()">Inicia sesión aquí</span></p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="../scripts/scriptReportes.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    
+</body>
+</html>

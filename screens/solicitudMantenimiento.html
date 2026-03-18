@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud de Mantenimiento - Ganadería Inteligente</title>
+    <link rel="stylesheet" href="../styles/styleInventarios.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú"><i class="fas fa-bars"></i></button>
+        <div class="title" id="page-title">Solicitud de Mantenimiento</div>
+        <div class="user-info">
+            <span id="user-span">Iniciar sesión</span>
+            <div class="profile-circle" id="profile-icon"></div>
+            <div id="profile-menu" class="profile-menu">
+                <button id="perfil-btn" class="hidden">Información</button>
+                <button id="logout-btn" class="hidden">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="main-container">
+        <nav class="menu-container" id="nav-menu">
+            <button onclick="window.location.href='../index.html'";><i class="fas fa-home"></i>Inicio</button>
+            <button onclick="window.location.href='inventario.html';"><i class="fas fa-boxes-stacked"></i>Gestión de Inventario</button>
+            <button onclick="window.location.href='reportes.html';"><i class="fas fa-chart-line"></i>Reportes</button>
+            <button onclick="window.location.href='consulta.html';"><i class="fas fa-search"></i>Consulta</button>
+            <button onclick="window.location.href='historialMedico.html';"><i class="fas fa-file-medical"></i>Historial Medico</button>
+            <button onclick="window.location.href='Seguimiento.html';"><i class="fas fa-chart-bar"></i>Seguimiento</button>
+            <button onclick="window.location.href='inventarioMaquinaria.html';"><i class="fas fa-tractor"></i>Inventario Maquinaria</button>
+            <button onclick="window.location.href='calendario.html';"><i class="fas fa-calendar-alt"></i>Calendario</button>
+            <button onclick="window.location.href='planesMantenimiento.html';"><i class="fas fa-tools"></i>Planes de Mantenimiento</button>
+            <button class="active" onclick="window.location.href='solicitudMantenimiento.html';"><i class="fas fa-wrench"></i>Solicitar Mantenimiento</button>
+            <button id="btn-panel" onclick="window.location.href='panelAdministracion.html';" style="display: none;"><i class="fas fa-users-cog"></i>Panel de Administración</button>
+        </nav>
+
+        <div class="content" id="content">
+            <h2><i class="fas fa-exclamation-triangle"></i> Crear una Nueva Solicitud de Mantenimiento</h2>
+            <p>Si has detectado una falla en algún equipo, por favor, completa el siguiente formulario.</p>
+
+            <form id="solicitud-form" style="max-width: 700px; margin-top: 25px;">
+                <label for="maquina-select">Equipo / Maquinaria Afectada</label>
+                <select id="maquina-select" class="form-input" required>
+                    <option value="">Cargando equipos...</option>
+                </select>
+                
+                <label for="problema-descripcion">Descripción Detallada del Problema</label>
+                <textarea id="problema-descripcion" rows="6" class="form-input" placeholder="Ej: El motor no arranca, se escucha un ruido extraño en la transmisión, etc." required></textarea>
+                
+                <label for="solicitante-email">Tu Correo Electrónico (para seguimiento)</label>
+                <input type="email" id="solicitante-email" class="form-input" readonly>
+                <p style="font-size: 0.8em; color: #666; margin-top: -10px; margin-bottom: 20px;">Este campo se rellena automáticamente al iniciar sesión.</p>
+
+                <button type="submit" class="add-record-btn">
+                     <i class="fas fa-paper-plane"></i> Enviar Solicitud
+                </button>
+            </form>
+            
+            <div id="form-message" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module" src="../scripts/solicitudMantenimiento.js"></script>
+    <script type="module">
+        // --- NEW SCRIPT FOR UI AND AUTH ---
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+        const auth = getAuth();
+
+        const navToggle = document.getElementById('nav-toggle');
+        const navMenu = document.getElementById('nav-menu');
+        const content = document.getElementById('content');
+
+        navToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('show');
+            content.classList.toggle('menu-active');
+        });
+
+        const profileIcon = document.getElementById('profile-icon');
+        const profileMenu = document.getElementById('profile-menu');
+        const userSpan = document.getElementById('user-span');
+        const logoutBtn = document.getElementById('logout-btn');
+        const perfilBtn = document.getElementById('perfil-btn');
+        const adminPanelBtn = document.getElementById('btn-panel');
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                userSpan.textContent = user.email;
+                logoutBtn.classList.remove('hidden');
+                perfilBtn.classList.remove('hidden');
+                document.getElementById('solicitante-email').value = user.email; // Auto-fill email
+                user.getIdTokenResult().then(idTokenResult => {
+                    if (idTokenResult.claims.admin) {
+                        adminPanelBtn.style.display = 'block';
+                    }
+                });
+            } else {
+                userSpan.textContent = 'Iniciar Sesión';
+                logoutBtn.classList.add('hidden');
+                perfilBtn.classList.add('hidden');
+                document.getElementById('solicitante-email').value = '';
+            }
+        });
+
+        profileIcon.addEventListener('click', () => {
+            profileMenu.style.display = profileMenu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = '../index.html';
+            });
+        });
+    </script>
+</body>
+</html>

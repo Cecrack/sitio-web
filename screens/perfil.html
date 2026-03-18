@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario</title>
+    <link rel="stylesheet" href="../styles/perfil.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-user-circle"></i> Perfil de Usuario</h1>
+        <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</button>
+    </header>
+    <main>
+        <section id="profile-section">
+            <h2>Información del Usuario</h2>
+            <div id="profile-info">
+                <!-- Imagen de perfil -->
+                <img id="profile-pic" src="" alt="Foto de perfil" />
+                
+                <!-- Botón para cambiar la foto de perfil -->
+                <div id="change-pic">
+                    <h3><i class="fas fa-camera"></i> Cambiar Foto de Perfil</h3>
+                    <form id="change-pic-form">
+                        <label for="profile-pic-file">Seleccionar una imagen:</label>
+                        <input type="file" id="profile-pic-file" accept="image/*" required>
+                        <button type="submit"><i class="fas fa-upload"></i> Actualizar Foto</button>
+                    </form>
+                </div>
+
+                <!-- Mostrar correo electrónico -->
+                <p><strong><i class="fas fa-envelope"></i> Correo:</strong> <span id="user-email">user@example.com</span></p>
+            </div>
+
+            <!-- Sección para cambiar la contraseña -->
+            <div id="change-password">
+                <h3><i class="fas fa-key"></i> Cambiar Contraseña</h3>
+                <form id="change-password-form">
+                    <label for="current-password">Contraseña Actual:</label>
+                    <input type="password" id="current-password" required>
+                    
+                    <label for="new-password">Nueva Contraseña:</label>
+                    <input type="password" id="new-password" required>
+                    
+                    <button type="submit"><i class="fas fa-save"></i> Actualizar Contraseña</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    <script type="module" src="../scripts/perfil.js"></script> <!-- Ruta al archivo JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+</body>
+</html>

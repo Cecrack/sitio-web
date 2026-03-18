@@ -1,0 +1,354 @@
+/* Reseteo básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+/* Estilos del encabezado */
+.header {
+    background-color: #d7c7b3;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    font-size: 18px;
+    position: relative;
+    z-index: 1001;
+}
+
+.header .title {
+    font-weight: bold;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-style: italic;
+    position: relative;
+}
+
+.profile-circle {
+    width: 40px;
+    height: 40px;
+    background-color: #B17457;
+    border-radius: 50%;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.profile-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Menú de perfil desplegable */
+.profile-menu {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 200px;
+    z-index: 1010;
+    border: 1px solid #eee;
+}
+
+.profile-menu.active {
+    display: block;
+}
+
+.profile-menu button {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 16px;
+    background-color: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.profile-menu button:last-child {
+    border-bottom: none;
+}
+
+.profile-menu button:hover {
+    background-color: #f7f7f7;
+}
+
+/* Contenedor principal */
+.main-container {
+    display: flex;
+    height: calc(100vh - 60px);
+}
+
+/* Menú lateral */
+.menu-container {
+    background-color: #3e3e3e;
+    width: 250px;
+    min-height: 100%;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.menu-container button {
+    background-color: #c1815d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    margin: 10px 0;
+    width: 80%;
+    cursor: pointer;
+    text-align: center;
+}
+
+.menu-container button:hover {
+    background-color: #a56039;
+}
+
+.menu-container button.active {
+    background-color: #a56039;
+}
+
+/* Área de contenido */
+.content {
+    flex: 1;
+    background-color: #f9f9f9;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.content .logo {
+    width: 800px;
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.content h1 {
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.content h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #555;
+}
+
+/* === ESTILOS DE MODAL UNIFICADOS === */
+
+/* Fondo oscuro detrás del modal */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 998;
+}
+
+.overlay.active {
+    display: block;
+}
+
+/* Contenedor del Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 450px;
+    z-index: 999;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s forwards;
+}
+
+.modal.active {
+    display: block;
+}
+
+/* Contenido interno del modal */
+.modal-content {
+    padding: 30px;
+    position: relative;
+}
+
+/* Botón para cerrar el modal */
+.modal .close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #aaa;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.modal .close-button:hover {
+    color: #333;
+}
+
+/* Título del modal */
+.modal h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+/* Formulario del modal */
+.modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal label {
+    font-size: 14px;
+    color: #555;
+    font-weight: bold;
+    margin-bottom: -5px;
+}
+
+.modal input,
+.modal select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #333;
+    transition: border-color 0.3s ease;
+}
+
+.modal input:focus,
+.modal select:focus {
+    border-color: #B17457;
+    outline: none;
+}
+
+/* Contenedor para el campo de nombre de grupo */
+#group-name-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Botón de envío del formulario */
+.modal button[type="submit"] {
+    width: 100%;
+    padding: 12px 20px;
+    margin-top: 10px;
+    background-color: #B17457;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.modal button[type="submit"]:hover {
+    background-color: #a56039;
+}
+
+/* Párrafo y enlace para cambiar de modal */
+.modal p {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.link-button {
+    color: #B17457;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.link-button:hover {
+    text-decoration: underline;
+}
+
+/* === FIN DE ESTILOS DE MODAL === */
+
+.hidden {
+    display: none;
+}
+
+/* Estilos responsivos */
+.nav-toggle {
+    display: none;
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+}
+
+@media (max-width: 768px) {
+    .menu-container {
+        display: none;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        background: #3e3e3e;
+        z-index: 1000;
+    }
+
+    .menu-container.show {
+        display: flex;
+    }
+
+    .nav-toggle {
+        display: block;
+    }
+
+    .content {
+        padding: 20px;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

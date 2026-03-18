@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario de Mantenimiento - Ganadería Inteligente</title>
+    <link rel="stylesheet" href="../styles/styleInventarios.css"> 
+    <link rel="stylesheet" href="../styles/styleCalendario.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+    <!-- Encabezado superior -->
+    <div class="header">
+        <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú"><i class="fas fa-bars"></i></button>
+        <div class="title" id="page-title">Calendario de Mantenimiento</div>
+        <div class="user-info">
+            <span>Iniciar sesión</span>
+            <div class="profile-circle" id="profile-icon"></div>
+            <div id="profile-menu" class="profile-menu">
+                <button id="perfil-btn" class="hidden">Información</button>
+                <button id="logout-btn" class="hidden">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor principal -->
+    <div class="main-container">
+        <!-- Menú lateral -->
+        <nav class="menu-container" id="nav-menu">
+            <button id="btn-inventario" onclick="window.location.href='inventario.html';"><i class="fas fa-boxes-stacked"></i>Gestión de Inventario</button>
+            <button id="btn-reportes" onclick="window.location.href='reportes.html';"><i class="fas fa-chart-line"></i>Reportes</button>
+            <button id="btn-consulta" onclick="window.location.href='consulta.html';"><i class="fas fa-search"></i>Consulta</button>
+            <button id="btn-historialMedico" onclick="window.location.href='historialMedico.html';"><i class="fas fa-file-medical"></i>Historial Médico</button>
+            <button id="btn-Salidaa" onclick="window.location.href='Seguimiento.html';"><i class="fas fa-chart-bar"></i>Seguimiento</button>
+            <button id="btn-inventario-maquinaria" onclick="window.location.href='inventarioMaquinaria.html';"><i class="fas fa-tractor"></i>Inventario Maquinaria</button>
+            <button id="btn-calendario" class="active" onclick="window.location.href='calendario.html';"><i class="fas fa-calendar-alt"></i>Calendario</button>
+            <button id="btn-planes-mantenimiento" onclick="window.location.href='planesMantenimiento.html';"><i class="fas fa-tools"></i>Planes de Mantenimiento</button>
+            <button id="btn-panel" onclick="window.location.href='panelAdministracion.html';"><i class="fas fa-users-cog"></i>Panel de Administración</button>
+        </nav>
+
+        <!-- Área de contenido principal -->
+        <div class="content" id="content">
+            <div class="calendar-header">
+                <button id="prev-month-btn"><i class="fas fa-chevron-left"></i></button>
+                <h2 id="current-month-year"></h2>
+                <button id="next-month-btn"><i class="fas fa-chevron-right"></i></button>
+                <button id="create-event-btn"><i class="fas fa-plus"></i> Crear Evento</button>
+            </div>
+            <div class="calendar-grid" id="calendar-grid">
+                <div class="calendar-day-name">Dom</div>
+                <div class="calendar-day-name">Lun</div>
+                <div class="calendar-day-name">Mar</div>
+                <div class="calendar-day-name">Mié</div>
+                <div class="calendar-day-name">Jue</div>
+                <div class="calendar-day-name">Vie</div>
+                <div class="calendar-day-name">Sáb</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Modal para ver detalles del evento -->
+    <div class="modal" id="event-details-modal">
+        <div class="modal-header">
+            <h3>Detalles del Evento</h3>
+            <button class="modal-close" onclick="closeModal('event-details-modal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body" id="event-details-body">
+            <!-- El contenido se llenará dinámicamente -->
+        </div>
+        <div class="modal-footer">
+            <button id="edit-event-btn">Editar</button>
+            <button id="delete-event-btn">Eliminar</button>
+        </div>
+    </div>
+
+    <!-- Modal para crear evento -->
+    <div class="modal" id="create-event-modal">
+        <div class="modal-header">
+            <h3>Crear Nuevo Evento</h3>
+            <button class="modal-close" onclick="closeModal('create-event-modal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body event-creation-options">
+            <div class="option-card" id="btn-create-maquinaria">
+                <i class="fas fa-tractor fa-2x"></i>
+                <h4>Mantenimiento de Maquinaria</h4>
+                <p>Registrar un mantenimiento preventivo o correctivo.</p>
+            </div>
+            <div class="option-card" id="btn-create-animal">
+                <i class="fas fa-paw fa-2x"></i>
+                <h4>Evento de Animal</h4>
+                <p>Añadir un evento veterinario o de historial médico.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para el formulario de maquinaria -->
+    <div class="modal" id="form-maquinaria-modal">
+        <div class="modal-header">
+            <h3 id="maquinaria-modal-title">Crear Orden de Trabajo</h3>
+            <button class="modal-close" onclick="closeModal('form-maquinaria-modal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="form-maquinaria">
+                <input type="hidden" id="maquinaria-event-id">
+                <label for="maquinaria-equipo">Equipo:</label>
+                <select id="maquinaria-equipo" required></select>
+                <label for="maquinaria-tipo">Tipo:</label>
+                <select id="maquinaria-tipo">
+                    <option value="preventivo">Preventivo</option>
+                    <option value="correctivo">Correctivo</option>
+                </select>
+                <label for="maquinaria-fecha">Fecha:</label>
+                <input type="date" id="maquinaria-fecha" required>
+                <label for="maquinaria-responsable">Responsable:</label>
+                <input type="text" id="maquinaria-responsable" required>
+                <label for="maquinaria-descripcion">Descripción:</label>
+                <textarea id="maquinaria-descripcion"></textarea>
+                <label for="maquinaria-estado">Estado:</label>
+                <select id="maquinaria-estado" required>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="En Progreso">En Progreso</option>
+                    <option value="Completada">Completada</option>
+                </select>
+                <button type="submit">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para el formulario de animales -->
+    <div class="modal" id="form-animal-modal">
+        <div class="modal-header">
+            <h3 id="animal-modal-title">Crear Evento de Animal</h3>
+            <button class="modal-close" onclick="closeModal('form-animal-modal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="form-animal">
+                <input type="hidden" id="animal-event-id">
+                <label for="animal-id">Animal (ID/RFID):</label>
+                <select id="animal-id" required></select>
+                <label for="animal-evento">Tipo de Evento:</label>
+                <input type="text" id="animal-evento" required>
+                <label for="animal-fecha">Fecha:</label>
+                <input type="date" id="animal-fecha" required>
+                <label for="animal-veterinario">Veterinario:</label>
+                <input type="text" id="animal-veterinario" required>
+                <label for="animal-descripcion">Descripción:</label>
+                <textarea id="animal-descripcion"></textarea>
+                <button type="submit">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module" src="../firebaseConfig.js"></script>
+    <script type="module" src="../scripts/scriptCalendario.js"></script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+/* Estilos para el contenedor del calendario */
+.content {
+    padding: 20px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calendar-header h2 {
+    color: #333;
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+.calendar-header button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+.calendar-header button:hover {
+    background-color: #0056b3;
+}
+
+/* Cuadrícula del calendario */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.calendar-day-name {
+    font-weight: bold;
+    text-align: center;
+    padding: 10px 0;
+    color: #555;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+}
+
+.calendar-day {
+    min-height: 120px;
+    padding: 8px;
+    border: 1px solid #e9e9e9;
+    background-color: #fff;
+    position: relative;
+    transition: background-color 0.3s;
+}
+
+.calendar-day.other-month {
+    background-color: #f7f7f7;
+    color: #aaa;
+}
+
+.calendar-day .day-number {
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.calendar-day.today .day-number {
+    color: #007bff;
+    font-size: 1.1rem;
+}
+
+/* Estilos para los eventos en el calendario */
+.event {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: white;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.event:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 2;
+}
+
+.event .material-icons {
+    font-size: 16px;
+}
+
+/* Colores según el estado de la orden de trabajo */
+.event-pendiente {
+    background-color: #dc3545; /* Rojo */
+}
+
+.event-en-progreso {
+    background-color: #ffc107; /* Amarillo */
+    color: #333;
+}
+
+.event-completada {
+    background-color: #28a745; /* Verde */
+}
+
+/* Color para eventos de animales */
+.event-animal {
+    background-color: #17a2b8; /* Azul */
+}
+
+/* Color para planes de mantenimiento */
+.event-plan {
+    background-color: #6f42c1; /* Morado */
+}
+
+/* Estilos para el modal de detalles del evento */
+#event-details-modal .modal-body {
+    padding: 20px;
+}
+
+#event-details-body p {
+    margin: 10px 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #555;
+}
+
+#event-details-body p strong {
+    color: #333;
+    margin-right: 8px;
+}
+
+/* Estilos para las tarjetas de creación de eventos */
+.event-creation-options {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+.option-card {
+    flex: 1;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.option-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    border-color: #c1815d;
+}
+
+.option-card .material-icons {
+    font-size: 48px;
+    color: #c1815d;
+    margin-bottom: 10px;
+}
+
+.option-card h4 {
+    margin: 10px 0;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.option-card p {
+    font-size: 0.9rem;
+    color: #666;
+}

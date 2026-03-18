@@ -1,0 +1,731 @@
+/* Reseteo básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: auto;
+}
+
+/* Estilos del encabezado */
+.header {
+    background-color: #d7c7b3;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    font-size: 18px;
+}
+
+.header .title {
+    font-weight: bold;
+}
+
+.header .user-info {
+    font-size: 16px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center; /* Alinear verticalmente el texto y el círculo */
+    gap: 10px; /* Espacio entre el texto y el círculo */
+    font-size: 16px;
+    font-style: italic;
+}
+
+/* Estilos para el círculo del perfil */
+.profile-circle {
+    width: 30px; /* Tamaño del círculo */
+    height: 30px;
+    background-color: #B17457; /* Color inicial mientras no hay imagen */
+    border-radius: 50%;
+    cursor: pointer;
+    overflow: hidden; /* Para recortar imágenes que el usuario suba */
+    display: flex;
+    justify-content: center; /* Centrar contenido dentro del círculo */
+    align-items: center;
+}
+
+/* Estilos del perfil cuando se muestra la imagen */
+.profile-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ajustar la imagen para cubrir el círculo */
+    border-radius: 50%; /* Asegurarse de que siga siendo un círculo */
+}
+
+/* Contenedor principal */
+.main-container {
+    display: flex;
+}
+
+.content {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+.filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #f4f4f4;
+}
+
+.chart-section {
+    display: flex; /* Utiliza flexbox para alinear los gráficos */
+    flex-wrap: wrap; /* Permite que los gráficos pasen a una nueva fila si no caben */
+    gap: 20px; /* Espacio entre cada gráfico */
+    justify-content: center; /* Alinea los gráficos al centro */
+    margin: 20px 0; /* Espacio entre la sección de gráficos y otros elementos */
+}
+
+/* Estilo para las gráficas individuales */
+.chart-section > div {
+    flex: 1 1 calc(50% - 20px); /* Ocupan el 50% del ancho disponible */
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Centrar título y contenido */
+}
+
+/* Ajuste del canvas */
+.chart-section canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Responsividad para pantallas pequeñas */
+@media (max-width: 768px) {
+    .chart-section > div {
+        flex: 1 1 100%; /* Cada gráfica ocupa toda la fila en pantallas pequeñas */
+    }
+}
+
+
+/* Menú lateral izquierdo */
+.menu-container {
+    background-color: #3e3e3e;
+    width: 250px;
+    min-height: 100vh;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.menu-container button {
+    background-color: #c1815d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    margin: 10px 0;
+    width: 80%;
+    cursor: pointer;
+    text-align: center;
+}
+
+.menu-container button:hover {
+    background-color: #a56039;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.menu-container button.active {
+    background-color: #a56039;
+}
+
+/* Estilos para el menú de perfil desplegable */
+.profile-menu {
+    display: none;
+    position: absolute;
+    top: 60px; /* Ajusta la posición del menú debajo del perfil */
+    right: 20px;
+    background-color: #140202;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    width: 200px;
+    z-index: 10;
+}
+
+.profile-menu button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #f4f4f4;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+}
+
+.profile-menu button:last-child {
+    border-bottom: none;
+}
+
+.profile-menu button:hover {
+    background-color: #c4bcbc;
+}
+
+.profile-menu.active {
+    display: block;
+}
+
+/* Estilos para los modales (Iniciar sesión / Crear usuario) */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal h2 {
+    margin-bottom: 20px;
+}
+
+.modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal button {
+    margin-top: 10px;
+}
+
+/* Overlay con efecto suave de aparición */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6); /* Fondo semitransparente más oscuro */
+    z-index: 998;
+    transition: background 0.3s ease;
+}
+
+.overlay.active {
+    display: block;
+}
+
+/* Modal con diseño más moderno */
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centrado del modal */
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    width: 90%;
+    max-width: 500px; /* Controla el tamaño máximo */
+    z-index: 999;
+    opacity: 0;
+    animation: fadeIn 0.4s forwards; /* Animación de aparición */
+}
+
+/* Animación de aparición del modal */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal.active {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Título del modal */
+.modal h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Estilos del formulario dentro del modal */
+.modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal input, .modal select, .modal textarea {
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #333;
+    transition: border-color 0.3s ease;
+}
+
+.modal input:focus, .modal select:focus, .modal textarea:focus {
+    border-color: #B17457; /* Color de borde cuando se enfoca */
+    outline: none;
+}
+
+.modal button {
+    padding: 12px 20px;
+    background-color: #B17457;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    align-self: flex-end; /* Alinear el botón a la derecha */
+}
+
+.modal button:hover {
+    background-color: #a56039;
+}
+
+/* Estilos para el botón de cerrar */
+.modal .close-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 20px;
+    background: none;
+    border: none;
+    color: #333;
+    cursor: pointer;
+}
+
+.modal .close-button:hover {
+    color: #B17457;
+}
+
+/* Diseño general del formulario */
+.modal .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal label {
+    font-size: 16px;
+    color: #555;
+}
+
+/* Estilo del mensaje de error (si lo hubiera) */
+.modal .error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+#switch-to-create {
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+#switch-to-create:hover {
+    color: #0056b3;
+}
+
+.hidden {
+    display: none;
+}
+/* Añadir estos estilos básicos para modales, perfiles y el overlay */
+
+.profile-menu {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+}
+
+.profile-menu.active {
+    display: block;
+}
+
+.profile-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #b17457;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+}
+
+.overlay.active {
+    display: block;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+.modal.active {
+    display: block;
+}
+
+.close-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    border: none;
+    background: transparent;
+    font-size: 20px;
+    cursor: pointer;
+}
+.no-permission {
+    text-align: center;
+    padding: 2rem;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    margin: 2rem auto;
+    max-width: 600px;
+}
+.no-permission h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+.no-permission p {
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Estilo responsivo para pantallas pequeñas */
+@media (max-width: 768px) {
+    .menu-container {
+        display: none; /* Ocultar el menú por defecto */
+        position: absolute;
+        top: 60px;
+        left: 0;
+        background: #3e3e3e;
+        width: 100%;
+        padding: 10px 0;
+        flex-direction: column;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        z-index: 100;
+    }
+
+    .menu-container.show {
+        display: flex; /* Mostrar el menú cuando se activa */
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .nav-toggle {
+        font-size: 24px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #333;
+    }
+}
+
+/* Mostrar el botón hamburguesa solo en pantallas pequeñas */
+.nav-toggle {
+    display: none; /* Ocultar por defecto */
+}
+
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: block; /* Mostrar en pantallas pequeñas */
+        font-size: 24px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #333;
+    }
+}
+/* Estilo base para los corrales en pantallas grandes */
+.corrales-container {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.corral {
+    width: 150px;
+    height: 200px;
+    border: 2px solid #b17457;
+    border-radius: 10px;
+    background-color: #f5e6d7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px;
+}
+
+.corral h3 {
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+.vacas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    width: 100%;
+}
+
+.vaca {
+    width: 20px;
+    height: 20px;
+    background-color: #ff5733;
+    border-radius: 50%;
+}
+
+/* Estilos responsivos para pantallas pequeñas */
+@media (max-width: 768px) {
+    .corrales-container {
+        flex-direction: column;  /* Los corrales estarán en una columna en lugar de fila */
+        align-items: center;     /* Centrar los corrales */
+    }
+
+    .corral {
+        width: 120px;    /* Hacer los corrales más pequeños */
+        height: 160px;
+        margin-bottom: 15px;  /* Añadir espacio entre los corrales */
+    }
+
+    .vacas {
+        gap: 10px;   /* Aumentar el espacio entre las vacas */
+    }
+
+    .vaca {
+        width: 15px;  /* Reducir el tamaño de las vacas */
+        height: 15px;
+    }
+}
+
+/* Estilos para pantallas más pequeñas */
+@media (max-width: 480px) {
+    .corrales-container {
+        padding: 0 10px;  /* Añadir un poco de padding a los lados */
+    }
+
+    .corral {
+        width: 100px;   /* Ajustar el tamaño de los corrales */
+        height: 140px;
+    }
+
+    .vacas {
+        gap: 8px;    /* Menor espacio entre las vacas */
+    }
+
+    .vaca {
+        width: 12px;  /* Más pequeño aún */
+        height: 12px;
+    }
+
+    .corral h3 {
+        font-size: 14px;  /* Reducir el tamaño de la fuente para los títulos */
+    }
+}
+
+/* Estilos generales para el modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    z-index: 1001;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 80%; /* Ajusta el ancho del modal */
+    max-width: 900px; /* Máximo ancho */
+    height: auto; /* Altura dinámica basada en el contenido */
+    max-height: 90%; /* Altura máxima en caso de mucho contenido */
+    overflow-y: auto; /* Scroll vertical si el contenido supera el máximo */
+}
+
+/* Fondo del overlay */
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+#overlay.active {
+    display: block;
+}
+
+/* Contenedor de las vacas dentro del modal */
+#vacas-details {
+    display: flex; /* Activar flexbox */
+    flex-wrap: wrap; /* Permitir que los elementos se ajusten */
+    gap: 15px; /* Espaciado entre elementos */
+    justify-content: flex-start; /* Alinear al inicio */
+    padding: 10px; /* Margen interno para espacio */
+}
+
+/* Tarjetas individuales de vacas */
+.vaca-detail {
+    flex: 0 0 calc(33.333% - 10px); /* Una vaca ocupa un tercio del espacio */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    background: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 300px;
+    text-align: center;
+}
+
+/* Ajuste de la imagen dentro de cada tarjeta */
+.vaca-detail img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%; /* Hacer imágenes circulares */
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+/* Responsividad para pantallas medianas */
+@media (max-width: 768px) {
+    .vaca-detail {
+        flex: 0 0 calc(50% - 10px); /* Dos vacas por fila */
+    }
+}
+
+/* Responsividad para pantallas pequeñas */
+@media (max-width: 480px) {
+    .vaca-detail {
+        flex: 0 0 100%; /* Una vaca por fila */
+    }
+}
+/* Estilo para la sección del reporte PDF */
+.pdf-report-section {
+    margin: 20px;
+    text-align: center;
+}
+
+#pdf-viewer {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#pdf-embed {
+    border: 1px solid #ddd;
+}
+
+.chart-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Dos columnas */
+    gap: 20px; /* Espacio entre gráficas */
+    margin: 20px auto;
+    max-width: 1200px; /* Ancho máximo del contenedor */
+}
+
+.chart-container canvas {
+    width: 100%; /* Ajusta el ancho de las gráficas */
+    height: 250px; /* Altura fija */
+    border: 1px solid #ddd; /* Borde ligero para separarlas visualmente */
+    border-radius: 8px; /* Esquinas redondeadas */
+    background-color: #f9f9f9; /* Fondo claro */
+    padding: 10px; /* Espaciado interno */
+}
+
+.chart-title {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.chart-container canvas {
+    height: 400px; /* Reducir altura */
+}
+

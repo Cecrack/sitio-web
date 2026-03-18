@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Ganadería Inteligente</title>
+    <link rel="stylesheet" href="../styles/stylePanelAdministacion.css">
+    <!-- Añadida la librería de iconos Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+    <!-- Encabezado superior -->
+    <div class="header">
+        <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú">&#9776;</button>
+        <div class="title" id="page-title">Panel de Administración</div>
+        <div class="user-info">
+            <span></span>
+            <div class="profile-circle" id="profile-icon"></div>
+            <div id="profile-menu" class="profile-menu">
+                <button id="login-btn">Iniciar sesión</button>
+                <button id="create-user-btn">Crear cuenta</button>
+                <button id="perfil-btn" class="hidden">Información</button>
+                <button id="logout-btn" class="hidden">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor principal -->
+    <div class="main-container">
+       <!-- Menú lateral izquierdo con iconos -->
+        <nav class="menu-container" id="nav-menu">
+            <button id="btn-inicio" onclick="window.location.href='../index.html';"><i class="fas fa-home"></i><span>Inicio</span></button>
+            <button id="btn-inventario" onclick="window.location.href='inventario.html';"><i class="fas fa-boxes-stacked"></i><span>Gestión de Inventario</span></button>
+            <button id="btn-reportes" onclick="window.location.href='reportes.html';"><i class="fas fa-chart-line"></i><span>Reportes</span></button>
+            <button id="btn-consulta" onclick="window.location.href='consulta.html';"><i class="fas fa-search"></i><span>Consulta</span></button>
+            <button id="btn-historialMedico" onclick="window.location.href='historialMedico.html';"><i class="fas fa-file-medical"></i><span>Historial Médico</span></button>
+            <button id="btn-Salidaa" onclick="window.location.href='Seguimiento.html';"><i class="fas fa-truck"></i><span>Seguimiento</span></button>
+            <button id="btn-inventario-maquinaria" onclick="window.location.href='inventarioMaquinaria.html';"><i class="fas fa-tractor"></i><span>Inventario Maquinaria</span></button>
+            <button id="btn-calendario" onclick="window.location.href='calendario.html';"><i class="fas fa-calendar-alt"></i><span>Calendario</span></button>
+            <button id="btn-planes-mantenimiento" onclick="window.location.href='planesMantenimiento.html';"><i class="fas fa-tools"></i><span>Planes de Mantenimiento</span></button>
+            <button id="btn-panel" class="active" onclick="window.location.href='panelAdministracion.html';"><i class="fas fa-user-shield"></i><span>Panel de Administración</span></button>
+        </nav>
+
+        <div class="content" id="content">
+            <div id="admin-panel-content" class="hidden">
+                <h1>Administradores de Panel</h1>
+                <div id="admin-list">
+                    <table id="users-table">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Proveedor</th>
+                                <th>Fecha de creación</th>
+                                <th>Último acceso</th>
+                                <th>Grupo</th>
+                                <th>Roles</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Las filas se generan con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="access-denied" class="hidden">
+                <h1>Acceso Denegado</h1>
+                <p>No tienes los permisos necesarios para ver esta página.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales y Overlay -->
+    <div id="overlay" class="overlay"></div>
+    <div id="login-form" class="modal">...</div>
+    <div id="create-user-form-modal" class="modal hidden">...</div>
+ 
+    <script type="module" src="../scripts/scriptPA.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+</html>

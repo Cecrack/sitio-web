@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario de Maquinaria - Ganadería Inteligente</title>
+    <link rel="stylesheet" href="../styles/styleInventarios.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="../styles/styleInventarioMaquinaria.css">
+</head>
+<body>
+    <!-- Encabezado superior -->
+    <div class="header">
+        <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú"><i class="fas fa-bars"></i></button>
+        <div class="title" id="page-title">Inventario de Maquinaria</div>
+        <div class="user-info">
+            <span>Iniciar sesión</span>
+            <div class="profile-circle" id="profile-icon"></div>
+            <div id="profile-menu" class="profile-menu">
+                <button id="perfil-btn" class="hidden">Información</button>
+                <button id="logout-btn" class="hidden">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor principal -->
+    <div class="main-container">
+        <!-- Menú lateral -->
+        <nav class="menu-container" id="nav-menu">
+            <button id="btn-inicio" onclick="window.location.href='../index.html';"><i class="fas fa-home"></i>Inicio</button>
+            <button id="btn-inventario" onclick="window.location.href='inventario.html';"><i class="fas fa-boxes-stacked"></i>Gestión de Inventario</button>
+            <button id="btn-reportes" onclick="window.location.href='reportes.html';"><i class="fas fa-chart-line"></i>Reportes</button>
+            <button id="btn-consulta" onclick="window.location.href='consulta.html';"><i class="fas fa-search"></i>Consulta</button>
+            <button id="btn-historialMedico" onclick="window.location.href='historialMedico.html';"><i class="fas fa-file-medical"></i>Historial Médico</button>
+            <button id="btn-Salidaa" onclick="window.location.href='../screens/Seguimiento.html';"><i class="fas fa-chart-bar"></i>Seguimiento</button>
+            <button id="btn-inventario-maquinaria" class="active" onclick="window.location.href='inventarioMaquinaria.html';"><i class="fas fa-tractor"></i>Inventario Maquinaria</button>
+            <button id="btn-calendario" onclick="window.location.href='calendario.html';"><i class="fas fa-calendar-alt"></i>Calendario</button>
+            <button id="btn-planes-mantenimiento" onclick="window.location.href='planesMantenimiento.html';"><i class="fas fa-tools"></i>Planes de Mantenimiento</button>
+            <button id="btn-panel" onclick="window.location.href='panelAdministracion.html';"><i class="fas fa-users-cog"></i>Panel de Administración</button>
+        </nav>
+
+        <!-- Área de contenido principal -->
+        <div class="content" id="content">
+            <h2>Inventario de Equipos y Maquinaria</h2>
+            <div class="btn-add-record">
+                <button id="add-equipment-btn" class="add-record-btn">
+                    <i class="fas fa-plus-circle"></i> Agregar Equipo
+                </button>
+            </div>
+            <table class="history-table" id="equipment-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Fecha de Compra</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Datos de equipos -->
+                </tbody>
+            </table>
+
+            <h2 style="margin-top: 40px;">Órdenes de Trabajo</h2>
+            <div class="btn-add-record">
+                <button id="add-maintenance-btn" class="add-record-btn">
+                    <i class="fas fa-plus-circle"></i> Agregar Orden de Trabajo
+                </button>
+            </div>
+            <table class="history-table" id="maintenance-table">
+                <thead>
+                    <tr>
+                        <th>Equipo</th>
+                        <th>Tipo de Mantenimiento</th>
+                        <th>Fecha</th>
+                        <th>Descripción</th>
+                        <th>Responsable</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Datos de mantenimiento -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para agregar equipo -->
+    <div class="modal" id="modal-add-equipment">
+        <div class="modal-header">
+            <h3>Agregar Equipo</h3>
+            <button class="modal-close"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="add-equipment-form">
+                <label for="equipment-name">Nombre</label>
+                <input type="text" id="equipment-name" class="form-input" required>
+                <label for="equipment-description">Descripción</label>
+                <textarea id="equipment-description" class="form-input" required></textarea>
+                <label for="equipment-purchase-date">Fecha de Compra</label>
+                <input type="date" id="equipment-purchase-date" class="form-input" required>
+                <label for="equipment-status">Estado</label>
+                <select id="equipment-status" class="form-input" required>
+                    <option value="operativo">Operativo</option>
+                    <option value="en_mantenimiento">En Mantenimiento</option>
+                    <option value="fuera_de_servicio">Fuera de Servicio</option>
+                </select>
+                <button type="submit" class="add-record-btn">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para editar equipo -->
+    <div class="modal" id="modal-edit-equipment">
+        <div class="modal-header">
+            <h3>Editar Equipo</h3>
+            <button class="modal-close"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="edit-equipment-form">
+                <input type="hidden" id="edit-equipment-id">
+                <label for="edit-equipment-name">Nombre</label>
+                <input type="text" id="edit-equipment-name" class="form-input" required>
+                <label for="edit-equipment-description">Descripción</label>
+                <textarea id="edit-equipment-description" class="form-input" required></textarea>
+                <label for="edit-equipment-purchase-date">Fecha de Compra</label>
+                <input type="date" id="edit-equipment-purchase-date" class="form-input" required>
+                <label for="edit-equipment-status">Estado</label>
+                <select id="edit-equipment-status" class="form-input" required>
+                    <option value="operativo">Operativo</option>
+                    <option value="en_mantenimiento">En Mantenimiento</option>
+                    <option value="fuera_de_servicio">Fuera de Servicio</option>
+                </select>
+                <button type="submit" class="add-record-btn">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para agregar orden de trabajo -->
+    <div class="modal" id="modal-add-maintenance">
+        <div class="modal-header">
+            <h3>Agregar Orden de Trabajo</h3>
+            <button class="modal-close"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="add-maintenance-form">
+                <label for="maintenance-equipment">Equipo</label>
+                <select id="maintenance-equipment" class="form-input" required></select>
+                <label for="maintenance-type">Tipo de Mantenimiento</label>
+                <select id="maintenance-type" class="form-input" required>
+                    <option value="correctivo">Correctivo</option>
+                    <option value="preventivo">Preventivo</option>
+                </select>
+                <label for="maintenance-date">Fecha</label>
+                <input type="date" id="maintenance-date" class="form-input" required>
+                <label for="maintenance-description">Descripción</label>
+                <textarea id="maintenance-description" class="form-input" required></textarea>
+                <label for="maintenance-responsible">Responsable</label>
+                <input type="text" id="maintenance-responsible" class="form-input" required>
+                <label for="maintenance-status">Estado</label>
+                <select id="maintenance-status" class="form-input" required>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="en_progreso">En Progreso</option>
+                    <option value="completada">Completada</option>
+                </select>
+                <button type="submit" class="add-record-btn">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para editar orden de trabajo -->
+    <div class="modal" id="modal-edit-maintenance">
+        <div class="modal-header">
+            <h3>Editar Orden de Trabajo</h3>
+            <button class="modal-close"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="edit-maintenance-form">
+                <input type="hidden" id="edit-maintenance-id">
+                <label for="edit-maintenance-equipment">Equipo</label>
+                <select id="edit-maintenance-equipment" class="form-input" required></select>
+                <label for="edit-maintenance-type">Tipo de Mantenimiento</label>
+                <select id="edit-maintenance-type" class="form-input" required>
+                    <option value="correctivo">Correctivo</option>
+                    <option value="preventivo">Preventivo</option>
+                </select>
+                <label for="edit-maintenance-date">Fecha</label>
+                <input type="date" id="edit-maintenance-date" class="form-input" required>
+                <label for="edit-maintenance-description">Descripción</label>
+                <textarea id="edit-maintenance-description" class="form-input" required></textarea>
+                <label for="edit-maintenance-responsible">Responsable</label>
+                <input type="text" id="edit-maintenance-responsible" class="form-input" required>
+                <label for="edit-maintenance-status">Estado</label>
+                <select id="edit-maintenance-status" class="form-input" required>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="en_progreso">En Progreso</option>
+                    <option value="completada">Completada</option>
+                </select>
+                <button type="submit" class="add-record-btn">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module" src="../firebaseConfig.js"></script>
+    <script type="module" src="../scripts/scriptInventarioMaquinaria.js"></script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta - Ganadería Inteligente</title>
+    <link rel="stylesheet" href="../styles/styleConsulta.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+
+    <!-- Encabezado superior -->
+    <div class="header">
+        <!-- Botón hamburguesa para móviles -->
+        <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú"><i class="fas fa-bars"></i></button>
+
+        <div class="title" id="page-title">Consulta</div>
+        <div class="user-info">
+            <span>Iniciar sesión</span>
+            <div class="profile-circle" id="profile-icon">
+                <!-- El círculo del perfil -->
+            </div>
+            <div id="profile-menu" class="profile-menu">
+                <button id="perfil-btn" class="hidden">Información</button>
+                <button id="logout-btn" class="hidden">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contenedor principal -->
+    <div class="main-container">
+        <!-- Menú lateral izquierdo -->
+        <nav class="menu-container" id="nav-menu">
+            <button id="btn-inventario" onclick="window.location.href='inventario.html';"><i class="fas fa-boxes-stacked"></i>Gestión de Inventario</button>
+            <button id="btn-reportes" onclick="window.location.href='reportes.html';"><i class="fas fa-chart-line"></i>Reportes</button>
+            <button id="btn-consulta" class="active" onclick="window.location.href='consulta.html';"><i class="fas fa-search"></i>Consulta</button>
+            <button id="btn-historialMedico" onclick="window.location.href='historialMedico.html';"><i class="fas fa-file-medical"></i>Historial Médico</button>
+            <button id="btn-Salidaa" onclick="window.location.href='Seguimiento.html';"><i class="fas fa-chart-bar"></i>Seguimiento</button>
+            <button id="btn-inventario-maquinaria" onclick="window.location.href='inventarioMaquinaria.html';"><i class="fas fa-tractor"></i>Inventario Maquinaria</button>
+            <button id="btn-calendario" onclick="window.location.href='calendario.html';"><i class="fas fa-calendar-alt"></i>Calendario</button>
+            <button id="btn-planes-mantenimiento" onclick="window.location.href='planesMantenimiento.html';"><i class="fas fa-tools"></i>Planes de Mantenimiento</button>
+            <button id="btn-panel" onclick="window.location.href='panelAdministracion.html';"><i class="fas fa-users-cog"></i>Panel de Administración</button>
+        </nav>
+        
+        <!-- Contenedor del contenido -->
+        <div class="content" id="content">
+            <h1>Consulta de Registros de Vacas</h1>
+
+            <!-- Filtros (solo visibles en móvil) -->
+            <div class="filters-container" id="filters-container">
+                <label for="filter-rfid">RFID</label>
+                <input type="text" id="filter-rfid" class="filter-input" placeholder="Filtrar por RFID">
+
+                <label for="filter-raza">Raza</label>
+                <input type="text" id="filter-raza" class="filter-input" placeholder="Filtrar por Raza">
+
+                <label for="filter-estado-salud">Estado de Salud</label>
+                <select id="filter-estado-salud" class="filter-input">
+                    <option value="">Todos</option>
+                    <option value="Bueno">Bueno</option>
+                    <option value="Regular">Regular</option>
+                    <option value="Enfermo">Enfermo</option>
+                </select>
+
+                <label for="filter-ubicacion">Ubicación</label>
+                <input type="text" id="filter-ubicacion" class="filter-input" placeholder="Filtrar por Ubicación">
+            </div>
+
+            <div class="cards-container" id="cards-container">
+                <!-- Las tarjetas se cargarán dinámicamente aquí -->
+            </div>
+            
+        </div>
+    </div>
+
+    <div id="edit-vaca-modal" class="modal">
+        <div class="modal-content">
+            <h2>Editar Registro</h2>
+            <form id="edit-vaca-form">
+                <!-- Imagen de previsualización -->
+                <div class="image-preview">
+                    <img id="edit-image-preview" src="default-image.jpg" alt="Previsualización de la imagen" style="max-width: 100%; height: auto; border-radius: 5px;">
+                </div>
+
+                <label for="edit-id-interno">Identificador Interno</label>
+                <input type="text" id="edit-id-interno" readonly>
+    
+                <label for="edit-rfid">RFID</label>
+                <input type="text" id="edit-rfid">
+    
+                <label for="edit-raza">Raza</label>
+                <input type="text" id="edit-raza">
+    
+                <label for="edit-sexo">Sexo</label>
+                <input type="text" id="edit-sexo">
+    
+                <label for="edit-estado-salud">Estado de Salud</label>
+                <select id="edit-estado-salud">
+                    <option value="Bueno">Bueno</option>
+                    <option value="Regular">Regular</option>
+                    <option value="Enferma">Enferma</option>
+                </select>
+    
+                <label for="edit-estado-reproductivo">Estado Reproductivo</label>
+                <input type="text" id="edit-estado-reproductivo">
+    
+                <label for="edit-peso">Peso</label>
+                <input type="number" id="edit-peso">
+    
+                <label for="edit-ubicacion">Ubicación</label>
+                <input type="text" id="edit-ubicacion">
+    
+                <label for="edit-historial-vacunacion">Historial de Vacunación</label>
+                <textarea id="edit-historial-vacunacion"></textarea>
+    
+                <label for="edit-ultimo-parto">Último Parto</label>
+                <input type="date" id="edit-ultimo-parto">
+    
+                <label for="edit-ingreso">Fecha de Ingreso</label>
+                <input type="date" id="edit-ingreso">
+    
+                <label for="edit-desparasitacion">Fecha de Desparasitación</label>
+                <input type="date" id="edit-desparasitacion">
+    
+                <label for="edit-numero-crias">Número de Crías</label>
+                <input type="number" id="edit-numero-crias">
+    
+                <label for="edit-observaciones">Observaciones</label>
+                <textarea id="edit-observaciones"></textarea>
+    
+                <button type="submit">Guardar Cambios</button>
+            </form>
+            <button class="close-button" onclick="closeModal('edit-vaca-modal')">Cerrar</button>
+        </div>
+    </div>
+    
+
+    <!-- Overlay para modales -->
+    <div id="overlay" class="overlay"></div>
+    
+    <script type="module" src="../scripts/scriptConsultas.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- MQTT.js -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+</body>
+</html>

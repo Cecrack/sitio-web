@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Ganadería Inteligente</title>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<style>
+    /* Estilo para el menú desplegable */
+    .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 10px;
+            top: 50px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            z-index: 100;
+        }
+    /* Centrar el contenido */
+    .content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        min-height: 80vh; /* Asegura que el contenido ocupe gran parte de la pantalla */
+    }
+
+    /* Ajustar el tamaño de la imagen */
+    .content .logo {
+        width: 800px; /* Aumenta el tamaño de la imagen */
+        height: auto; /* Mantiene la proporción de la imagen */
+        margin-bottom: 20px; /* Espacio entre la imagen y el título */
+    }
+
+</style>
+<body>
+
+    <!-- Encabezado superior -->
+    <div class="header">
+        <!-- Botón hamburguesa para móviles -->
+        <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú">&#9776;</button>
+        <div class="title" id="page-title">Inicio</div>
+        <div class="user-info">
+            <span>Iniciar sesión</span>
+            <div class="profile-circle" id="profile-icon">
+                <!-- El círculo del perfil -->
+            </div>
+            <div id="profile-menu" class="profile-menu">
+                <!-- Botón para iniciar sesión -->
+                <button id="login-btn">Iniciar sesión</button>
+            
+                <!-- Botón para crear cuenta -->
+                <button id="create-user-btn">Crear cuenta</button>
+            
+                <!-- Botón para cerrar sesión (inicialmente oculto) -->
+                <button id="perfil-btn" class="hidden">Informacion</button>
+                <button id="logout-btn" class="hidden">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- Contenedor principal -->
+    <div class="main-container">
+    <!-- Menú lateral izquierdo -->
+    <nav class="menu-container" id="nav-menu">
+        <button id="btn-inicio" class="active" onclick="window.location.href='index.html';">Inicio</button>
+        <button id="btn-inventario"class="hidden"  onclick="window.location.href='screens/inventario.html';">Gestión de Inventario</button>
+        <button id="btn-reportes" class="hidden" onclick="window.location.href='screens/reportes.html';">Reportes</button>
+        <button id="btn-consulta" class="hidden" onclick="window.location.href='screens/consulta.html';">Consulta</button>
+        <button id="btn-historialMedico" class="hidden" onclick="window.location.href='screens/historialMedico.html';">Historial Medico</button>
+        <button id="btn-Salidaa" class="hidden" onclick="window.location.href='screens/Seguimiento.html';">Salida</button>
+        <button id="btn-inventario-maquinaria" class="hidden" onclick="window.location.href='screens/inventarioMaquinaria.html';">Inventario Maquinaria</button>
+        <button id="btn-calendario" class="hidden" onclick="window.location.href='screens/calendario.html';">Calendario</button>
+        <button id="btn-planes-mantenimiento" class="hidden" onclick="window.location.href='screens/planesMantenimiento.html';">Planes de Mantenimiento</button>
+        <button id="btn-panel" class="hidden" onclick="window.location.href='screens/panelAdministracion.html';">Panel de Administración</button>
+    </nav>
+
+        <!-- Área de contenido principal -->
+        <div class="content" id="content">
+            <h1>Bienvenido a Ganaderia Raulaje</h1>
+            <h3>Inicie sesión para empezar</h3>
+            <img src="images/ganaderiaRaulaje.png" alt="Logo de Ganadería Raulaje" class="logo">
+            
+        </div>
+
+    </div>
+
+    <!-- Overlay para modales -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Modal de Iniciar sesión -->
+    <div id="login-form" class="modal">
+        <div class="modal-content">
+            <h2>Iniciar sesión</h2>
+            <form id="login-form-form">
+                <label for="username">Usuario</label>
+                <input type="text" id="login-username" name="username" required>
+                <label for="password">Contraseña</label>
+                <input type="password" id="login-password" name="password" required>
+                <button type="submit">Iniciar sesión</button>
+            </form>
+            <button class="close-button">Cerrar</button>
+            <p>¿No tienes cuenta? <span id="switch-to-create" class="link-button">Crea una aquí</span></p>
+        </div>
+    </div>
+
+    <!-- Modal de Crear cuenta -->
+    <div id="create-user-form" class="modal">
+        <div class="modal-content">
+            <h2>Crear cuenta de Grupo</h2>
+            <form id="create-user-form-form">
+                <label for="create-email">Correo electrónico</label>
+                <input type="email" id="create-email" required>
+                <label for="create-password">Contraseña</label>
+                <input type="password" id="create-password" required>
+                <label for="create-confirm-password">Confirmar contraseña</label>
+                <input type="password" id="create-confirm-password" required>
+                
+                <div id="group-name-container">
+                    <label for="group-name">Nombre del Grupo</label>
+                    <input type="text" id="group-name" name="group-name" required>
+                </div>
+
+                <button type="submit">Crear cuenta</button>
+            </form>
+            <button class="close-button">Cerrar</button>
+            <p>¿Ya tienes cuenta? <span id="switch-to-login" class="link-button">Inicia sesión aquí</span></p>
+        </div>
+    </div>
+
+    <script type="module" src="scripts/scriptindex.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+</body>
+</html>

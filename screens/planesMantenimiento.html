@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Mantenimiento - Ganadería Inteligente</title>
+    <link rel="stylesheet" href="../styles/styleInventarios.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        .modal { display: none; position: fixed; z-index: 1001; left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); width: 90%; max-width: 500px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; }
+        .form-input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; }
+        .history-table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 30px; }
+        .history-table th, .history-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .history-table th { background-color: #f2f2f2; }
+        .history-table .action-btn { background: #B17457; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px; }
+        .history-table .action-btn.reject { background: #999; }
+        .history-table .action-btn:hover { opacity: 0.8; }
+        .icon-btn { background: none; border: none; cursor: pointer; color: #B17457; font-size: 18px; }
+        .icon-btn:hover { color: #8a5a44; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú"><i class="fas fa-bars"></i></button>
+        <div class="title" id="page-title">Gestión de Mantenimiento</div>
+        <div class="user-info">
+            <span id="user-span">Iniciar sesión</span>
+            <div class="profile-circle" id="profile-icon"></div>
+            <div id="profile-menu" class="profile-menu">
+                <button id="perfil-btn" class="hidden">Información</button>
+                <button id="logout-btn" class="hidden">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+    <div class="main-container">
+        <nav class="menu-container" id="nav-menu">
+            <button onclick="window.location.href='inventario.html';"><i class="fas fa-boxes-stacked"></i>Gestión de Inventario</button>
+            <button onclick="window.location.href='reportes.html';"><i class="fas fa-chart-line"></i>Reportes</button>
+            <button onclick="window.location.href='consulta.html';"><i class="fas fa-search"></i>Consulta</button>
+            <button onclick="window.location.href='historialMedico.html';"><i class="fas fa-file-medical"></i>Historial Medico</button>
+            <button onclick="window.location.href='Seguimiento.html';"><i class="fas fa-chart-bar"></i>Seguimiento</button>
+            <button onclick="window.location.href='inventarioMaquinaria.html';"><i class="fas fa-tractor"></i>Inventario Maquinaria</button>
+            <button onclick="window.location.href='calendario.html';"><i class="fas fa-calendar-alt"></i>Calendario</button>
+            <button onclick="window.location.href='solicitudMantenimiento.html';"><i class="fas fa-wrench"></i>Solicitar Mantenimiento</button>
+            <button class="active" onclick="window.location.href='planesMantenimiento.html';"><i class="fas fa-tools"></i>Gestión de Mantenimiento</button>
+            <button id="btn-panel" onclick="window.location.href='panelAdministracion.html';" style="display: none;"><i class="fas fa-users-cog"></i>Panel de Administración</button>
+        </nav>
+        <div class="content" id="content">
+            <!-- Sección de Solicitudes Pendientes -->
+            <h2>Solicitudes de Mantenimiento Pendientes</h2>
+            <table class="history-table" id="solicitudes-table"><thead><tr><th>Equipo</th><th>Descripción</th><th>Solicitante</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+
+            <!-- Sección de Órdenes de Trabajo -->
+            <h2>Historial de Órdenes de Trabajo</h2>
+            <div class="btn-add-record"><button id="add-order-btn" class="add-record-btn"><i class="fas fa-plus"></i> Crear Orden de Trabajo</button></div>
+            <table class="history-table" id="orders-table"><thead><tr><th>Equipo</th><th>Descripción/Tarea</th><th>Tipo</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+
+            <!-- Sección de Planes de Mantenimiento -->
+            <h2>Planes de Mantenimiento Preventivo</h2>
+            <div class="btn-add-record"><button id="add-plan-btn" class="add-record-btn"><i class="fas fa-plus"></i> Crear Plan Preventivo</button></div>
+            <table class="history-table" id="plans-table"><thead><tr><th>Equipo</th><th>Tarea</th><th>Frecuencia</th><th>Próximo Mant.</th><th>Estado</th><th>Acciones</th></tr></thead><tbody></tbody></table>
+        </div>
+    </div>
+
+    <!-- Modal Unificado -->
+    <div class="modal" id="modal-form"><div class="modal-header"><h3 id="modal-title">Formulario</h3><button class="modal-close"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="main-form"><input type="hidden" id="edit-id"><input type="hidden" id="form-type"><label for="form-equipment">Equipo</label><select id="form-equipment" class="form-input" required></select><label for="form-task">Tarea / Descripción</label><input type="text" id="form-task" class="form-input" required><div id="plan-fields" style="display:none;"><label for="plan-frequency">Frecuencia (días)</label><input type="number" id="plan-frequency" class="form-input"><label for="plan-next-date">Próximo Mantenimiento</label><input type="date" id="plan-next-date" class="form-input"></div><div id="order-fields" style="display:none;"><label for="order-type">Tipo de Mantenimiento</label><select id="order-type" class="form-input"><option value="Mantenimiento Preventivo">Preventivo</option><option value="Mantenimiento Correctivo">Correctivo</option></select></div><label for="form-status">Estado</label><select id="form-status" class="form-input" required></select><button type="submit" class="add-record-btn">Guardar</button></form></div></div>
+    <div class="overlay" id="overlay"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module">
+        import { db } from '/firebaseConfig.js';
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+        import { collection, getDocs, addDoc, doc, updateDoc, deleteDoc, getDoc, serverTimestamp, query, where, orderBy } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const auth = getAuth();
+            
+            // UI Elements
+            const navToggle = document.getElementById('nav-toggle');
+            const navMenu = document.getElementById('nav-menu');
+            const content = document.getElementById('content');
+            const profileIcon = document.getElementById('profile-icon');
+            const profileMenu = document.getElementById('profile-menu');
+            const userSpan = document.getElementById('user-span');
+            const logoutBtn = document.getElementById('logout-btn');
+            const perfilBtn = document.getElementById('perfil-btn');
+            const adminPanelBtn = document.getElementById('btn-panel');
+
+            // Modal & Form Elements
+            const modal = document.getElementById('modal-form');
+            const modalCloseBtn = modal.querySelector('.modal-close');
+            const overlay = document.getElementById('overlay');
+            const mainForm = document.getElementById('main-form');
+            const modalTitle = document.getElementById('modal-title');
+            const equipmentSelect = document.getElementById('form-equipment');
+            const editIdInput = document.getElementById('edit-id');
+            const formTypeInput = document.getElementById('form-type');
+            const taskInput = document.getElementById('form-task');
+            const statusInput = document.getElementById('form-status');
+
+            // Table Bodies
+            const solicitudesTableBody = document.querySelector('#solicitudes-table tbody');
+            const ordersTableBody = document.querySelector('#orders-table tbody');
+            const plansTableBody = document.querySelector('#plans-table tbody');
+
+            let equipmentMap = {};
+
+            // --- UI & AUTH LOGIC ---
+            navToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('show');
+                content.classList.toggle('menu-active');
+            });
+            profileIcon.addEventListener('click', () => profileMenu.style.display = profileMenu.style.display === 'block' ? 'none' : 'block');
+            logoutBtn.addEventListener('click', () => signOut(auth).then(() => window.location.href = '../index.html'));
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    userSpan.textContent = user.email;
+                    logoutBtn.classList.remove('hidden');
+                    perfilBtn.classList.remove('hidden');
+                    user.getIdTokenResult().then(idTokenResult => {
+                        const isAdmin = !!idTokenResult.claims.admin;
+                        if (isAdmin) {
+                            adminPanelBtn.style.display = 'block';
+                        } else {
+                            adminPanelBtn.style.display = 'none';
+                        }
+                        loadAllData(isAdmin);
+                    });
+                } else {
+                    userSpan.textContent = 'Iniciar Sesión';
+                    logoutBtn.classList.add('hidden');
+                    perfilBtn.classList.add('hidden');
+                    adminPanelBtn.style.display = 'none';
+                    content.innerHTML = '<h2>Inicia Sesión</h2><p>Debes iniciar sesión para ver el estado del mantenimiento.</p>';
+                }
+            });
+
+            // --- MODAL & FORM LOGIC ---
+            const openModal = () => { overlay.style.display = 'block'; modal.style.display = 'block'; };
+            const closeModal = () => { overlay.style.display = 'none'; modal.style.display = 'none'; mainForm.reset(); editIdInput.value = ''; };
+            modalCloseBtn.addEventListener('click', closeModal);
+            overlay.addEventListener('click', closeModal);
+            document.getElementById('add-order-btn').addEventListener('click', () => openForm('order'));
+            document.getElementById('add-plan-btn').addEventListener('click', () => openForm('plan'));
+
+            async function openForm(type, id = null) {
+                mainForm.reset();
+                editIdInput.value = id || '';
+                formTypeInput.value = type;
+                document.getElementById('plan-fields').style.display = 'none';
+                document.getElementById('order-fields').style.display = 'none';
+
+                if (type === 'plan') {
+                    modalTitle.textContent = id ? 'Editar Plan' : 'Crear Plan Preventivo';
+                    document.getElementById('plan-fields').style.display = 'block';
+                    statusInput.innerHTML = '<option value="Activo">Activo</option><option value="Inactivo">Inactivo</option>';
+                    if (id) {
+                        const planDoc = await getDoc(doc(db, 'planes_mantenimiento', id));
+                        if (planDoc.exists()) {
+                            const data = planDoc.data();
+                            equipmentSelect.value = data.equipoId;
+                            taskInput.value = data.tarea;
+                            document.getElementById('plan-frequency').value = data.frecuencia;
+                            document.getElementById('plan-next-date').value = data.proximoMantenimiento;
+                            statusInput.value = data.estado;
+                        }
+                    }
+                } else if (type === 'order') {
+                    modalTitle.textContent = id ? 'Editar Orden' : 'Crear Orden de Trabajo';
+                    document.getElementById('order-fields').style.display = 'block';
+                    statusInput.innerHTML = '<option value="Pendiente">Pendiente</option><option value="En Progreso">En Progreso</option><option value="Completada">Completada</option><option value="Cancelada">Cancelada</option>';
+                    if (id) {
+                        const orderDoc = await getDoc(doc(db, 'ordenes_trabajo', id));
+                        if (orderDoc.exists()) {
+                            const data = orderDoc.data();
+                            equipmentSelect.value = data.equipoId;
+                            taskInput.value = data.descripcion;
+                            document.getElementById('order-type').value = data.tipo;
+                            statusInput.value = data.estado;
+                        }
+                    }
+                }
+                openModal();
+            }
+            
+            // --- DATA LOADING --- 
+            const loadEquipment = async () => {
+                const q = collection(db, "maquinaria");
+                const querySnapshot = await getDocs(q);
+                equipmentMap = {};
+                equipmentSelect.innerHTML = '<option value="" disabled selected>Seleccione un equipo</option>';
+                querySnapshot.forEach((doc) => {
+                    const equipment = doc.data();
+                    equipmentMap[doc.id] = equipment.name;
+                    const option = document.createElement('option');
+                    option.value = doc.id;
+                    option.textContent = equipment.name;
+                    equipmentSelect.appendChild(option);
+                });
+            };
+
+            const renderTable = (tbody, data, renderRow) => {
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="100%">No hay registros para mostrar.</td></tr>`;
+                    return;
+                }
+                data.forEach(item => renderRow(tbody, item));
+            };
+
+            async function loadAllData(isAdmin) {
+                await loadEquipment(); // Load equipment first
+                const [solicitudes, ordenes, planes] = await Promise.all([
+                    getDocs(query(collection(db, "solicitudesMantenimiento"), where("estado", "==", "pendiente"))),
+                    getDocs(query(collection(db, "ordenes_trabajo"), orderBy("fechaCreacion", "desc"))),
+                    getDocs(collection(db, "planes_mantenimiento"))
+                ]);
+
+                renderTable(solicitudesTableBody, solicitudes.docs, (tbody, doc) => {
+                    const req = doc.data();
+                    const fecha = req.fecha ? new Date(req.fecha.seconds * 1000).toLocaleDateString() : 'N/A';
+                    const actions = isAdmin ? `<button class='action-btn approve-btn' data-id='${doc.id}'>Aprobar</button><button class='action-btn reject-btn reject' data-id='${doc.id}'>Rechazar</button>` : '';
+                    tbody.insertRow().innerHTML = `<td>${equipmentMap[req.maquinaId] || 'N/A'}</td><td>${req.descripcion}</td><td>${req.solicitanteEmail}</td><td>${fecha}</td><td>${actions}</td>`;
+                });
+
+                renderTable(ordersTableBody, ordenes.docs, (tbody, doc) => {
+                    const order = doc.data();
+                    const fecha = order.fechaCreacion ? new Date(order.fechaCreacion.seconds * 1000).toLocaleDateString() : 'N/A';
+                    const actions = isAdmin ? `<button class='icon-btn edit-order-btn' data-id='${doc.id}'><i class='fas fa-edit'></i></button><button class='icon-btn delete-order-btn' data-id='${doc.id}'><i class='fas fa-trash'></i></button>` : '';
+                    tbody.insertRow().innerHTML = `<td>${equipmentMap[order.equipoId] || 'N/A'}</td><td>${order.descripcion}</td><td>${order.tipo}</td><td>${order.estado}</td><td>${fecha}</td><td>${actions}</td>`;
+                });
+
+                renderTable(plansTableBody, planes.docs, (tbody, doc) => {
+                    const plan = doc.data();
+                    const actions = isAdmin ? `<button class='icon-btn edit-plan-btn' data-id='${doc.id}'><i class='fas fa-edit'></i></button><button class='icon-btn delete-plan-btn' data-id='${doc.id}'><i class='fas fa-trash'></i></button>` : '';
+                    tbody.insertRow().innerHTML = `<td>${equipmentMap[plan.equipoId] || 'N/A'}</td><td>${plan.tarea}</td><td>${plan.frecuencia} días</td><td>${plan.proximoMantenimiento}</td><td>${plan.estado}</td><td>${actions}</td>`;
+                });
+
+                if (!isAdmin) {
+                    document.getElementById('add-order-btn').style.display = 'none';
+                    document.getElementById('add-plan-btn').style.display = 'none';
+                }
+            }
+            
+            // --- EVENT LISTENERS (Submit, Clicks) ---
+            mainForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const id = editIdInput.value;
+                const type = formTypeInput.value;
+                const data = { equipoId: equipmentSelect.value, estado: statusInput.value };
+
+                if (type === 'plan') {
+                    data.tarea = taskInput.value;
+                    data.frecuencia = document.getElementById('plan-frequency').value;
+                    data.proximoMantenimiento = document.getElementById('plan-next-date').value;
+                    const collectionName = 'planes_mantenimiento';
+                    id ? await updateDoc(doc(db, collectionName, id), data) : await addDoc(collection(db, collectionName), data);
+                } else if (type === 'order') {
+                    data.descripcion = taskInput.value;
+                    data.tipo = document.getElementById('order-type').value;
+                    const collectionName = 'ordenes_trabajo';
+                     if (id) {
+                        await updateDoc(doc(db, collectionName, id), data);
+                    } else {
+                        data.fechaCreacion = serverTimestamp();
+                        await addDoc(collection(db, collectionName), data);
+                    }
+                }
+                Swal.fire('Éxito', 'Guardado correctamente', 'success');
+                closeModal();
+                loadAllData(true); // Assuming only admins can submit the form
+            });
+
+            solicitudesTableBody.addEventListener('click', async (e) => {
+                const target = e.target.closest('button');
+                if (!target) return;
+                const id = target.dataset.id;
+                if (!id) return;
+
+                if (target.classList.contains('approve-btn')) {
+                    const solDoc = await getDoc(doc(db, 'solicitudesMantenimiento', id));
+                    if (solDoc.exists()) {
+                        const { maquinaId, descripcion, solicitanteEmail } = solDoc.data();
+                        await addDoc(collection(db, 'ordenes_trabajo'), { equipoId: maquinaId, descripcion, tipo: 'Mantenimiento Correctivo', estado: 'Pendiente', solicitante: solicitanteEmail, fechaCreacion: serverTimestamp() });
+                        await updateDoc(solDoc.ref, { estado: 'aprobada' });
+                        Swal.fire('Aprobada', 'Se creó una orden de trabajo.', 'success');
+                        loadAllData(true);
+                    }
+                } else if (target.classList.contains('reject-btn')) {
+                    Swal.fire({ title: '¿Confirmas el rechazo?', icon: 'warning', showCancelButton: true }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            await updateDoc(doc(db, 'solicitudesMantenimiento', id), { estado: 'rechazada' });
+                            Swal.fire('Rechazada', 'La solicitud fue rechazada.', 'success');
+                            loadAllData(true);
+                        }
+                    });
+                }
+            });
+
+            const setupTableListeners = (tbody, editClass, deleteClass, type) => {
+                tbody.addEventListener('click', (e) => {
+                    const target = e.target.closest('button');
+                    if (!target) return;
+                    const id = target.dataset.id;
+                    if (!id) return;
+
+                    if (target.classList.contains(editClass)) openForm(type, id);
+                    else if (target.classList.contains(deleteClass)) {
+                        Swal.fire({ title: '¿Estás seguro?', text: '¡No podrás revertir esto!', icon: 'warning', showCancelButton: true}).then(async (result) => {
+                            if (result.isConfirmed) {
+                                const collectionName = type === 'plan' ? 'planes_mantenimiento' : 'ordenes_trabajo';
+                                await deleteDoc(doc(db, collectionName, id));
+                                Swal.fire('Eliminado', 'El registro ha sido eliminado.', 'success');
+                                loadAllData(true);
+                            }
+                        });
+                    }
+                });
+            };
+            setupTableListeners(plansTableBody, 'edit-plan-btn', 'delete-plan-btn', 'plan');
+            setupTableListeners(ordersTableBody, 'edit-order-btn', 'delete-order-btn', 'order');
+        });
+    </script>
+</body>
+</html>
